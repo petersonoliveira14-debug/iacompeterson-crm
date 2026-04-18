@@ -2,24 +2,33 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
+const ADMIN_USERNAME = "masteradmin01";
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL!;
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (username !== ADMIN_USERNAME) {
+      toast.error("Usuário não encontrado.");
+      return;
+    }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password });
       if (error) throw error;
       router.push("/admin/dashboard");
     } catch {
-      toast.error("E-mail ou senha incorretos.");
+      toast.error("Usuário ou senha incorretos.");
     } finally {
       setLoading(false);
     }
@@ -66,26 +75,38 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-base font-medium text-slate-700 mb-1.5">E-mail</label>
+              <label className="block text-base font-medium text-slate-700 mb-1.5">Usuário</label>
               <input
-                type="email"
+                type="text"
                 className="input-field"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="masteradmin01"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
                 required
               />
             </div>
             <div>
               <label className="block text-base font-medium text-slate-700 mb-1.5">Senha</label>
-              <input
-                type="password"
-                className="input-field"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="input-field pr-12"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
