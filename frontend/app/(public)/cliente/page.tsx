@@ -171,7 +171,7 @@ export default function ClienteFormPage() {
                 <br />
                 <span className="text-gold-600 font-medium">São só 5 minutos.</span>
               </p>
-              <button onClick={() => setStep(1)} className="btn-primary w-full text-base py-4">
+              <button onClick={() => { setTipoSolucao(null); setSubtipo(null); setStep(1); }} className="btn-primary w-full text-base py-4">
                 Começar →
               </button>
               <p className="text-sm text-slate-400 mt-4">Suas informações são confidenciais e seguras.</p>
