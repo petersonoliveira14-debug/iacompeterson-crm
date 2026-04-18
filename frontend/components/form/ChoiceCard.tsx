@@ -23,19 +23,19 @@ export function ChoiceCard({ emoji, label, description, selected, onClick }: Cho
       <span className="text-2xl flex-shrink-0 mt-0.5">{emoji}</span>
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "font-semibold text-sm",
-          selected ? "text-emerald-700" : "text-slate-800"
+          "font-semibold text-base",
+          selected ? "text-navy-800" : "text-slate-800"
         )}>
           {label}
         </p>
         {description && (
-          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{description}</p>
+          <p className="text-sm text-slate-500 mt-0.5 leading-relaxed">{description}</p>
         )}
       </div>
       <div className={cn(
         "w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 transition-all duration-200",
         selected
-          ? "bg-emerald-600 border-emerald-600"
+          ? "bg-gold-500 border-gold-500"
           : "border-slate-300"
       )}>
         {selected && (

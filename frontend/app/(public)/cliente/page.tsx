@@ -160,21 +160,21 @@ export default function ClienteFormPage() {
           {/* Step 0: Splash */}
           {step === 0 && (
             <div className="step-content text-center">
-              <div className="w-20 h-20 rounded-3xl bg-emerald-100 flex items-center justify-center text-4xl mx-auto mb-6">
+              <div className="w-20 h-20 rounded-3xl bg-gold-100 flex items-center justify-center text-4xl mx-auto mb-6">
                 🤖
               </div>
-              <h1 className="text-3xl text-slate-900 mb-3">
+              <h1 className="text-4xl text-slate-900 mb-3">
                 Vamos entender o seu negócio
               </h1>
-              <p className="text-slate-500 mb-8 leading-relaxed">
+              <p className="text-slate-500 mb-8 leading-relaxed text-lg">
                 Responda algumas perguntas rápidas para que eu possa preparar uma proposta personalizada para você.
                 <br />
-                <span className="text-emerald-600 font-medium">São só 5 minutos.</span>
+                <span className="text-gold-600 font-medium">São só 5 minutos.</span>
               </p>
               <button onClick={() => setStep(1)} className="btn-primary w-full text-base py-4">
                 Começar →
               </button>
-              <p className="text-xs text-slate-400 mt-4">Suas informações são confidenciais e seguras.</p>
+              <p className="text-sm text-slate-400 mt-4">Suas informações são confidenciais e seguras.</p>
             </div>
           )}
 
@@ -183,10 +183,10 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={1} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2 flex items-center gap-2">
-                <h2 className="text-2xl text-slate-900">O que você precisa?</h2>
+                <h2 className="text-3xl text-slate-900">O que você precisa?</h2>
                 <HintTooltip text="Não precisa ter certeza! Escolha o que mais se aproxima. Vamos te ajudar a descobrir a solução ideal." />
               </div>
-              <p className="text-slate-500 text-sm mb-6">Escolha o que melhor descreve o que você busca:</p>
+              <p className="text-slate-500 text-base mb-6">Escolha o que melhor descreve o que você busca:</p>
               <div className="space-y-3">
                 <ChoiceCard emoji="⚙️" label="#sistema" description="CRM, ERP, Estoque, Dashboard, Pipeline comercial..." selected={false} onClick={() => handleTipoSelect("sistema")} />
                 <ChoiceCard emoji="🤖" label="#atendimento automatizado" description="Bot no WhatsApp, Instagram DM, chat no site..." selected={false} onClick={() => handleTipoSelect("atendimento")} />
@@ -201,9 +201,9 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={1} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2 flex items-center gap-2">
-                <h2 className="text-2xl text-slate-900">Qual sistema você precisa?</h2>
+                <h2 className="text-3xl text-slate-900">Qual sistema você precisa?</h2>
               </div>
-              <p className="text-slate-500 text-sm mb-6">Selecione o tipo de sistema:</p>
+              <p className="text-slate-500 text-base mb-6">Selecione o tipo de sistema:</p>
               <div className="space-y-3">
                 <ChoiceCard emoji="📊" label="CRM" description="Gestão de clientes, leads e funil de vendas" selected={false} onClick={() => handleSubtipoSelect("crm")} />
                 <ChoiceCard emoji="🏭" label="ERP" description="Financeiro + estoque + pedidos integrados" selected={false} onClick={() => handleSubtipoSelect("erp")} />
@@ -222,10 +222,10 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={1} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2 flex items-center gap-2">
-                <h2 className="text-2xl text-slate-900">Em qual canal?</h2>
+                <h2 className="text-3xl text-slate-900">Em qual canal?</h2>
                 <HintTooltip text="É possível integrar todos os canais em um bot centralizado. Escolha o principal agora." />
               </div>
-              <p className="text-slate-500 text-sm mb-6">Onde você quer automatizar o atendimento?</p>
+              <p className="text-slate-500 text-base mb-6">Onde você quer automatizar o atendimento?</p>
               <div className="space-y-3">
                 <ChoiceCard emoji="💬" label="WhatsApp" description="Bot direto no WhatsApp da empresa" selected={false} onClick={() => handleSubtipoSelect("whatsapp")} />
                 <ChoiceCard emoji="📸" label="Instagram DM" description="Atendimento automático no Direct" selected={false} onClick={() => handleSubtipoSelect("instagram")} />
@@ -243,9 +243,9 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={1} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2">
-                <h2 className="text-2xl text-slate-900">Para que usaria o assistente?</h2>
+                <h2 className="text-3xl text-slate-900">Para que usaria o assistente?</h2>
               </div>
-              <p className="text-slate-500 text-sm mb-6">Escolha o principal uso:</p>
+              <p className="text-slate-500 text-base mb-6">Escolha o principal uso:</p>
               <div className="space-y-3">
                 <ChoiceCard emoji="📅" label="Agenda e tarefas" description="Organizar meu dia e compromissos" selected={false} onClick={() => handleSubtipoSelect("agenda")} />
                 <ChoiceCard emoji="📊" label="Análise de dados" description="Interpretar relatórios e métricas" selected={false} onClick={() => handleSubtipoSelect("analise")} />
@@ -263,35 +263,35 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={2} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2 flex items-center gap-2">
-                <h2 className="text-2xl text-slate-900">Sobre você</h2>
+                <h2 className="text-3xl text-slate-900">Sobre você</h2>
                 <HintTooltip text="Informações confidenciais, usadas apenas para personalizar sua proposta." />
               </div>
-              <p className="text-slate-500 text-sm mb-6">Vamos nos conhecer!</p>
+              <p className="text-slate-500 text-base mb-6">Vamos nos conhecer!</p>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Seu nome completo *</label>
+                  <label className="block text-base font-medium text-slate-700 mb-1.5">Seu nome completo *</label>
                   <input className="input-field" placeholder="Ex: João Silva" value={nomeContato} onChange={(e) => setNomeContato(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Nome da empresa</label>
+                  <label className="block text-base font-medium text-slate-700 mb-1.5">Nome da empresa</label>
                   <input className="input-field" placeholder="Ex: Clínica Saúde & Vida" value={nomeEmpresa} onChange={(e) => setNomeEmpresa(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp *</label>
+                  <label className="block text-base font-medium text-slate-700 mb-1.5">WhatsApp *</label>
                   <input className="input-field" placeholder="(11) 99999-9999" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Segmento de atuação *</label>
+                  <label className="block text-base font-medium text-slate-700 mb-2">Segmento de atuação *</label>
                   <div className="grid grid-cols-2 gap-2">
                     {SEGMENTOS.map((s) => (
                       <button
                         key={s.label}
                         type="button"
                         onClick={() => setSegmento(s.label)}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-base font-medium transition-all duration-200 ${
                           segmento === s.label
-                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            ? "border-gold-500 bg-gold-50 text-navy-800"
                             : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -321,13 +321,13 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={3} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2">
-                <h2 className="text-2xl text-slate-900">Como é hoje?</h2>
+                <h2 className="text-3xl text-slate-900">Como é hoje?</h2>
               </div>
-              <p className="text-slate-500 text-sm mb-6">Me conta sobre a situação atual da sua operação.</p>
+              <p className="text-slate-500 text-base mb-6">Me conta sobre a situação atual da sua operação.</p>
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Como gerencia clientes/pedidos hoje?</label>
+                  <label className="block text-base font-medium text-slate-700 mb-2">Como gerencia clientes/pedidos hoje?</label>
                   <div className="space-y-2">
                     {GESTAO_OPTIONS.map((o) => (
                       <ChoiceCard key={o.value} emoji={o.emoji} label={o.label} selected={gestaoHoje === o.value} onClick={() => setGestaoHoje(o.value)} />
@@ -337,7 +337,7 @@ export default function ClienteFormPage() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <label className="text-sm font-medium text-slate-700">Qual é sua maior dor operacional hoje?</label>
+                    <label className="text-base font-medium text-slate-700">Qual é sua maior dor operacional hoje?</label>
                     <HintTooltip text="Ex: 'Perco clientes por falta de follow-up' ou 'Minha equipe não registra nada no sistema'" />
                   </div>
                   <textarea
@@ -349,16 +349,16 @@ export default function ClienteFormPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Volume médio de atendimentos por dia:</label>
+                  <label className="block text-base font-medium text-slate-700 mb-2">Volume médio de atendimentos por dia:</label>
                   <div className="grid grid-cols-2 gap-2">
                     {VOLUME_OPTIONS.map((o) => (
                       <button
                         key={o.value}
                         type="button"
                         onClick={() => setVolume(o.value)}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-base font-medium transition-all duration-200 ${
                           volume === o.value
-                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            ? "border-gold-500 bg-gold-50 text-navy-800"
                             : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -382,14 +382,14 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={4} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2">
-                <h2 className="text-2xl text-slate-900">O que você espera?</h2>
+                <h2 className="text-3xl text-slate-900">O que você espera?</h2>
               </div>
-              <p className="text-slate-500 text-sm mb-6">Vamos alinhar expectativas.</p>
+              <p className="text-slate-500 text-base mb-6">Vamos alinhar expectativas.</p>
 
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <label className="text-sm font-medium text-slate-700">Qual resultado concreto você quer em 3 meses?</label>
+                    <label className="text-base font-medium text-slate-700">Qual resultado concreto você quer em 3 meses?</label>
                     <HintTooltip text="Seja específico! Ex: 'quero reduzir 50% do tempo no atendimento manual' ou 'quero um bot que qualifique meus leads automaticamente'" />
                   </div>
                   <textarea
@@ -401,16 +401,16 @@ export default function ClienteFormPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Em quanto tempo precisa disso funcionando?</label>
+                  <label className="block text-base font-medium text-slate-700 mb-2">Em quanto tempo precisa disso funcionando?</label>
                   <div className="grid grid-cols-2 gap-2">
                     {PRAZO_OPTIONS.map((o) => (
                       <button
                         key={o.value}
                         type="button"
                         onClick={() => setPrazo(o.value)}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-base font-medium transition-all duration-200 ${
                           prazo === o.value
-                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            ? "border-gold-500 bg-gold-50 text-navy-800"
                             : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -423,7 +423,7 @@ export default function ClienteFormPage() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <label className="text-sm font-medium text-slate-700">Faixa de investimento:</label>
+                    <label className="text-base font-medium text-slate-700">Faixa de investimento:</label>
                     <HintTooltip text="Sem julgamento — isso ajuda a calibrar a solução ideal para a sua realidade." />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -432,9 +432,9 @@ export default function ClienteFormPage() {
                         key={o.value}
                         type="button"
                         onClick={() => setInvestimento(o.value)}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
+                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-base font-medium transition-all duration-200 ${
                           investimento === o.value
-                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            ? "border-gold-500 bg-gold-50 text-navy-800"
                             : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -458,10 +458,10 @@ export default function ClienteFormPage() {
             <div className="step-content">
               <ProgressBar current={5} total={TOTAL_STEPS} />
               <div className="mt-6 mb-2 flex items-center gap-2">
-                <h2 className="text-2xl text-slate-900">Mais alguma coisa?</h2>
+                <h2 className="text-3xl text-slate-900">Mais alguma coisa?</h2>
                 <HintTooltip text="Conte sobre limitações, experiências ruins anteriores, integrações específicas ou qualquer detalhe único do seu negócio." />
               </div>
-              <p className="text-slate-500 text-sm mb-6">Opcional — mas pode fazer toda a diferença na proposta.</p>
+              <p className="text-slate-500 text-base mb-6">Opcional — mas pode fazer toda a diferença na proposta.</p>
 
               <textarea
                 className="input-field h-40 resize-none pt-3"
@@ -470,9 +470,9 @@ export default function ClienteFormPage() {
                 onChange={(e) => setObservacoes(e.target.value)}
               />
 
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mt-6">
-                <p className="text-sm text-emerald-800 font-medium">📋 Resumo do seu briefing:</p>
-                <ul className="text-xs text-emerald-700 mt-2 space-y-1">
+              <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mt-6">
+                <p className="text-base text-navy-800 font-medium">📋 Resumo do seu briefing:</p>
+                <ul className="text-sm text-slate-700 mt-2 space-y-1">
                   <li>• <strong>Tipo:</strong> {tipoSolucao} {subtipo ? `→ ${subtipo}` : ""}</li>
                   <li>• <strong>Empresa:</strong> {nomeEmpresa || nomeContato}</li>
                   <li>• <strong>Segmento:</strong> {segmento}</li>
@@ -491,7 +491,7 @@ export default function ClienteFormPage() {
                   {loading ? "Enviando..." : "Enviar briefing 🚀"}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-3 text-center">
+              <p className="text-sm text-slate-400 mt-3 text-center">
                 Ao enviar, você concorda que usaremos seus dados para preparar a proposta.
               </p>
             </div>
@@ -517,29 +517,29 @@ function SuccessScreen({ whatsapp, nome }: { whatsapp: string; nome: string }) {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ["#059669", "#0ea5e9", "#10b981", "#f59e0b"],
+        colors: ["#c9a84c", "#0f2044", "#d4a83e", "#163566"],
       });
     });
   }, []);
 
   return (
     <div className="step-content">
-      <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-4xl mx-auto mb-6">
+      <div className="w-20 h-20 rounded-full bg-gold-100 flex items-center justify-center text-4xl mx-auto mb-6">
         🎉
       </div>
-      <h2 className="text-3xl text-slate-900 mb-3">Briefing recebido!</h2>
-      <p className="text-slate-500 mb-6 leading-relaxed">
+      <h2 className="text-4xl text-slate-900 mb-3">Briefing recebido!</h2>
+      <p className="text-slate-500 mb-6 leading-relaxed text-lg">
         Obrigado, <strong>{nome.split(" ")[0]}</strong>! Vou analisar tudo com cuidado e preparar uma proposta personalizada para você.
       </p>
-      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-left">
-        <p className="text-sm font-semibold text-emerald-800 mb-2">📱 Próximos passos:</p>
-        <ol className="text-sm text-emerald-700 space-y-2">
+      <div className="bg-gold-50 border border-gold-200 rounded-xl p-5 text-left">
+        <p className="text-base font-semibold text-navy-800 mb-2">📱 Próximos passos:</p>
+        <ol className="text-base text-slate-700 space-y-2">
           <li>1. Analyso seu briefing nas próximas horas</li>
           <li>2. Em até <strong>48h</strong>, Peterson entra em contato</li>
           <li>3. Apresentamos o pré-projeto em uma reunião</li>
         </ol>
       </div>
-      <p className="text-sm text-slate-500 mt-6">
+      <p className="text-base text-slate-500 mt-6">
         Fique de olho no WhatsApp: <strong>{whatsapp}</strong>
       </p>
     </div>

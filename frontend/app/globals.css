@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --color-primary: #059669;
-  --color-brand-bg: #064e3b;
-  --color-secondary: #0ea5e9;
+  --color-primary: #c9a84c;
+  --color-brand-bg: #0f2044;
+  --color-secondary: #c9a84c;
   --color-surface: #f8fafc;
   --color-border: #e2e8f0;
   --color-text: #0f172a;
@@ -35,9 +35,9 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer components {
   .btn-primary {
-    @apply bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-600/20
-           transition-all duration-300 active:scale-[0.98] hover:bg-emerald-700
-           focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2;
+    @apply bg-navy-800 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-navy-800/20
+           transition-all duration-300 active:scale-[0.98] hover:bg-navy-900
+           focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-2;
   }
 
   .btn-secondary {
@@ -48,8 +48,8 @@ h1, h2, h3, h4, h5, h6 {
 
   .input-field {
     @apply w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900
-           placeholder:text-slate-400 text-sm font-medium
-           focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent
+           placeholder:text-slate-400 text-base font-medium
+           focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent
            transition-all duration-300;
   }
 
@@ -59,12 +59,12 @@ h1, h2, h3, h4, h5, h6 {
 
   .choice-card {
     @apply flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 bg-slate-50
-           cursor-pointer transition-all duration-200 hover:border-emerald-600 hover:bg-emerald-50
+           cursor-pointer transition-all duration-200 hover:border-gold-500 hover:bg-gold-50
            active:scale-[0.98];
   }
 
   .choice-card.selected {
-    @apply border-emerald-600 bg-emerald-50 shadow-md shadow-emerald-600/10;
+    @apply border-gold-500 bg-gold-50 shadow-md shadow-gold-500/10;
   }
 
   .step-content {

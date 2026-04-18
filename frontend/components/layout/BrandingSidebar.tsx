@@ -2,16 +2,16 @@ export function BrandingSidebar() {
   return (
     <div
       className="hidden lg:flex w-[60%] min-h-screen flex-col relative overflow-hidden"
-      style={{ background: "#064e3b" }}
+      style={{ background: "#0f2044" }}
     >
       {/* Abstract gradients */}
       <div
         className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "#059669" }}
+        style={{ background: "#c9a84c" }}
       />
       <div
         className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "#075985" }}
+        style={{ background: "#163566" }}
       />
 
       <div className="relative z-10 flex flex-col justify-center flex-1 px-12 py-16 max-w-[560px] mx-auto">
@@ -19,7 +19,7 @@ export function BrandingSidebar() {
         <div className="flex items-center gap-3 mb-10">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl font-bold"
-            style={{ background: "rgba(255,255,255,0.1)", backdropFilter: "blur(4px)" }}
+            style={{ background: "rgba(201,168,76,0.15)", backdropFilter: "blur(4px)", border: "1px solid rgba(201,168,76,0.25)" }}
           >
             🤖
           </div>
@@ -27,17 +27,17 @@ export function BrandingSidebar() {
             <p className="text-white font-bold text-lg leading-tight" style={{ fontFamily: "'General Sans', sans-serif" }}>
               IA com Peterson
             </p>
-            <p className="text-emerald-300 text-sm">Automação inteligente</p>
+            <p className="text-sm" style={{ color: "#c9a84c" }}>Automação inteligente</p>
           </div>
         </div>
 
         <h1
           className="text-white font-bold mb-4 leading-tight"
-          style={{ fontSize: "3.5rem", fontFamily: "'General Sans', sans-serif" }}
+          style={{ fontSize: "3.75rem", fontFamily: "'General Sans', sans-serif" }}
         >
           Transforme sua operação com IA
         </h1>
-        <p className="text-emerald-200 text-lg mb-10 leading-relaxed">
+        <p className="text-lg mb-10 leading-relaxed" style={{ color: "#d0def4" }}>
           Sistemas personalizados, bots de atendimento e automações que trabalham enquanto você dorme.
         </p>
 
@@ -56,7 +56,7 @@ export function BrandingSidebar() {
               <span className="text-xl flex-shrink-0">{item.icon}</span>
               <div>
                 <p className="text-white font-semibold text-sm">{item.title}</p>
-                <p className="text-emerald-300 text-xs">{item.desc}</p>
+                <p className="text-xs" style={{ color: "#c9a84c" }}>{item.desc}</p>
               </div>
             </div>
           ))}

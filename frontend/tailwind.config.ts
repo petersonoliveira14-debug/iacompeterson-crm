@@ -9,6 +9,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        navy: {
+          50: "#eff4fb",
+          100: "#d0def4",
+          200: "#a1bde8",
+          700: "#163566",
+          800: "#0f2044",
+          900: "#0b1a38",
+          950: "#07111f",
+        },
+        gold: {
+          50: "#fdf9ec",
+          100: "#faefc6",
+          200: "#f6e190",
+          400: "#d4a83e",
+          500: "#c9a84c",
+          600: "#b8943a",
+          700: "#9a7b2c",
+        },
         emerald: {
           brand: "#064e3b",
           primary: "#059669",
@@ -19,9 +37,6 @@ const config: Config = {
           700: "#047857",
           800: "#065f46",
           900: "#064e3b",
-        },
-        sky: {
-          accent: "#0ea5e9",
         },
         slate: {
           surface: "#f8fafc",
@@ -42,8 +57,9 @@ const config: Config = {
         xl: "20px",
       },
       boxShadow: {
+        navy: "0 10px 15px -3px rgb(15 32 68 / 0.25)",
+        gold: "0 10px 15px -3px rgb(201 168 76 / 0.2)",
         emerald: "0 10px 15px -3px rgb(5 150 105 / 0.2)",
-        sky: "0 10px 15px -3px rgb(14 165 233 / 0.2)",
       },
       keyframes: {
         "step-in": {
