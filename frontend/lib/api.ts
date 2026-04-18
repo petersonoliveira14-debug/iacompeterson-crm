@@ -46,7 +46,7 @@ export async function submitForm(data: FormData): Promise<{ id: string }> {
     .insert({ ...data, status: "formulario_recebido" })
     .select("id")
     .single();
-  if (error) throw new Error("Erro ao enviar formulário");
+  if (error) throw new Error(error.message);
   return { id: result.id };
 }
 
