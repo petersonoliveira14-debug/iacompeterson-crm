@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface DashboardMetrics {
   total_leads: number;
@@ -38,25 +39,27 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [recentes, setRecentes] = useState<ClienteRecente[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
 
-    const headers = { Authorization: `Bearer ${token}` };
-
-    Promise.all([
-      fetch(`${API_URL}/api/admin/metricas`, { headers }).then(r => r.json()),
-      fetch(`${API_URL}/api/admin/clientes?limit=8`, { headers }).then(r => r.json()),
-    ]).then(([m, c]) => {
-      setMetrics(m);
-      setRecentes(c.items || c);
-    }).catch(() => router.push("/admin/login"))
-      .finally(() => setLoading(false));
+      // Busca clientes direto do Supabase
+      supabase
+        .from("clientes")
+        .select("id, nome_contato, nome_empresa, tipo_solucao, status, created_at")
+        .order("created_at", { ascending: false })
+        .limit(8)
+        .then(({ data }) => {
+          setRecentes(data || []);
+          setLoading(false);
+        });
+    });
   }, [router]);
+
+  const total = recentes.length;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -78,17 +81,12 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* Métricas */}
+            {/* Métricas simples */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <MetricCard emoji="📥" label="Total de leads" value={metrics?.total_leads ?? 0} />
-              <MetricCard emoji="💼" label="Em negociação" value={metrics?.em_negociacao ?? 0} />
-              <MetricCard emoji="🔨" label="Em execução" value={metrics?.em_execucao ?? 0} />
-              <MetricCard
-                emoji="💰"
-                label="Receita no mês"
-                value={`R$ ${(metrics?.receita_mes ?? 0).toLocaleString("pt-BR")}`}
-                highlight
-              />
+              <MetricCard emoji="📥" label="Total de leads" value={total} />
+              <MetricCard emoji="💼" label="Em negociação" value={recentes.filter(c => ["formulario_recebido","prd_elaborado","prd_aprovado","proposta_enviada"].includes(c.status)).length} />
+              <MetricCard emoji="🔨" label="Em execução" value={recentes.filter(c => c.status === "em_execucao").length} />
+              <MetricCard emoji="✅" label="Entregues" value={recentes.filter(c => c.status === "entregue").length} highlight />
             </div>
 
             {/* Clientes recentes */}

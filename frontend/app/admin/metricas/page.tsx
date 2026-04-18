@@ -3,46 +3,61 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { supabase } from "@/lib/supabase";
 
 export default function MetricasPage() {
   const router = useRouter();
-  const [metrics, setMetrics] = useState<any>(null);
+  const [clientes, setClientes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
-    fetch(`${API_URL}/api/admin/metricas`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json()).then(setMetrics);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
+      supabase
+        .from("clientes")
+        .select("status, created_at")
+        .then(({ data }) => {
+          setClientes(data || []);
+          setLoading(false);
+        });
+    });
   }, [router]);
 
-  const cards = metrics ? [
-    { emoji: "📥", label: "Total de leads", value: metrics.total_leads },
-    { emoji: "💼", label: "Em negociação", value: metrics.em_negociacao },
-    { emoji: "🔨", label: "Em execução", value: metrics.em_execucao },
-    { emoji: "✅", label: "Entregues", value: metrics.entregues_mes },
-    { emoji: "💰", label: "Receita no mês", value: `R$ ${(metrics.receita_mes || 0).toLocaleString("pt-BR")}` },
-    { emoji: "📊", label: "Taxa de conversão", value: `${metrics.taxa_conversao || 0}%` },
-  ] : [];
+  const total = clientes.length;
+  const emNegociacao = clientes.filter(c => ["formulario_recebido","prd_elaborado","prd_aprovado","proposta_elaborada","proposta_enviada"].includes(c.status)).length;
+  const emExecucao = clientes.filter(c => c.status === "em_execucao").length;
+  const entregues = clientes.filter(c => c.status === "entregue").length;
+  const taxaConversao = total > 0 ? Math.round((entregues / total) * 100 * 10) / 10 : 0;
+
+  const cards = [
+    { emoji: "📥", label: "Total de leads", value: total },
+    { emoji: "💼", label: "Em negociação", value: emNegociacao },
+    { emoji: "🔨", label: "Em execução", value: emExecucao },
+    { emoji: "✅", label: "Entregues", value: entregues },
+    { emoji: "💰", label: "Receita no mês", value: "R$ —" },
+    { emoji: "📊", label: "Taxa de conversão", value: `${taxaConversao}%` },
+  ];
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       <main className="flex-1 p-8">
         <h1 className="text-3xl text-slate-900 mb-6">Métricas</h1>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {cards.map((c) => (
-            <div key={c.label} className="card p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">{c.emoji}</span>
-                <p className="text-sm font-medium text-slate-500">{c.label}</p>
+        {loading ? (
+          <p className="text-base text-slate-400">Carregando...</p>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {cards.map((c) => (
+              <div key={c.label} className="card p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">{c.emoji}</span>
+                  <p className="text-sm font-medium text-slate-500">{c.label}</p>
+                </div>
+                <p className="text-3xl font-bold text-slate-900" style={{ fontFamily: "'General Sans', sans-serif" }}>{c.value}</p>
               </div>
-              <p className="text-3xl font-bold text-slate-900" style={{ fontFamily: "'General Sans', sans-serif" }}>{c.value}</p>
-            </div>
-          ))}
-          {!metrics && <p className="text-base text-slate-400 col-span-3 text-center py-8">Carregando...</p>}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

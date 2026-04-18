@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/admin/Sidebar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { supabase } from "@/lib/supabase";
 
 const STAGES = [
   { value: "lead_captado", label: "Lead Captado", color: "bg-slate-100 border-slate-200" },
@@ -23,12 +22,18 @@ export default function PipelinePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
-    fetch(`${API_URL}/api/admin/clientes?limit=100`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(d => setClientes(d.items || d))
-      .finally(() => setLoading(false));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
+      supabase
+        .from("clientes")
+        .select("id, nome_contato, nome_empresa, status, segmento, faixa_investimento")
+        .order("created_at", { ascending: false })
+        .limit(200)
+        .then(({ data }) => {
+          setClientes(data || []);
+          setLoading(false);
+        });
+    });
   }, [router]);
 
   return (

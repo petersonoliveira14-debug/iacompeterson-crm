@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/admin/Sidebar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { supabase } from "@/lib/supabase";
 
 const STATUS_INFO: Record<string, { label: string; color: string }> = {
   lead_captado: { label: "Lead", color: "bg-slate-100 text-slate-600" },
@@ -34,13 +33,17 @@ export default function ClientesPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
-    fetch(`${API_URL}/api/admin/clientes`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(d => setClientes(d.items || d))
-      .catch(() => router.push("/admin/login"))
-      .finally(() => setLoading(false));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
+      supabase
+        .from("clientes")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          setClientes(data || []);
+          setLoading(false);
+        });
+    });
   }, [router]);
 
   const filtered = clientes.filter(c =>
@@ -56,7 +59,6 @@ export default function ClientesPage() {
             <h1 className="text-3xl text-slate-900">Clientes</h1>
             <p className="text-base text-slate-500 mt-0.5">{clientes.length} no total</p>
           </div>
-          <Link href="/admin/clientes/novo" className="btn-primary">+ Novo lead</Link>
         </div>
 
         <div className="card mb-4">
