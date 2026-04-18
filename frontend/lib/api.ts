@@ -1,3 +1,5 @@
+import { supabase } from "./supabase";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface FormData {
@@ -39,13 +41,13 @@ export interface PacoteProposta {
 }
 
 export async function submitForm(data: FormData): Promise<{ id: string }> {
-  const res = await fetch(`${API_URL}/api/clientes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  if (!res.ok) throw new Error("Erro ao enviar formulário");
-  return res.json();
+  const { data: result, error } = await supabase
+    .from("clientes")
+    .insert({ ...data, status: "formulario_recebido" })
+    .select("id")
+    .single();
+  if (error) throw new Error("Erro ao enviar formulário");
+  return { id: result.id };
 }
 
 export async function getProposta(token: string): Promise<Proposta> {
