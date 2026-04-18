@@ -37,22 +37,27 @@ export default function LoginPage() {
       {/* Branding */}
       <div
         className="hidden lg:flex w-[60%] min-h-screen flex-col relative overflow-hidden"
-        style={{ background: "#064e3b" }}
+        style={{ background: "#0f2044" }}
       >
-        <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#059669" }} />
-        <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#075985" }} />
+        <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#c9a84c" }} />
+        <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full opacity-20 blur-3xl" style={{ background: "#163566" }} />
         <div className="relative z-10 flex flex-col justify-center flex-1 px-12 max-w-[560px] mx-auto">
           <div className="flex items-center gap-3 mb-10">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl">🤖</div>
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+              style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.25)" }}
+            >
+              🤖
+            </div>
             <div>
               <p className="text-white font-bold text-lg" style={{ fontFamily: "'General Sans', sans-serif" }}>IA com Peterson</p>
-              <p className="text-emerald-300 text-sm">Painel Administrativo</p>
+              <p className="text-sm" style={{ color: "#c9a84c" }}>Painel Administrativo</p>
             </div>
           </div>
           <h2 className="text-white font-bold text-4xl mb-4" style={{ fontFamily: "'General Sans', sans-serif" }}>
             Bem-vindo de volta, Peterson
           </h2>
-          <p className="text-emerald-200 text-lg leading-relaxed">
+          <p className="text-lg leading-relaxed" style={{ color: "#d0def4" }}>
             Gerencie seus clientes, acompanhe o pipeline e construa propostas — tudo em um lugar.
           </p>
         </div>
@@ -63,12 +68,12 @@ export default function LoginPage() {
         <div className="w-full max-w-[448px] mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl text-slate-900 mb-2">Entrar</h1>
-            <p className="text-slate-500">Acesse o painel de gestão</p>
+            <p className="text-base text-slate-500">Acesse o painel de gestão</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">E-mail</label>
+              <label className="block text-base font-medium text-slate-700 mb-1.5">E-mail</label>
               <input
                 type="email"
                 className="input-field"
@@ -79,7 +84,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Senha</label>
+              <label className="block text-base font-medium text-slate-700 mb-1.5">Senha</label>
               <input
                 type="password"
                 className="input-field"

@@ -20,6 +20,10 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 17px;
+}
+
 body {
   font-family: 'Satoshi', 'Inter', sans-serif;
   color: var(--color-text);

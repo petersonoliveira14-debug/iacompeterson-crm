@@ -14,7 +14,7 @@ const STATUS_INFO: Record<string, { label: string; color: string }> = {
   formulario_recebido: { label: "Form. recebido", color: "bg-sky-100 text-sky-700" },
   prd_elaborado: { label: "PRD", color: "bg-purple-100 text-purple-700" },
   reuniao_1: { label: "Reunião 1", color: "bg-violet-100 text-violet-700" },
-  prd_aprovado: { label: "PRD ✓", color: "bg-emerald-100 text-emerald-700" },
+  prd_aprovado: { label: "PRD ✓", color: "bg-navy-100 text-navy-700" },
   proposta_elaborada: { label: "Proposta 📝", color: "bg-amber-100 text-amber-700" },
   proposta_enviada: { label: "Proposta 📤", color: "bg-orange-100 text-orange-700" },
   proposta_aceita: { label: "Aceito 🎉", color: "bg-green-100 text-green-700" },
@@ -53,8 +53,8 @@ export default function ClientesPage() {
       <main className="flex-1 p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl text-slate-900">Clientes</h1>
-            <p className="text-slate-500 text-sm mt-0.5">{clientes.length} no total</p>
+            <h1 className="text-3xl text-slate-900">Clientes</h1>
+            <p className="text-base text-slate-500 mt-0.5">{clientes.length} no total</p>
           </div>
           <Link href="/admin/clientes/novo" className="btn-primary">+ Novo lead</Link>
         </div>
@@ -70,10 +70,10 @@ export default function ClientesPage() {
           </div>
           <div className="divide-y divide-slate-100">
             {loading && (
-              <div className="p-8 text-center text-slate-400">Carregando...</div>
+              <div className="p-8 text-center text-base text-slate-400">Carregando...</div>
             )}
             {!loading && filtered.length === 0 && (
-              <div className="p-8 text-center text-slate-400">
+              <div className="p-8 text-center text-base text-slate-400">
                 {search ? "Nenhum resultado." : "Nenhum cliente ainda. Compartilhe o link do formulário!"}
               </div>
             )}
@@ -82,16 +82,16 @@ export default function ClientesPage() {
               return (
                 <Link key={c.id} href={`/admin/clientes/${c.id}`}
                   className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-xl flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-navy-100 flex items-center justify-center text-xl flex-shrink-0">
                     {TIPO_EMOJI[c.tipo_solucao] || "👤"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-slate-800 text-sm truncate">{c.nome_empresa || c.nome_contato}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{c.nome_empresa ? c.nome_contato + " · " : ""}{c.segmento} · {c.whatsapp}</p>
+                    <p className="font-semibold text-slate-800 text-base truncate">{c.nome_empresa || c.nome_contato}</p>
+                    <p className="text-sm text-slate-400 mt-0.5">{c.nome_empresa ? c.nome_contato + " · " : ""}{c.segmento} · {c.whatsapp}</p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${st.color}`}>{st.label}</span>
-                    <span className="text-xs text-slate-400 hidden md:block">
+                    <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${st.color}`}>{st.label}</span>
+                    <span className="text-sm text-slate-400 hidden md:block">
                       {new Date(c.created_at).toLocaleDateString("pt-BR")}
                     </span>
                     <span className="text-slate-300">›</span>

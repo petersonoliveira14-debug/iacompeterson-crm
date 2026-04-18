@@ -30,18 +30,18 @@ export default function MetricasPage() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       <main className="flex-1 p-8">
-        <h1 className="text-2xl text-slate-900 mb-6">Métricas</h1>
+        <h1 className="text-3xl text-slate-900 mb-6">Métricas</h1>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {cards.map((c) => (
             <div key={c.label} className="card p-6">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">{c.emoji}</span>
-                <p className="text-xs font-medium text-slate-500">{c.label}</p>
+                <p className="text-sm font-medium text-slate-500">{c.label}</p>
               </div>
-              <p className="text-2xl font-bold text-slate-900" style={{ fontFamily: "'General Sans', sans-serif" }}>{c.value}</p>
+              <p className="text-3xl font-bold text-slate-900" style={{ fontFamily: "'General Sans', sans-serif" }}>{c.value}</p>
             </div>
           ))}
-          {!metrics && <p className="text-slate-400 col-span-3 text-center py-8">Carregando...</p>}
+          {!metrics && <p className="text-base text-slate-400 col-span-3 text-center py-8">Carregando...</p>}
         </div>
       </main>
     </div>

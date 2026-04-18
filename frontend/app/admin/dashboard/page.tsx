@@ -29,7 +29,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   lead_captado: { label: "Lead", color: "bg-slate-100 text-slate-600" },
   formulario_recebido: { label: "Formulário", color: "bg-blue-100 text-blue-700" },
   prd_elaborado: { label: "PRD", color: "bg-purple-100 text-purple-700" },
-  prd_aprovado: { label: "PRD ✓", color: "bg-emerald-100 text-emerald-700" },
+  prd_aprovado: { label: "PRD ✓", color: "bg-navy-100 text-navy-700" },
   proposta_enviada: { label: "Proposta", color: "bg-amber-100 text-amber-700" },
   proposta_aceita: { label: "Aceito 🎉", color: "bg-green-100 text-green-700" },
   em_execucao: { label: "Em execução", color: "bg-sky-100 text-sky-700" },
@@ -63,8 +63,8 @@ export default function DashboardPage() {
       <Sidebar />
       <main className="flex-1 p-8">
         <div className="mb-8">
-          <h1 className="text-2xl text-slate-900">Dashboard</h1>
-          <p className="text-slate-500 text-sm mt-1">Visão geral do seu negócio</p>
+          <h1 className="text-3xl text-slate-900">Dashboard</h1>
+          <p className="text-base text-slate-500 mt-1">Visão geral do seu negócio</p>
         </div>
 
         {loading ? (
@@ -94,14 +94,14 @@ export default function DashboardPage() {
             {/* Clientes recentes */}
             <div className="card">
               <div className="flex items-center justify-between p-6 border-b border-slate-100">
-                <h2 className="font-bold text-slate-900">Últimos clientes</h2>
-                <Link href="/admin/clientes" className="text-sm text-emerald-600 hover:underline font-medium">
+                <h2 className="font-bold text-slate-900 text-lg">Últimos clientes</h2>
+                <Link href="/admin/clientes" className="text-base text-gold-600 hover:underline font-medium">
                   Ver todos →
                 </Link>
               </div>
               <div className="divide-y divide-slate-100">
                 {recentes.length === 0 && (
-                  <p className="p-6 text-slate-400 text-sm text-center">Nenhum cliente ainda. Compartilhe o link do formulário!</p>
+                  <p className="p-6 text-slate-400 text-base text-center">Nenhum cliente ainda. Compartilhe o link do formulário!</p>
                 )}
                 {recentes.map((c) => {
                   const st = STATUS_LABELS[c.status] || { label: c.status, color: "bg-slate-100 text-slate-600" };
@@ -112,16 +112,16 @@ export default function DashboardPage() {
                       className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition-colors"
                     >
                       <div>
-                        <p className="font-medium text-slate-800 text-sm">{c.nome_empresa || c.nome_contato}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="font-medium text-slate-800 text-base">{c.nome_empresa || c.nome_contato}</p>
+                        <p className="text-sm text-slate-400 mt-0.5">
                           {c.nome_empresa ? c.nome_contato + " · " : ""}{c.tipo_solucao}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${st.color}`}>
+                        <span className={`text-sm font-medium px-2.5 py-1 rounded-full ${st.color}`}>
                           {st.label}
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-sm text-slate-400">
                           {new Date(c.created_at).toLocaleDateString("pt-BR")}
                         </span>
                       </div>
@@ -132,10 +132,10 @@ export default function DashboardPage() {
             </div>
 
             {/* Link rápido formulário */}
-            <div className="mt-6 p-5 rounded-2xl border-2 border-dashed border-emerald-200 bg-emerald-50/50">
-              <p className="text-sm font-semibold text-emerald-800 mb-1">🔗 Link do formulário para clientes:</p>
+            <div className="mt-6 p-5 rounded-2xl border-2 border-dashed border-gold-200 bg-gold-50/50">
+              <p className="text-base font-semibold text-navy-800 mb-1">🔗 Link do formulário para clientes:</p>
               <div className="flex items-center gap-3">
-                <code className="text-sm text-emerald-700 bg-white border border-emerald-200 rounded-lg px-3 py-1.5 flex-1 overflow-x-auto">
+                <code className="text-base text-navy-800 bg-white border border-gold-200 rounded-lg px-3 py-1.5 flex-1 overflow-x-auto">
                   {typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/cliente
                 </code>
                 <button
@@ -162,12 +162,12 @@ function MetricCard({ emoji, label, value, highlight }: {
   highlight?: boolean;
 }) {
   return (
-    <div className={`card p-6 ${highlight ? "border-emerald-200 bg-emerald-50/50" : ""}`}>
+    <div className={`card p-6 ${highlight ? "border-gold-200 bg-gold-50/50" : ""}`}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{emoji}</span>
-        <p className="text-xs font-medium text-slate-500">{label}</p>
+        <p className="text-sm font-medium text-slate-500">{label}</p>
       </div>
-      <p className={`text-2xl font-bold ${highlight ? "text-emerald-600" : "text-slate-900"}`}
+      <p className={`text-2xl font-bold ${highlight ? "text-gold-600" : "text-slate-900"}`}
         style={{ fontFamily: "'General Sans', sans-serif" }}>
         {value}
       </p>
