@@ -140,8 +140,8 @@ export default function ClienteFormPage() {
       await submitForm(payload);
       localStorage.removeItem(STORAGE_KEY);
       setStep(TOTAL_STEPS);
-    } catch {
-      toast.error("Erro ao enviar. Tente novamente.");
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao enviar. Tente novamente.", { duration: 6000 });
     } finally {
       setLoading(false);
     }
