@@ -32,7 +32,6 @@ export default function PRDPage() {
             setDocId(data[0].id);
           }
         });
-    });
   }, [id, router]);
 
   const save = async (status: string) => {

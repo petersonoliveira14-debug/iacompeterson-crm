@@ -19,7 +19,6 @@ export default function MetricasPage() {
           setClientes(data || []);
           setLoading(false);
         });
-    });
   }, [router]);
 
   const total = clientes.length;

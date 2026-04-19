@@ -32,7 +32,6 @@ export default function PipelinePage() {
           setClientes(data || []);
           setLoading(false);
         });
-    });
   }, [router]);
 
   return (

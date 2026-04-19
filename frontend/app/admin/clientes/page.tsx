@@ -42,7 +42,6 @@ export default function ClientesPage() {
           setClientes(data || []);
           setLoading(false);
         });
-    });
   }, [router]);
 
   const filtered = clientes.filter(c =>

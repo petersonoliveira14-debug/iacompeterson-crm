@@ -33,9 +33,7 @@ export default function PropostaBuilderPage() {
   const [createdToken, setCreatedToken] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); }
-    });
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); }
   }, [router]);
 
   const updatePacote = (i: number, field: keyof Pacote, value: string | boolean) => {
