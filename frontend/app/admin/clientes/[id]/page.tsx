@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/admin/Sidebar";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 const PIPELINE_STAGES = [
   { value: "lead_captado", label: "Lead Captado" },
@@ -45,28 +45,42 @@ export default function ClienteDetailPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
-    fetch(`${API_URL}/api/admin/clientes/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then(setCliente)
-      .catch(() => router.push("/admin/clientes"))
-      .finally(() => setLoading(false));
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
+      supabase
+        .from("clientes")
+        .select("*")
+        .eq("id", id)
+        .single()
+        .then(({ data, error }) => {
+          if (error || !data) { router.push("/admin/clientes"); return; }
+          setCliente(data);
+          setLoading(false);
+        });
+    });
   }, [id, router]);
 
   const updateStatus = async (newStatus: string) => {
-    const token = localStorage.getItem("admin_token")!;
     setUpdatingStatus(true);
-    await fetch(`${API_URL}/api/admin/clientes/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ status: newStatus }),
-    });
-    setCliente((c: any) => ({ ...c, status: newStatus }));
+    const { error } = await supabase
+      .from("clientes")
+      .update({ status: newStatus })
+      .eq("id", id);
+    if (error) {
+      toast.error("Erro ao atualizar status.");
+    } else {
+      setCliente((c: any) => ({ ...c, status: newStatus }));
+      toast.success("Status atualizado!");
+    }
     setUpdatingStatus(false);
   };
 
-  if (loading) return <div className="flex min-h-screen bg-slate-50"><Sidebar /><div className="flex-1 flex items-center justify-center text-slate-400">Carregando...</div></div>;
+  if (loading) return (
+    <div className="flex min-h-screen bg-slate-50">
+      <Sidebar />
+      <div className="flex-1 flex items-center justify-center text-slate-400">Carregando...</div>
+    </div>
+  );
 
   if (!cliente) return null;
 
@@ -83,7 +97,10 @@ export default function ClienteDetailPage() {
         <div className="flex items-start justify-between mb-6">
           <div>
             <h1 className="text-2xl text-slate-900">{cliente.nome_empresa || cliente.nome_contato}</h1>
-            <p className="text-slate-500 text-sm mt-1">{cliente.nome_empresa ? `${cliente.nome_contato} · ` : ""}{cliente.segmento} · {cliente.whatsapp}</p>
+            <p className="text-slate-500 text-sm mt-1">
+              {cliente.nome_empresa ? `${cliente.nome_contato} · ` : ""}
+              {cliente.segmento} · {cliente.whatsapp}
+            </p>
           </div>
           <div className="flex gap-2">
             <Link href={`/admin/clientes/${id}/proposta`} className="btn-primary text-sm py-2">+ Criar proposta</Link>
@@ -128,15 +145,15 @@ export default function ClienteDetailPage() {
 
         {/* Ações rápidas */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <Link href={`/admin/clientes/${id}/prd`} className="card p-4 hover:border-emerald-200 transition-colors text-center">
+          <Link href={`/admin/clientes/${id}/prd`} className="card p-4 hover:border-gold-400 transition-colors text-center">
             <p className="text-2xl mb-1">📄</p>
             <p className="text-sm font-medium text-slate-700">PRD</p>
           </Link>
-          <Link href={`/admin/clientes/${id}/proposta`} className="card p-4 hover:border-emerald-200 transition-colors text-center">
+          <Link href={`/admin/clientes/${id}/proposta`} className="card p-4 hover:border-gold-400 transition-colors text-center">
             <p className="text-2xl mb-1">💰</p>
             <p className="text-sm font-medium text-slate-700">Proposta</p>
           </Link>
-          <Link href={`/admin/clientes/${id}/prompt`} className="card p-4 hover:border-emerald-200 transition-colors text-center">
+          <Link href={`/admin/clientes/${id}/prompt`} className="card p-4 hover:border-gold-400 transition-colors text-center">
             <p className="text-2xl mb-1">🤖</p>
             <p className="text-sm font-medium text-slate-700">Prompt</p>
           </Link>

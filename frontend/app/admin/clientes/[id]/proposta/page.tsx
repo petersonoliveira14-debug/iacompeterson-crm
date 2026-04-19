@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/admin/Sidebar";
+import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface Pacote {
   nome: string;
@@ -33,14 +32,17 @@ export default function PropostaBuilderPage() {
   const [saving, setSaving] = useState(false);
   const [createdToken, setCreatedToken] = useState<string | null>(null);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); }
+    });
+  }, [router]);
+
   const updatePacote = (i: number, field: keyof Pacote, value: string | boolean) => {
     setPacotes(prev => prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
-
     const validPacotes = pacotes.filter(p => p.nome && p.valor && p.prazo_dias);
     if (validPacotes.length === 0) {
       toast.error("Preencha ao menos um pacote com nome, valor e prazo.");
@@ -49,39 +51,55 @@ export default function PropostaBuilderPage() {
 
     setSaving(true);
     try {
-      const res = await fetch(`${API_URL}/api/admin/clientes/${id}/propostas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
+      // Gerar token único para a proposta
+      const token = Array.from(crypto.getRandomValues(new Uint8Array(12)))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      // Criar a proposta
+      const { data: proposta, error: propostaError } = await supabase
+        .from("propostas")
+        .insert({
+          cliente_id: id,
+          token,
           validade_ate: validade || null,
-          pacotes: validPacotes.map(p => ({
+          status: "rascunho",
+        })
+        .select("id, token")
+        .single();
+
+      if (propostaError || !proposta) throw propostaError || new Error("Erro ao criar proposta");
+
+      // Inserir os pacotes
+      const { error: pacotesError } = await supabase
+        .from("proposta_pacotes")
+        .insert(
+          validPacotes.map(p => ({
+            proposta_id: proposta.id,
             nome: p.nome,
             descricao: p.descricao || null,
             itens: p.itens.split("\n").filter(Boolean),
             valor: parseFloat(p.valor.replace(",", ".")),
             prazo_dias: parseInt(p.prazo_dias),
             destaque: p.destaque,
-          })),
-        }),
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setCreatedToken(data.token);
-      toast.success("Proposta criada!");
-    } catch {
-      toast.error("Erro ao criar proposta.");
+          }))
+        );
+
+      if (pacotesError) throw pacotesError;
+
+      // Atualizar status do cliente
+      await supabase
+        .from("clientes")
+        .update({ status: "proposta_elaborada" })
+        .eq("id", id);
+
+      setCreatedToken(proposta.token);
+      toast.success("Proposta criada com sucesso!");
+    } catch (err: any) {
+      toast.error(err?.message || "Erro ao criar proposta.");
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleEnviar = async (propostaId: string) => {
-    const token = localStorage.getItem("admin_token")!;
-    await fetch(`${API_URL}/api/admin/propostas/${propostaId}/enviar`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    toast.success("Proposta marcada como enviada!");
   };
 
   const propostaLink = createdToken
@@ -109,10 +127,10 @@ export default function PropostaBuilderPage() {
               <h2 className="text-xl font-bold text-slate-900">Proposta criada!</h2>
               <p className="text-slate-500 text-sm mt-1">Copie o link e envie para o cliente pelo WhatsApp</p>
             </div>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4">
-              <p className="text-xs font-semibold text-emerald-800 mb-2">🔗 Link da proposta:</p>
+            <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mb-4">
+              <p className="text-xs font-semibold text-navy-800 mb-2">🔗 Link da proposta:</p>
               <div className="flex gap-2">
-                <code className="text-sm text-emerald-700 flex-1 overflow-x-auto">{propostaLink}</code>
+                <code className="text-sm text-navy-800 flex-1 overflow-x-auto break-all">{propostaLink}</code>
                 <button
                   onClick={() => { navigator.clipboard.writeText(propostaLink!); toast.success("Copiado!"); }}
                   className="btn-primary py-1.5 px-3 text-xs flex-shrink-0"
@@ -121,9 +139,17 @@ export default function PropostaBuilderPage() {
                 </button>
               </div>
             </div>
-            <p className="text-xs text-slate-400 text-center">
-              O link fica disponível até você marcar como &quot;enviada&quot; e o cliente assinar.
-            </p>
+            <div className="flex gap-2 justify-center">
+              <Link href={`/admin/clientes/${id}`} className="btn-secondary text-sm py-2">
+                ← Voltar ao cliente
+              </Link>
+              <button
+                onClick={() => { setCreatedToken(null); setPacotes([{ ...defaultPacote(), nome: "Essencial" }, { ...defaultPacote(), nome: "Profissional", destaque: true }, { ...defaultPacote(), nome: "Premium" }]); }}
+                className="btn-secondary text-sm py-2"
+              >
+                + Nova proposta
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -134,13 +160,13 @@ export default function PropostaBuilderPage() {
 
             <div className="space-y-4 mb-6">
               {pacotes.map((p, i) => (
-                <div key={i} className={`card p-5 ${p.destaque ? "border-emerald-300" : ""}`}>
+                <div key={i} className={`card p-5 ${p.destaque ? "border-gold-300" : ""}`}>
                   <div className="flex items-center gap-2 mb-4">
                     <h3 className="font-bold text-slate-800">Pacote {i + 1}</h3>
                     <label className="flex items-center gap-1.5 text-xs text-slate-500 ml-auto cursor-pointer">
                       <input type="checkbox" checked={p.destaque}
                         onChange={e => updatePacote(i, "destaque", e.target.checked)}
-                        className="accent-emerald-600" />
+                        className="accent-gold-500" />
                       Destaque (⭐ Mais escolhido)
                     </label>
                   </div>

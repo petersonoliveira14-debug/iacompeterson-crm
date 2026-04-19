@@ -4,37 +4,70 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sidebar } from "@/components/admin/Sidebar";
+import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function PRDPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [conteudo, setConteudo] = useState("");
   const [versao, setVersao] = useState(1);
+  const [docId, setDocId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push("/admin/login"); return; }
+      // Carregar PRD existente (última versão)
+      supabase
+        .from("documentos")
+        .select("id, conteudo, versao")
+        .eq("cliente_id", id)
+        .eq("tipo", "prd")
+        .order("versao", { ascending: false })
+        .limit(1)
+        .then(({ data }) => {
+          if (data && data.length > 0) {
+            setConteudo(data[0].conteudo);
+            setVersao(data[0].versao);
+            setDocId(data[0].id);
+          }
+        });
+    });
+  }, [id, router]);
+
   const save = async (status: string) => {
-    const token = localStorage.getItem("admin_token");
-    if (!token) { router.push("/admin/login"); return; }
     setSaving(true);
     try {
-      await fetch(`${API_URL}/api/admin/clientes/${id}/documentos`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ tipo: "prd", versao, conteudo, status }),
-      });
-      toast.success(status === "aprovado" ? "PRD aprovado!" : "PRD salvo!");
+      if (docId) {
+        // Atualizar documento existente
+        const { error } = await supabase
+          .from("documentos")
+          .update({ conteudo, status, versao })
+          .eq("id", docId);
+        if (error) throw error;
+      } else {
+        // Criar novo documento
+        const { data, error } = await supabase
+          .from("documentos")
+          .insert({ cliente_id: id, tipo: "prd", versao, conteudo, status })
+          .select("id")
+          .single();
+        if (error) throw error;
+        setDocId(data.id);
+      }
+
       if (status === "aprovado") {
-        await fetch(`${API_URL}/api/admin/clientes/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ status: "prd_aprovado" }),
-        });
+        await supabase
+          .from("clientes")
+          .update({ status: "prd_aprovado" })
+          .eq("id", id);
+        toast.success("PRD aprovado! Cliente avançado para PRD Aprovado.");
+      } else {
+        toast.success("PRD salvo como rascunho.");
       }
     } catch {
-      toast.error("Erro ao salvar.");
+      toast.error("Erro ao salvar PRD.");
     } finally {
       setSaving(false);
     }
@@ -55,8 +88,12 @@ export default function PRDPage() {
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl text-slate-900">Editor de PRD</h1>
           <div className="flex gap-2">
-            <button onClick={() => save("rascunho")} disabled={saving} className="btn-secondary text-sm py-2">Salvar rascunho</button>
-            <button onClick={() => save("aprovado")} disabled={saving} className="btn-primary text-sm py-2">✅ Aprovar PRD</button>
+            <button onClick={() => save("rascunho")} disabled={saving} className="btn-secondary text-sm py-2">
+              Salvar rascunho
+            </button>
+            <button onClick={() => save("aprovado")} disabled={saving} className="btn-primary text-sm py-2">
+              ✅ Aprovar PRD
+            </button>
           </div>
         </div>
 
@@ -68,7 +105,9 @@ export default function PRDPage() {
             onChange={e => setConteudo(e.target.value)}
           />
         </div>
-        <p className="text-xs text-slate-400 mt-2 text-center">Use Markdown. Cole o template de _TEMPLATES/prd-template.md como base.</p>
+        <p className="text-xs text-slate-400 mt-2 text-center">
+          Use Markdown. Cole o template de _TEMPLATES/prd-template.md como base.
+        </p>
       </main>
     </div>
   );
