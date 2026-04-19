@@ -16,9 +16,8 @@ export default function PRDPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-      // Carregar PRD existente (última versão)
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    // Carregar PRD existente (última versão)
       supabase
         .from("documentos")
         .select("id, conteudo, versao")

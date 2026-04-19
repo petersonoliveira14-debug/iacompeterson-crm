@@ -11,9 +11,8 @@ export default function MetricasPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-      supabase
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    supabase
         .from("clientes")
         .select("status, created_at")
         .then(({ data }) => {

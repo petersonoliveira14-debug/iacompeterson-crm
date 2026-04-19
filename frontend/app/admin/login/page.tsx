@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 const ADMIN_USERNAME = "masteradmin01";
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL!;
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD!;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,18 +17,13 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username !== ADMIN_USERNAME) {
-      toast.error("Usuário não encontrado.");
-      return;
-    }
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password });
-      if (error) throw error;
+    await new Promise(r => setTimeout(r, 400));
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      localStorage.setItem("admin_session", "authenticated");
       router.push("/admin/dashboard");
-    } catch {
+    } else {
       toast.error("Usuário ou senha incorretos.");
-    } finally {
       setLoading(false);
     }
   };

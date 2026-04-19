@@ -45,9 +45,8 @@ export default function ClienteDetailPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-      supabase
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    supabase
         .from("clientes")
         .select("*")
         .eq("id", id)
@@ -57,7 +56,6 @@ export default function ClienteDetailPage() {
           setCliente(data);
           setLoading(false);
         });
-    });
   }, [id, router]);
 
   const updateStatus = async (newStatus: string) => {

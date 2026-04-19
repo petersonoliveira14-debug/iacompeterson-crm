@@ -33,9 +33,8 @@ export default function ClientesPage() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-      supabase
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    supabase
         .from("clientes")
         .select("*")
         .order("created_at", { ascending: false })

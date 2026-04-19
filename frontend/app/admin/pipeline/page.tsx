@@ -22,9 +22,8 @@ export default function PipelinePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-      supabase
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    supabase
         .from("clientes")
         .select("id, nome_contato, nome_empresa, status, segmento, faixa_investimento")
         .order("created_at", { ascending: false })

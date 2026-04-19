@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
 
 const NAV_ITEMS = [
   { href: "/admin/dashboard", emoji: "📊", label: "Dashboard" },
@@ -17,8 +16,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem("admin_session");
     router.push("/admin/login");
   };
 

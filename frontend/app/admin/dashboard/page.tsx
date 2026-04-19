@@ -43,20 +43,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) { router.push("/admin/login"); return; }
-
-      // Busca clientes direto do Supabase
-      supabase
-        .from("clientes")
-        .select("id, nome_contato, nome_empresa, tipo_solucao, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(8)
-        .then(({ data }) => {
-          setRecentes(data || []);
-          setLoading(false);
-        });
-    });
+    if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    supabase
+      .from("clientes")
+      .select("id, nome_contato, nome_empresa, tipo_solucao, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8)
+      .then(({ data }) => {
+        setRecentes(data || []);
+        setLoading(false);
+      });
   }, [router]);
 
   const total = recentes.length;
