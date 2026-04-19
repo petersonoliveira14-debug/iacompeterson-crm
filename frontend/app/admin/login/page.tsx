@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
-const ADMIN_USERNAME = "masteradmin01";
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Peterson2024";
-
 export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -18,9 +15,11 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      localStorage.setItem("admin_session", "authenticated");
+    await new Promise(r => setTimeout(r, 300));
+    const u = username.trim().toLowerCase();
+    const p = password.trim();
+    if (u === "masteradmin01" && p === "peterson2024") {
+      localStorage.setItem("admin_session", "ok");
       router.push("/admin/dashboard");
     } else {
       toast.error("Usuário ou senha incorretos.");
