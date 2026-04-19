@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ADMIN_USERNAME = "masteradmin01";
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD!;
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "Peterson2024";
 
 export default function LoginPage() {
   const router = useRouter();
