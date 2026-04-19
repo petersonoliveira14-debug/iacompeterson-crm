@@ -8,14 +8,26 @@ export interface FormData {
   whatsapp: string;
   segmento: string;
   tipo_solucao: string;
-  subtipo?: string;
+  tipos_solucao?: string[];
+  segmento_outro?: string;
+  cnpj?: string;
+  cpf?: string;
+  porte_empresa?: string;
+  faturamento_mensal?: string;
+  tempo_empresa?: string;
   como_gerencia_hoje?: string;
-  maior_dor?: string;
+  dores_b2b?: string[];
+  dor_outra?: string;
   volume_atendimentos?: string;
+  budget_mensal?: string;
   resultado_esperado?: string;
   prazo_desejado?: string;
   faixa_investimento?: string;
-  observacoes?: string;
+  diferencial?: string;
+  icp?: string;
+  canal_aquisicao?: string;
+  experiencia_tech?: string;
+  restricoes?: string;
 }
 
 export interface Proposta {
