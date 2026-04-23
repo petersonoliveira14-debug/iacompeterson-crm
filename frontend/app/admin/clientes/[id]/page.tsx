@@ -72,7 +72,7 @@ const VOLUME_LABELS: Record<string, string> = {
   mais_200: "Mais de 200/dia",
 };
 
-export const DORES_LABELS: Record<string, string> = {
+const DORES_LABELS: Record<string, string> = {
   sem_followup: "📉 Sem follow-up",
   sem_registro: "📋 Equipe não registra",
   atendimento_lento: "⏰ Atendimento lento",
