@@ -3,9 +3,32 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getProposta, aceitarProposta, type Proposta, type PacoteProposta } from "@/lib/api";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 import toast from "react-hot-toast";
+
+// ─── Design tokens ────────────────────────────────────────────────────────────
+
+const NAVY = "#0f2044";
+const GOLD  = "#c9a84c";
+
+// ─── Tech stack para carrossel ────────────────────────────────────────────────
+
+const TECH_STACK = [
+  { name: "Supabase",  color: "#3ECF8E" },
+  { name: "OpenAI",    color: "#10a37f" },
+  { name: "Anthropic", color: "#d4826a" },
+  { name: "Claude",    color: "#d97706" },
+  { name: "Google",    color: "#4285f4" },
+  { name: "Meta AI",   color: "#0082fb" },
+  { name: "GitHub",    color: "#6e5494" },
+  { name: "Lovable",   color: "#e11d48" },
+  { name: "Canva",     color: "#00c4cc" },
+  { name: "n8n",       color: "#ea4b4b" },
+  { name: "Vercel",    color: "#888888" },
+  { name: "Next.js",   color: "#0070f3" },
+];
+
+// ─── Página principal ─────────────────────────────────────────────────────────
 
 export default function PropostaPage() {
   const { token } = useParams<{ token: string }>();
@@ -40,11 +63,13 @@ export default function PropostaPage() {
     }
   };
 
+  // ── Estados de carregamento / erro ──
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#f8fafc" }}>
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{ borderColor: GOLD, borderTopColor: "transparent" }} />
           <p className="text-slate-500">Carregando proposta...</p>
         </div>
       </div>
@@ -53,8 +78,8 @@ export default function PropostaPage() {
 
   if (!proposta) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-sm">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#f8fafc" }}>
+        <div className="text-center max-w-sm px-6">
           <div className="text-5xl mb-4">😕</div>
           <h2 className="text-xl font-bold text-slate-800 mb-2">Proposta não encontrada</h2>
           <p className="text-slate-500">Este link pode ter expirado ou sido desativado. Entre em contato com Peterson.</p>
@@ -65,8 +90,8 @@ export default function PropostaPage() {
 
   if (proposta.status === "aceita") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-sm">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#f8fafc" }}>
+        <div className="text-center max-w-sm px-6">
           <div className="text-5xl mb-4">✅</div>
           <h2 className="text-xl font-bold text-slate-800 mb-2">Proposta já aceita!</h2>
           <p className="text-slate-500">Esta proposta já foi aceita. Em breve entraremos em contato.</p>
@@ -75,45 +100,61 @@ export default function PropostaPage() {
     );
   }
 
+  const firstName = proposta.cliente.nome_contato.split(" ")[0];
+  const pacoteSelecionado = proposta.pacotes.find(p => p.id === selected);
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div style={{ background: "#064e3b" }} className="py-6 px-6">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">🤖</div>
+    <div className="min-h-screen" style={{ background: "#f8fafc" }}>
+
+      {/* ── 1. HEADER ── */}
+      <header style={{ background: NAVY }} className="py-5 px-6">
+        <div className="max-w-6xl mx-auto flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+            style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}>
+            🤖
+          </div>
           <div>
-            <p className="text-white font-bold" style={{ fontFamily: "'General Sans', sans-serif" }}>IA com Peterson</p>
-            <p className="text-emerald-300 text-xs">Proposta Comercial</p>
+            <p className="text-white font-bold" style={{ fontFamily: "'General Sans', sans-serif" }}>
+              IA com Peterson
+            </p>
+            <p className="text-xs font-medium" style={{ color: GOLD }}>Proposta Comercial</p>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-10">
-        {/* Intro */}
-        <div className="text-center mb-10 animate-step-in">
-          <h1 className="text-3xl text-slate-900 mb-3">
-            Olá, {proposta.cliente.nome_contato.split(" ")[0]}!
-          </h1>
-          <p className="text-slate-500 text-lg">
-            Preparei esta proposta especialmente para a <strong>{proposta.cliente.nome_empresa || "sua empresa"}</strong>.
+      {/* ── 2. HERO ── */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center animate-step-in">
+          <p className="text-sm font-bold tracking-widest uppercase mb-4" style={{ color: GOLD }}>
+            Proposta exclusiva
           </p>
-          <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
+          <h1 className="text-5xl font-bold mb-5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+            Olá, {firstName}!
+          </h1>
+          <p className="text-xl text-slate-500 mb-10 leading-relaxed">
+            Preparei esta proposta especialmente para a{" "}
+            <strong className="text-slate-800">{proposta.cliente.nome_empresa || "sua empresa"}</strong>.
+          </p>
+
+          {/* Badges */}
+          <div className="flex items-center justify-center gap-3 flex-wrap mb-10">
             {proposta.validade_ate && (
-              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-full">
+              <span className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200
+                               text-amber-700 text-sm px-5 py-2.5 rounded-full font-medium">
                 ⏰ Válida até {new Date(proposta.validade_ate).toLocaleDateString("pt-BR")}
-              </div>
+              </span>
             )}
             <Link
               href={`/proposta/${proposta.token}/apresentacao`}
-              className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-all"
-              style={{ background: "#0f2044", color: "white" }}
+              className="inline-flex items-center gap-2 text-sm px-5 py-2.5 rounded-full font-semibold transition-all hover:opacity-90"
+              style={{ background: NAVY, color: "white" }}
             >
               📊 Ver apresentação
             </Link>
           </div>
 
-          {/* Diferencial */}
-          <div className="flex items-center justify-center gap-6 mt-5 flex-wrap">
+          {/* Trust strip */}
+          <div className="flex items-center justify-center gap-8 flex-wrap">
             {[
               { icon: "🛡️", text: "30 dias de suporte incluídos" },
               { icon: "✅", text: "Aceite digital com validade legal" },
@@ -126,74 +167,119 @@ export default function PropostaPage() {
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Pacotes */}
-        <div className="grid gap-4 md:grid-cols-3 mb-10">
-          {proposta.pacotes.map((pacote) => (
-            <PacoteCard
-              key={pacote.id}
-              pacote={pacote}
-              selected={selected === pacote.id}
-              onSelect={() => setSelected(pacote.id)}
-            />
-          ))}
-        </div>
+      {/* ── 3. PACKAGES ── */}
+      <section className="pb-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-center text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
+            Investimento
+          </p>
+          <h2 className="text-center text-3xl font-bold mb-12" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+            Escolha o plano ideal para você
+          </h2>
 
-        {/* Assinatura */}
-        {selected && (
-          <div className="card p-6 animate-step-in">
-            <h3 className="text-lg font-bold text-slate-900 mb-4">Confirmar aceite</h3>
-
-            <div className="mb-4">
-              <label className="block text-base font-medium text-slate-700 mb-1.5">
-                Seu nome completo (assinatura digital)
-              </label>
-              <input
-                className="input-field"
-                placeholder="Digite seu nome completo para assinar"
-                value={nomeAssinante}
-                onChange={(e) => setNomeAssinante(e.target.value)}
+          <div className="grid md:grid-cols-3 gap-6 items-start">
+            {proposta.pacotes.map((pacote) => (
+              <PacoteCard
+                key={pacote.id}
+                pacote={pacote}
+                selected={selected === pacote.id}
+                onSelect={() => setSelected(pacote.id)}
               />
-            </div>
-
-            <label className="flex items-start gap-3 cursor-pointer mb-6">
-              <input
-                type="checkbox"
-                checked={aceiteConfirmado}
-                onChange={(e) => setAceiteConfirmado(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded accent-emerald-600"
-              />
-              <span className="text-base text-slate-600 leading-relaxed">
-                Declaro que li e aceito os termos desta proposta, incluindo o escopo, valores e condições descritos acima.
-                Estou ciente que este aceite tem validade legal.
-              </span>
-            </label>
-
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-6">
-              <p className="text-sm font-semibold text-emerald-800">Resumo do que você está aceitando:</p>
-              <p className="text-sm text-emerald-700 mt-1">
-                Pacote <strong>{proposta.pacotes.find(p => p.id === selected)?.nome}</strong> —
-                R$ {proposta.pacotes.find(p => p.id === selected)?.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-              </p>
-            </div>
-
-            <button
-              onClick={handleAceitar}
-              disabled={submitting || !nomeAssinante || !aceiteConfirmado}
-              className="btn-primary w-full text-base py-4 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? "Registrando aceite..." : "✅ Aceitar e assinar proposta"}
-            </button>
+            ))}
           </div>
-        )}
+        </div>
+      </section>
 
-        <p className="text-center text-xs text-slate-400 mt-8">
-          Dúvidas? Entre em contato com Peterson pelo WhatsApp antes de assinar.
+      {/* ── 4. COMPARISON TABLE ── */}
+      <ComparisonTable
+        pacotes={proposta.pacotes}
+        selected={selected}
+        onSelect={setSelected}
+      />
+
+      {/* ── 5. TECH CAROUSEL ── */}
+      <TechCarousel />
+
+      {/* ── 6. ACCEPTANCE FORM ── */}
+      {selected && (
+        <section className="py-20 px-6">
+          <div className="max-w-xl mx-auto animate-step-in">
+            <div className="bg-white rounded-2xl border-2 p-8" style={{ borderColor: NAVY }}>
+              <h3 className="text-2xl font-bold mb-2" style={{ color: NAVY }}>
+                Confirmar aceite
+              </h3>
+              <p className="text-slate-500 text-sm mb-6">
+                Você está prestes a assinar digitalmente esta proposta.
+              </p>
+
+              {/* Resumo do plano */}
+              <div className="rounded-xl p-4 mb-6" style={{ background: "rgba(15,32,68,0.04)", border: `1px solid rgba(15,32,68,0.1)` }}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: GOLD }}>
+                  Plano selecionado
+                </p>
+                <p className="text-lg font-bold" style={{ color: NAVY }}>
+                  {pacoteSelecionado?.nome}
+                </p>
+                <p className="text-2xl font-bold mt-1" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+                  R$ {pacoteSelecionado?.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              {/* Nome */}
+              <div className="mb-5">
+                <label className="block text-base font-medium text-slate-700 mb-1.5">
+                  Seu nome completo <span className="text-slate-400 font-normal">(assinatura digital)</span>
+                </label>
+                <input
+                  className="input-field"
+                  placeholder="Digite seu nome completo"
+                  value={nomeAssinante}
+                  onChange={(e) => setNomeAssinante(e.target.value)}
+                />
+              </div>
+
+              {/* Checkbox */}
+              <label className="flex items-start gap-3 cursor-pointer mb-7">
+                <input
+                  type="checkbox"
+                  checked={aceiteConfirmado}
+                  onChange={(e) => setAceiteConfirmado(e.target.checked)}
+                  className="mt-1 w-4 h-4 rounded"
+                  style={{ accentColor: NAVY }}
+                />
+                <span className="text-base text-slate-600 leading-relaxed">
+                  Declaro que li e aceito os termos desta proposta, incluindo escopo, valores e condições.
+                  Estou ciente que este aceite tem validade legal.
+                </span>
+              </label>
+
+              <button
+                onClick={handleAceitar}
+                disabled={submitting || !nomeAssinante || !aceiteConfirmado}
+                className="w-full py-4 rounded-xl text-base font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: NAVY, color: "white" }}
+              >
+                {submitting ? "Registrando aceite..." : "✅ Aceitar e assinar proposta"}
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── FOOTER ── */}
+      <footer className="py-10 text-center">
+        <p className="text-sm text-slate-400">
+          Dúvidas? Fale com Peterson pelo WhatsApp antes de assinar.
         </p>
-      </div>
+      </footer>
+
     </div>
   );
 }
+
+// ─── PacoteCard ───────────────────────────────────────────────────────────────
 
 function PacoteCard({ pacote, selected, onSelect }: {
   pacote: PacoteProposta;
@@ -204,50 +290,232 @@ function PacoteCard({ pacote, selected, onSelect }: {
     <button
       type="button"
       onClick={onSelect}
-      className={cn(
-        "relative text-left p-5 rounded-2xl border-2 transition-all duration-300 w-full",
-        selected
-          ? "border-emerald-600 bg-emerald-50 shadow-lg shadow-emerald-600/10"
-          : "border-slate-200 bg-white hover:border-emerald-300 hover:shadow-md",
-        pacote.destaque && !selected && "border-emerald-200"
-      )}
+      className="relative text-left w-full rounded-2xl transition-all duration-300"
+      style={{
+        border: `2px solid ${selected ? NAVY : pacote.destaque ? GOLD : "#e2e8f0"}`,
+        background: selected ? NAVY : pacote.destaque ? "#fffbf0" : "white",
+        boxShadow: selected
+          ? "0 20px 60px rgba(15,32,68,0.25)"
+          : pacote.destaque
+          ? "0 8px 30px rgba(201,168,76,0.2)"
+          : "0 1px 3px rgba(0,0,0,0.06)",
+        transform: pacote.destaque && !selected ? "scale(1.03)" : "scale(1)",
+      }}
     >
       {pacote.destaque && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-          Mais escolhido ⭐
+        <div
+          className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap"
+          style={{ background: GOLD, color: NAVY }}
+        >
+          ⭐ Mais escolhido
         </div>
       )}
 
-      <div className={cn("text-base font-bold mb-1", selected ? "text-emerald-700" : "text-slate-800")}>
-        {pacote.nome}
-      </div>
+      <div className="p-7">
+        {/* Nome */}
+        <p className="text-lg font-bold mb-1" style={{ color: selected ? "white" : NAVY }}>
+          {pacote.nome}
+        </p>
 
-      {pacote.descricao && (
-        <p className="text-sm text-slate-500 mb-3 leading-relaxed">{pacote.descricao}</p>
-      )}
+        {/* Descrição */}
+        {pacote.descricao && (
+          <p className="text-sm mb-5 leading-relaxed"
+            style={{ color: selected ? "rgba(255,255,255,0.65)" : "#64748b" }}>
+            {pacote.descricao}
+          </p>
+        )}
 
-      <div className={cn("text-2xl font-bold mb-1", selected ? "text-emerald-600" : "text-slate-900")} style={{ fontFamily: "'General Sans', sans-serif" }}>
-        R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-      </div>
-      <p className="text-sm text-slate-400 mb-4">Prazo: {pacote.prazo_dias} dias úteis</p>
+        {/* Preço */}
+        <p className="text-3xl font-bold mb-1"
+          style={{ color: selected ? GOLD : NAVY, fontFamily: "'General Sans', sans-serif" }}>
+          R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+        </p>
+        <p className="text-sm mb-6"
+          style={{ color: selected ? "rgba(255,255,255,0.45)" : "#94a3b8" }}>
+          Prazo: {pacote.prazo_dias} dias úteis
+        </p>
 
-      <ul className="space-y-2">
-        {pacote.itens.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-base text-slate-700">
-            <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
-            {item}
-          </li>
-        ))}
-      </ul>
+        {/* Divisor */}
+        <div className="h-px mb-6"
+          style={{ background: selected ? "rgba(255,255,255,0.12)" : "#f1f5f9" }} />
 
-      <div className={cn(
-        "mt-4 w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all duration-200",
-        selected
-          ? "bg-emerald-600 text-white"
-          : "bg-slate-100 text-slate-600"
-      )}>
-        {selected ? "✓ Selecionado" : "Selecionar"}
+        {/* Itens */}
+        <ul className="space-y-3 mb-7">
+          {pacote.itens.map((item, i) => (
+            <li key={i} className="flex items-start gap-3 text-base">
+              <span
+                className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
+                style={{
+                  background: selected ? "rgba(201,168,76,0.2)" : "rgba(15,32,68,0.07)",
+                  color: selected ? GOLD : NAVY,
+                }}
+              >✓</span>
+              <span style={{ color: selected ? "rgba(255,255,255,0.85)" : "#334155" }}>
+                {item}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        {/* CTA */}
+        <div
+          className="w-full py-3 rounded-xl text-base font-bold text-center"
+          style={{
+            background: selected ? GOLD : pacote.destaque ? NAVY : "#f1f5f9",
+            color: selected ? NAVY : pacote.destaque ? "white" : "#64748b",
+          }}
+        >
+          {selected ? "✓ Selecionado" : "Selecionar plano"}
+        </div>
       </div>
     </button>
+  );
+}
+
+// ─── ComparisonTable ──────────────────────────────────────────────────────────
+
+function ComparisonTable({ pacotes, selected, onSelect }: {
+  pacotes: PacoteProposta[];
+  selected: string | null;
+  onSelect: (id: string) => void;
+}) {
+  if (pacotes.length === 0) return null;
+
+  // Todos os itens únicos, ordenados do mais comum para o mais exclusivo
+  const allItems = Array.from(new Set(pacotes.flatMap(p => p.itens)));
+  const sorted = [...allItems].sort((a, b) => {
+    const ca = pacotes.filter(p => p.itens.includes(a)).length;
+    const cb = pacotes.filter(p => p.itens.includes(b)).length;
+    return cb - ca;
+  });
+
+  return (
+    <section className="py-20 px-6 bg-white">
+      <div className="max-w-5xl mx-auto">
+        <p className="text-center text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
+          Detalhes
+        </p>
+        <h2 className="text-center text-3xl font-bold mb-12"
+          style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+          Comparativo completo
+        </h2>
+
+        <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #e2e8f0", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
+          <table className="w-full">
+            <thead>
+              <tr style={{ background: NAVY }}>
+                <th className="text-left px-6 py-5 text-sm font-semibold w-2/5" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Recurso
+                </th>
+                {pacotes.map(p => (
+                  <th key={p.id} className="text-center px-5 py-5 text-sm font-bold text-white">
+                    {p.nome}
+                    {p.destaque && <span className="ml-1.5 text-xs" style={{ color: GOLD }}>★</span>}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map((item, i) => (
+                <tr key={item} style={{ background: i % 2 === 0 ? "white" : "#f8fafc" }}>
+                  <td className="px-6 py-4 text-sm text-slate-600 border-t border-slate-100">
+                    {item}
+                  </td>
+                  {pacotes.map(p => (
+                    <td key={p.id} className="px-5 py-4 text-center border-t border-slate-100">
+                      {p.itens.includes(item)
+                        ? <span className="text-xl font-bold" style={{ color: GOLD }}>✓</span>
+                        : <span className="text-slate-200 text-xl">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+
+              {/* Linha de preço */}
+              <tr style={{ background: "#f0f4f8", borderTop: `2px solid #e2e8f0` }}>
+                <td className="px-6 py-5 text-base font-bold" style={{ color: NAVY }}>
+                  Investimento total
+                </td>
+                {pacotes.map(p => (
+                  <td key={p.id} className="px-5 py-5 text-center">
+                    <span className="text-base font-bold" style={{ color: NAVY }}>
+                      R$ {p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    </span>
+                  </td>
+                ))}
+              </tr>
+
+              {/* Linha de CTA */}
+              <tr style={{ background: NAVY }}>
+                <td className="px-6 py-5 text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  Selecionar plano
+                </td>
+                {pacotes.map(p => (
+                  <td key={p.id} className="px-5 py-5 text-center">
+                    <button
+                      onClick={() => onSelect(p.id)}
+                      className="px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
+                      style={{
+                        background: selected === p.id ? GOLD : "rgba(255,255,255,0.1)",
+                        color: selected === p.id ? NAVY : "white",
+                        border: `1px solid ${selected === p.id ? GOLD : "rgba(255,255,255,0.2)"}`,
+                      }}
+                    >
+                      {selected === p.id ? "✓ Escolhido" : "Escolher"}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── TechCarousel ─────────────────────────────────────────────────────────────
+
+function TechCarousel() {
+  const doubled = [...TECH_STACK, ...TECH_STACK];
+
+  return (
+    <section style={{ background: NAVY }} className="py-16 overflow-hidden">
+      <div className="max-w-3xl mx-auto text-center mb-10 px-6">
+        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
+          Tecnologia de ponta
+        </p>
+        <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'General Sans', sans-serif" }}>
+          Construído com as melhores ferramentas do mundo
+        </h2>
+      </div>
+
+      <div className="relative overflow-hidden">
+        {/* Fade nas bordas */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: `linear-gradient(to right, ${NAVY}, transparent)` }} />
+        <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+          style={{ background: `linear-gradient(to left, ${NAVY}, transparent)` }} />
+
+        <div className="flex gap-3 animate-scroll-x" style={{ width: "max-content", paddingLeft: "12px" }}>
+          {doubled.map((tech, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2.5 px-5 py-3 rounded-xl flex-shrink-0"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ background: tech.color }} />
+              <span className="text-sm font-semibold text-white whitespace-nowrap">
+                {tech.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

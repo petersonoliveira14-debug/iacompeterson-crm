@@ -93,3 +93,14 @@ h3 { letter-spacing: -0.015em; }
     @apply text-sm text-slate-400 leading-relaxed;
   }
 }
+
+@keyframes scroll-x {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-scroll-x {
+  animation: scroll-x 30s linear infinite;
+}
+.animate-scroll-x:hover {
+  animation-play-state: paused;
+}
