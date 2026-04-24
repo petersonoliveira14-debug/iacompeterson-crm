@@ -171,7 +171,7 @@ function Slide3Dores({ data }: { data: ApresentacaoData }) {
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
               <span className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
                 style={{ background: GOLD, color: NAVY }}>✓</span>
-              <p className="text-white text-sm font-medium">{DORES_LABELS[d] || d}</p>
+              <p className="text-white text-base font-medium">{DORES_LABELS[d] || d}</p>
             </div>
           ))}
         </div>
@@ -288,26 +288,26 @@ function Slide6Pacotes({ data }: { data: ApresentacaoData }) {
                 background: p.destaque ? "#fffbf0" : "white",
               }}>
               {p.destaque && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold text-white"
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-sm font-bold text-white"
                   style={{ background: GOLD }}>
                   ⭐ Mais escolhido
                 </div>
               )}
-              <p className="font-bold text-slate-800 mb-1">{p.nome}</p>
-              {p.descricao && <p className="text-xs text-slate-500 mb-3">{p.descricao}</p>}
+              <p className="text-base font-bold text-slate-800 mb-1">{p.nome}</p>
+              {p.descricao && <p className="text-sm text-slate-500 mb-3">{p.descricao}</p>}
               <p className="text-2xl font-bold mb-0.5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
                 R$ {p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
               </p>
-              <p className="text-xs text-slate-400 mb-4">{p.prazo_dias} dias úteis</p>
-              <ul className="space-y-1.5 flex-1">
+              <p className="text-sm text-slate-400 mb-4">{p.prazo_dias} dias úteis</p>
+              <ul className="space-y-2 flex-1">
                 {p.itens.slice(0, 5).map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                     <span style={{ color: GOLD }} className="flex-shrink-0 mt-0.5">✓</span>
                     {item}
                   </li>
                 ))}
                 {p.itens.length > 5 && (
-                  <li className="text-xs text-slate-400">+{p.itens.length - 5} itens adicionais</li>
+                  <li className="text-sm text-slate-400">+{p.itens.length - 5} itens adicionais</li>
                 )}
               </ul>
             </div>
@@ -342,8 +342,8 @@ function Slide7ProximosPassos({ data }: { data: ApresentacaoData }) {
               <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
                 style={{ background: NAVY }}>{i + 1}</div>
               <div>
-                <p className="font-semibold text-slate-800 text-sm">{s.emoji} {s.title}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{s.desc}</p>
+                <p className="font-semibold text-slate-800 text-base">{s.emoji} {s.title}</p>
+                <p className="text-sm text-slate-500 mt-1">{s.desc}</p>
               </div>
             </div>
           ))}

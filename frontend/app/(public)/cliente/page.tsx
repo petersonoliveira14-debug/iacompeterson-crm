@@ -810,8 +810,8 @@ export default function ClienteFormPage() {
 
               {/* Resumo */}
               <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mt-6">
-                <p className="text-sm text-navy-800 font-medium mb-2">📋 Resumo do seu briefing:</p>
-                <ul className="text-xs text-slate-700 space-y-1">
+                <p className="text-base text-navy-800 font-medium mb-2">📋 Resumo do seu briefing:</p>
+                <ul className="text-sm text-slate-700 space-y-1.5">
                   <li>• <strong>Soluções:</strong> {tiposSelecionados.length > 0 ? tiposSelecionados.map(t => TIPO_OPTIONS.find(o => o.value === t)?.label).join(", ") : "—"}</li>
                   <li>• <strong>Empresa:</strong> {nomeEmpresa || nomeContato} — {segmento}</li>
                   <li>• <strong>Porte:</strong> {PORTE_OPTIONS.find(o => o.value === porte)?.label || "—"}</li>

@@ -123,7 +123,7 @@ const TECH_LABELS: Record<string, string> = {
 
 function Badge({ text }: { text: string }) {
   return (
-    <span className="inline-block px-2.5 py-1 rounded-full bg-gold-100 text-navy-800 text-xs font-medium mr-1.5 mb-1.5">
+    <span className="inline-block px-3 py-1 rounded-full bg-gold-100 text-navy-800 text-sm font-medium mr-1.5 mb-1.5">
       {text}
     </span>
   );
@@ -142,8 +142,8 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null;
   return (
     <div>
-      <dt className="text-xs font-medium text-slate-500 mb-0.5">{label}</dt>
-      <dd className="text-sm text-slate-800 bg-slate-50 rounded-lg px-3 py-2">{value}</dd>
+      <dt className="text-sm font-medium text-slate-500 mb-1">{label}</dt>
+      <dd className="text-base text-slate-800 bg-slate-50 rounded-lg px-4 py-2.5">{value}</dd>
     </div>
   );
 }

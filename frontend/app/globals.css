@@ -21,7 +21,7 @@
 }
 
 html {
-  font-size: 17px;
+  font-size: 18px;
 }
 
 body {
@@ -29,6 +29,12 @@ body {
   color: var(--color-text);
   background: #ffffff;
   -webkit-font-smoothing: antialiased;
+  line-height: 1.65;
+  font-size: 1rem;
+}
+
+p {
+  line-height: 1.7;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -36,6 +42,10 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
   letter-spacing: -0.025em;
 }
+
+h1 { letter-spacing: -0.03em; }
+h2 { letter-spacing: -0.025em; }
+h3 { letter-spacing: -0.015em; }
 
 @layer components {
   .btn-primary {
@@ -51,7 +61,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .input-field {
-    @apply w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900
+    @apply w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900
            placeholder:text-slate-400 text-base font-medium
            focus:outline-none focus:ring-2 focus:ring-gold-500 focus:border-transparent
            transition-all duration-300;
@@ -64,7 +74,7 @@ h1, h2, h3, h4, h5, h6 {
   .choice-card {
     @apply flex items-start gap-3 p-4 rounded-xl border-2 border-slate-200 bg-slate-50
            cursor-pointer transition-all duration-200 hover:border-gold-500 hover:bg-gold-50
-           active:scale-[0.98];
+           active:scale-[0.98] text-base;
   }
 
   .choice-card.selected {
@@ -73,5 +83,13 @@ h1, h2, h3, h4, h5, h6 {
 
   .step-content {
     animation: step-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .section-label {
+    @apply text-xs font-bold text-slate-500 uppercase tracking-widest;
+  }
+
+  .caption {
+    @apply text-sm text-slate-400 leading-relaxed;
   }
 }

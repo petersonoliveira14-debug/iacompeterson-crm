@@ -263,8 +263,8 @@ export default function ChecklistPage() {
         {/* Progress */}
         <div className="card p-4 mb-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-700">{done} de {total} itens concluídos</span>
-            <span className={`text-sm font-bold ${pct === 100 ? "text-emerald-600" : "text-navy-700"}`}>{pct}%</span>
+            <span className="text-base font-medium text-slate-700">{done} de {total} itens concluídos</span>
+            <span className={`text-base font-bold ${pct === 100 ? "text-emerald-600" : "text-navy-700"}`}>{pct}%</span>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-2.5">
             <div
@@ -292,8 +292,8 @@ export default function ChecklistPage() {
           return (
             <div key={cat} className="card p-5 mb-3">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-bold text-slate-700 text-sm uppercase tracking-wider">{cat}</h2>
-                <span className="text-xs text-slate-400">{catDone}/{catItems.length}</span>
+                <h2 className="font-bold text-slate-700 text-xs uppercase tracking-wider">{cat}</h2>
+                <span className="text-sm text-slate-400">{catDone}/{catItems.length}</span>
               </div>
               <ul className="space-y-2">
                 {catItems.map(item => (
@@ -309,7 +309,7 @@ export default function ChecklistPage() {
                       >
                         {item.done && <span className="text-xs font-bold">✓</span>}
                       </button>
-                      <span className={`flex-1 text-sm leading-snug ${item.done ? "line-through text-slate-400" : "text-slate-700"}`}>
+                      <span className={`flex-1 text-base leading-snug ${item.done ? "line-through text-slate-400" : "text-slate-700"}`}>
                         {item.label}
                       </span>
                       <div className="flex gap-1 flex-shrink-0">
@@ -332,7 +332,7 @@ export default function ChecklistPage() {
                     {notasAbertas.has(item.id) && (
                       <div className="mt-2 ml-8">
                         <textarea
-                          className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-gold-400"
+                          className="w-full text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-gold-400"
                           rows={2}
                           placeholder="Observação, link, credencial... (salvo automaticamente)"
                           value={item.notas || ""}

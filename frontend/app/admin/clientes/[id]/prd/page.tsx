@@ -325,7 +325,7 @@ export default function PRDPage() {
 
         <div className="card p-1">
           <textarea
-            className="w-full h-[calc(100vh-300px)] p-5 text-sm font-mono text-slate-800 resize-none focus:outline-none rounded-2xl"
+            className="w-full h-[calc(100vh-300px)] p-5 text-base font-mono text-slate-800 resize-none focus:outline-none rounded-2xl"
             placeholder="Clique em ✨ Gerar PRD para criar automaticamente, ou escreva aqui em Markdown..."
             value={conteudo}
             onChange={e => setConteudo(e.target.value)}

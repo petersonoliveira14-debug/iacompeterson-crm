@@ -131,7 +131,7 @@ export default function PropostaPage() {
             <h3 className="text-lg font-bold text-slate-900 mb-4">Confirmar aceite</h3>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              <label className="block text-base font-medium text-slate-700 mb-1.5">
                 Seu nome completo (assinatura digital)
               </label>
               <input
@@ -149,7 +149,7 @@ export default function PropostaPage() {
                 onChange={(e) => setAceiteConfirmado(e.target.checked)}
                 className="mt-0.5 w-4 h-4 rounded accent-emerald-600"
               />
-              <span className="text-sm text-slate-600">
+              <span className="text-base text-slate-600 leading-relaxed">
                 Declaro que li e aceito os termos desta proposta, incluindo o escopo, valores e condições descritos acima.
                 Estou ciente que este aceite tem validade legal.
               </span>
@@ -204,22 +204,22 @@ function PacoteCard({ pacote, selected, onSelect }: {
         </div>
       )}
 
-      <div className={cn("text-sm font-bold mb-1", selected ? "text-emerald-700" : "text-slate-800")}>
+      <div className={cn("text-base font-bold mb-1", selected ? "text-emerald-700" : "text-slate-800")}>
         {pacote.nome}
       </div>
 
       {pacote.descricao && (
-        <p className="text-xs text-slate-500 mb-3 leading-relaxed">{pacote.descricao}</p>
+        <p className="text-sm text-slate-500 mb-3 leading-relaxed">{pacote.descricao}</p>
       )}
 
       <div className={cn("text-2xl font-bold mb-1", selected ? "text-emerald-600" : "text-slate-900")} style={{ fontFamily: "'General Sans', sans-serif" }}>
         R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
       </div>
-      <p className="text-xs text-slate-400 mb-4">Prazo: {pacote.prazo_dias} dias úteis</p>
+      <p className="text-sm text-slate-400 mb-4">Prazo: {pacote.prazo_dias} dias úteis</p>
 
-      <ul className="space-y-1.5">
+      <ul className="space-y-2">
         {pacote.itens.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
+          <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
             <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
             {item}
           </li>
@@ -227,7 +227,7 @@ function PacoteCard({ pacote, selected, onSelect }: {
       </ul>
 
       <div className={cn(
-        "mt-4 w-full py-2 rounded-xl text-xs font-semibold text-center transition-all duration-200",
+        "mt-4 w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all duration-200",
         selected
           ? "bg-emerald-600 text-white"
           : "bg-slate-100 text-slate-600"
