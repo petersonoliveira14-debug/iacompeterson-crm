@@ -127,6 +127,11 @@ export default function PropostaBuilderPage() {
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+    // Validade padrão: 7 dias a partir de hoje
+    const hoje = new Date();
+    hoje.setDate(hoje.getDate() + 7);
+    setValidade(hoje.toISOString().split("T")[0]);
+
     supabase
       .from("clientes")
       .select("*")
@@ -250,7 +255,10 @@ export default function PropostaBuilderPage() {
             )}
 
             <div className="card p-5 mb-5">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Validade da proposta</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Validade da proposta
+                <span className="ml-2 text-xs font-normal text-slate-400">(padrão: 7 dias a partir de hoje)</span>
+              </label>
               <input type="date" className="input-field w-auto" value={validade} onChange={e => setValidade(e.target.value)} />
             </div>
 

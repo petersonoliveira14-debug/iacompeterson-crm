@@ -111,6 +111,20 @@ export default function PropostaPage() {
               📊 Ver apresentação
             </Link>
           </div>
+
+          {/* Diferencial */}
+          <div className="flex items-center justify-center gap-6 mt-5 flex-wrap">
+            {[
+              { icon: "🛡️", text: "30 dias de suporte incluídos" },
+              { icon: "✅", text: "Aceite digital com validade legal" },
+              { icon: "🚀", text: "Início imediato após aceite" },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex items-center gap-2 text-sm text-slate-500">
+                <span>{icon}</span>
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Pacotes */}
