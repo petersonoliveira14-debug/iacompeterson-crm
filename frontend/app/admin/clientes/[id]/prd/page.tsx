@@ -63,6 +63,13 @@ const TIPO_LABELS: Record<string, string> = {
 
 // ─── Gerador de PRD ───────────────────────────────────────────────────────────
 
+const PRAZO_DURACAO: Record<string, number> = {
+  urgente: 21,
+  "1_2_meses": 35,
+  "3_meses": 55,
+  sem_pressa: 60,
+};
+
 function gerarPRD(c: any): string {
   const tiposArr: string[] = c.tipos_solucao || (c.tipo_solucao ? c.tipo_solucao.split(", ") : []);
   const tipos = tiposArr.map((t: string) => TIPO_LABELS[t] || t).join(", ") || "A definir";
@@ -70,6 +77,13 @@ function gerarPRD(c: any): string {
     .map((d: string) => `- ${DORES_LABELS[d] || d}`).join("\n");
   const dorOutraLine = c.dor_outra ? `- ${c.dor_outra}` : "";
   const hoje = new Date().toLocaleDateString("pt-BR");
+
+  const prazoTotal = PRAZO_DURACAO[c.prazo_desejado] || 45;
+  const f1End = 3;
+  const f2End = Math.max(f1End + 2, Math.round(prazoTotal * 0.2));
+  const f3End = Math.round(prazoTotal * 0.7);
+  const f4End = Math.round(prazoTotal * 0.9);
+  const f5End = prazoTotal;
 
   return `# PRD — ${c.nome_empresa || c.nome_contato}
 > Gerado automaticamente em ${hoje} · Versão 1 · Revisar antes de apresentar ao cliente
@@ -172,7 +186,23 @@ ${c.restricoes || "Nenhuma restrição ou integração obrigatória informada pe
 
 ---
 
-## 10. Próximos passos
+## 10. Cronograma de execução
+
+| Fase | Atividade | Prazo estimado |
+|------|-----------|----------------|
+| 🚀 Fase 1 | Kickoff, alinhamento e refinamento de escopo | Dias 1–${f1End} |
+| 🎨 Fase 2 | Prototipagem, wireframes e aprovação visual | Dias ${f1End + 1}–${f2End} |
+| ⚙️ Fase 3 | Desenvolvimento e integrações | Dias ${f2End + 1}–${f3End} |
+| 🧪 Fase 4 | Testes, ajustes e homologação | Dias ${f3End + 1}–${f4End} |
+| 🎓 Fase 5 | Entrega, deploy e treinamento da equipe | Dias ${f4End + 1}–${f5End} |
+| 🛡️ Pós-entrega | Suporte e monitoramento | 30 dias após entrega |
+
+> Prazo total estimado: **${prazoTotal} dias úteis** a partir do kickoff.
+> Cada fase pode ser ajustada conforme complexidade identificada nas reuniões de alinhamento.
+
+---
+
+## 11. Próximos passos
 
 1. Apresentar e validar este PRD com o cliente
 2. Ajustar escopo conforme feedback da reunião

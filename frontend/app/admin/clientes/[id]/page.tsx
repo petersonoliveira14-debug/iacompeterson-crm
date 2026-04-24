@@ -356,9 +356,9 @@ export default function ClienteDetailPage() {
             <p className="text-2xl mb-1">💰</p>
             <p className="text-sm font-medium text-slate-700">Proposta</p>
           </Link>
-          <Link href={`/admin/clientes/${id}/prompt`} className="card p-4 hover:border-gold-400 transition-colors text-center">
-            <p className="text-2xl mb-1">🤖</p>
-            <p className="text-sm font-medium text-slate-700">Prompt</p>
+          <Link href={`/admin/clientes/${id}/checklist`} className="card p-4 hover:border-gold-400 transition-colors text-center">
+            <p className="text-2xl mb-1">✅</p>
+            <p className="text-sm font-medium text-slate-700">Checklist</p>
           </Link>
         </div>
 
