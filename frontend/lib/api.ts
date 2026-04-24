@@ -63,18 +63,59 @@ export async function submitForm(data: FormData): Promise<{ id: string }> {
 }
 
 export async function getProposta(token: string): Promise<Proposta> {
-  const res = await fetch(`${API_URL}/api/propostas/${token}`);
-  if (!res.ok) throw new Error("Proposta não encontrada");
-  return res.json();
+  const { data, error } = await supabase
+    .from("propostas")
+    .select(`
+      id, token, status, validade_ate,
+      clientes (nome_contato, nome_empresa),
+      proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque)
+    `)
+    .eq("token", token)
+    .single();
+
+  if (error || !data) throw new Error("Proposta não encontrada");
+
+  const cliente = Array.isArray(data.clientes) ? data.clientes[0] : data.clientes;
+  const pacotes = (Array.isArray(data.proposta_pacotes) ? data.proposta_pacotes : []) as PacoteProposta[];
+
+  return {
+    id: data.id,
+    token: data.token,
+    status: data.status,
+    validade_ate: data.validade_ate,
+    cliente: {
+      nome_contato: cliente?.nome_contato || "",
+      nome_empresa: cliente?.nome_empresa || undefined,
+    },
+    pacotes,
+  };
 }
 
 export async function aceitarProposta(token: string, pacoteId: string, nome: string): Promise<void> {
-  const res = await fetch(`${API_URL}/api/propostas/${token}/aceitar`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pacote_id: pacoteId, nome_assinante: nome }),
-  });
-  if (!res.ok) throw new Error("Erro ao aceitar proposta");
+  const { data: proposta, error: fetchError } = await supabase
+    .from("propostas")
+    .select("id, cliente_id")
+    .eq("token", token)
+    .single();
+
+  if (fetchError || !proposta) throw new Error("Proposta não encontrada");
+
+  const { error: updateError } = await supabase
+    .from("propostas")
+    .update({
+      status: "aceita",
+      pacote_escolhido: pacoteId,
+      aceito_em: new Date().toISOString(),
+      aceito_por_nome: nome,
+    })
+    .eq("token", token);
+
+  if (updateError) throw new Error("Erro ao registrar aceite");
+
+  await supabase
+    .from("clientes")
+    .update({ status: "proposta_aceita" })
+    .eq("id", proposta.cliente_id);
 }
 
 // Admin (com auth)
