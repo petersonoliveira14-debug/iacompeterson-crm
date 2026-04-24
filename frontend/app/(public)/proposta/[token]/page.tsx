@@ -233,7 +233,7 @@ function PacoteCard({ pacote, selected, onSelect }: {
 
       <ul className="space-y-2">
         {pacote.itens.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+          <li key={i} className="flex items-start gap-2 text-base text-slate-700">
             <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
             {item}
           </li>
