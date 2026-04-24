@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getProposta, aceitarProposta, type Proposta, type PacoteProposta } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function PropostaPage() {
@@ -96,11 +97,20 @@ export default function PropostaPage() {
           <p className="text-slate-500 text-lg">
             Preparei esta proposta especialmente para a <strong>{proposta.cliente.nome_empresa || "sua empresa"}</strong>.
           </p>
-          {proposta.validade_ate && (
-            <div className="inline-flex items-center gap-2 mt-3 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-full">
-              ⏰ Válida até {new Date(proposta.validade_ate).toLocaleDateString("pt-BR")}
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
+            {proposta.validade_ate && (
+              <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-full">
+                ⏰ Válida até {new Date(proposta.validade_ate).toLocaleDateString("pt-BR")}
+              </div>
+            )}
+            <Link
+              href={`/proposta/${proposta.token}/apresentacao`}
+              className="inline-flex items-center gap-2 text-sm px-4 py-2 rounded-full font-medium transition-all"
+              style={{ background: "#0f2044", color: "white" }}
+            >
+              📊 Ver apresentação
+            </Link>
+          </div>
         </div>
 
         {/* Pacotes */}
