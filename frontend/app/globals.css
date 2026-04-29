@@ -104,3 +104,116 @@ h3 { letter-spacing: -0.015em; }
 .animate-scroll-x:hover {
   animation-play-state: paused;
 }
+
+/* ─── Admin dark theme ("small dark") ──────────────────────────────────────── */
+
+.admin-dark {
+  min-height: 100vh;
+  background: #0a1628;
+  color-scheme: dark;
+}
+
+/* Page backgrounds */
+.admin-dark .bg-slate-50          { background-color: #0a1628 !important; }
+.admin-dark .bg-slate-100         { background-color: rgba(255,255,255,0.04) !important; }
+.admin-dark .bg-slate-100\/50     { background-color: rgba(255,255,255,0.03) !important; }
+.admin-dark .bg-white             { background-color: rgba(255,255,255,0.05) !important; }
+
+/* Cards */
+.admin-dark .card {
+  background-color: rgba(255,255,255,0.05) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+}
+
+/* Pipeline kanban columns */
+.admin-dark .rounded-2xl.border.border-slate-200 {
+  background-color: rgba(255,255,255,0.03) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+}
+
+/* Pipeline cards (Link elements inside kanban) */
+.admin-dark a.block.bg-white {
+  background-color: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+}
+
+/* Text — contraste melhorado */
+.admin-dark .text-slate-900 { color: #f1f5f9 !important; }
+.admin-dark .text-slate-800 { color: #e2e8f0 !important; }
+.admin-dark .text-slate-700 { color: #cbd5e1 !important; }
+.admin-dark .text-slate-600 { color: #94a3b8 !important; }
+.admin-dark .text-slate-500 { color: #8899aa !important; }   /* era 0x64748b, muito escuro */
+.admin-dark .text-slate-400 { color: #6b7a8d !important; }   /* era 0x475569, quase invisível */
+
+/* Borders & dividers */
+.admin-dark .border-slate-200 { border-color: rgba(255,255,255,0.10) !important; }
+.admin-dark .border-slate-100 { border-color: rgba(255,255,255,0.07) !important; }
+.admin-dark .divide-slate-100 > * + * { border-color: rgba(255,255,255,0.07) !important; }
+
+/* Status count badges (bg-white pill inside column header) */
+.admin-dark span.bg-white.border.border-slate-200 {
+  background-color: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+  color: #cbd5e1 !important;
+}
+
+/* Input fields */
+.admin-dark .input-field {
+  background-color: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  color: #f1f5f9 !important;
+}
+.admin-dark .input-field::placeholder { color: rgba(255,255,255,0.30) !important; }
+
+/* Select elements */
+.admin-dark select.input-field {
+  background-color: rgba(255,255,255,0.07) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Hover states */
+.admin-dark .hover\:bg-slate-50:hover { background-color: rgba(255,255,255,0.05) !important; }
+.admin-dark .hover\:shadow-sm:hover   { box-shadow: 0 1px 6px rgba(0,0,0,0.5) !important; }
+
+/* Gold-tinted sections (links rápidos, avisos) */
+.admin-dark .bg-gold-50\/50,
+.admin-dark .bg-gold-50     { background-color: rgba(201,168,76,0.10) !important; }
+.admin-dark .border-gold-200 { border-color: rgba(201,168,76,0.30) !important; }
+.admin-dark .text-navy-800  { color: #c9a84c !important; }
+
+/* Status banners */
+.admin-dark .bg-emerald-50  { background-color: rgba(16,185,129,0.10) !important; }
+.admin-dark .border-emerald-200 { border-color: rgba(16,185,129,0.25) !important; }
+.admin-dark .text-emerald-800 { color: #6ee7b7 !important; }
+.admin-dark .bg-blue-50     { background-color: rgba(59,130,246,0.10) !important; }
+.admin-dark .border-blue-200 { border-color: rgba(59,130,246,0.25) !important; }
+.admin-dark .text-blue-800  { color: #93c5fd !important; }
+
+/* Navy-tinted sections */
+.admin-dark .bg-navy-100    { background-color: rgba(15,32,68,0.6) !important; }
+
+/* Textarea (PRD editor, notas do checklist) */
+.admin-dark textarea {
+  background-color: rgba(255,255,255,0.04) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255,255,255,0.10) !important;
+}
+
+/* Table / thead */
+.admin-dark thead { background-color: rgba(255,255,255,0.04) !important; }
+.admin-dark thead th { color: #94a3b8 !important; }
+.admin-dark tbody tr:hover { background-color: rgba(255,255,255,0.04) !important; }
+
+/* Breadcrumb links */
+.admin-dark a.hover\:text-slate-600 { color: rgba(255,255,255,0.45) !important; }
+.admin-dark a.hover\:text-slate-600:hover { color: rgba(255,255,255,0.85) !important; }
+
+/* Modal overlay */
+.admin-dark .bg-white.rounded-2xl {
+  background-color: #1a2742 !important;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Progress bar track */
+.admin-dark .bg-slate-100.rounded-full { background-color: rgba(255,255,255,0.08) !important; }

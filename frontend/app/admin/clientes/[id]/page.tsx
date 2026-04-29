@@ -25,6 +25,14 @@ const PIPELINE_STAGES = [
   { value: "pos_venda", label: "Pós-venda" },
 ];
 
+const MODAL_STAGES = ["proposta_enviada", "proposta_aceita", "em_execucao"];
+
+const MODAL_CONFIG: Record<string, { title: string; icon: string }> = {
+  proposta_enviada: { title: "Proposta Enviada", icon: "📤" },
+  proposta_aceita: { title: "Fechamento Registrado", icon: "🤝" },
+  em_execucao: { title: "Início da Execução", icon: "🚀" },
+};
+
 // ─── Mapas de rótulos legíveis ────────────────────────────────────────────────
 
 const TIPO_LABELS: Record<string, string> = {
@@ -119,6 +127,26 @@ const TECH_LABELS: Record<string, string> = {
   avancado: "⚙️ Avançado — tem equipe técnica",
 };
 
+// ─── Utilitários ──────────────────────────────────────────────────────────────
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${day}/${month}/${year}`;
+}
+
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
+function calcDiasRestantes(dataInicio: string, prazoDias: number): number {
+  const inicio = new Date(dataInicio);
+  const hoje = new Date();
+  const diffMs = hoje.getTime() - inicio.getTime();
+  const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return prazoDias - diffDias;
+}
+
 // ─── Componentes auxiliares ───────────────────────────────────────────────────
 
 function Badge({ text }: { text: string }) {
@@ -148,6 +176,118 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
+// ─── Modal de status ──────────────────────────────────────────────────────────
+
+interface StatusModalProps {
+  status: string;
+  data: { data: string; valor: string; prazo: string };
+  onChange: (field: "data" | "valor" | "prazo", value: string) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}
+
+function StatusModal({ status, data, onChange, onConfirm, onCancel, loading }: StatusModalProps) {
+  const config = MODAL_CONFIG[status];
+  if (!config) return null;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      onKeyDown={(e) => { if (e.key === "Escape") onCancel(); }}
+    >
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+        {/* Cabeçalho */}
+        <div className="flex items-center gap-3 mb-5">
+          <span className="text-3xl" aria-hidden="true">{config.icon}</span>
+          <h2 id="modal-title" className="text-lg font-semibold text-slate-800">
+            {config.title}
+          </h2>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {/* Campo de data — presente em todos os status */}
+          <div>
+            <label htmlFor="modal-data" className="text-sm font-medium text-slate-600 block mb-1">
+              {status === "proposta_enviada" && "Data de envio"}
+              {status === "proposta_aceita" && "Data de fechamento"}
+              {status === "em_execucao" && "Data de início"}
+            </label>
+            <input
+              id="modal-data"
+              type="date"
+              value={data.data}
+              onChange={(e) => onChange("data", e.target.value)}
+              className="input-field w-full"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Valor de fechamento — apenas proposta_aceita */}
+          {status === "proposta_aceita" && (
+            <div>
+              <label htmlFor="modal-valor" className="text-sm font-medium text-slate-600 block mb-1">
+                Valor de fechamento
+              </label>
+              <input
+                id="modal-valor"
+                type="text"
+                value={data.valor}
+                onChange={(e) => onChange("valor", e.target.value)}
+                placeholder="R$ 0,00"
+                className="input-field w-full"
+                disabled={loading}
+              />
+            </div>
+          )}
+
+          {/* Prazo em dias úteis — apenas em_execucao */}
+          {status === "em_execucao" && (
+            <div>
+              <label htmlFor="modal-prazo" className="text-sm font-medium text-slate-600 block mb-1">
+                Prazo em dias úteis
+              </label>
+              <input
+                id="modal-prazo"
+                type="number"
+                value={data.prazo}
+                onChange={(e) => onChange("prazo", e.target.value)}
+                placeholder="Ex: 30"
+                min={1}
+                className="input-field w-full"
+                disabled={loading}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Botões */}
+        <div className="flex gap-3 mt-6">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="btn-secondary flex-1"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={loading}
+            className="btn-primary flex-1"
+          >
+            {loading ? "Salvando..." : "Confirmar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export default function ClienteDetailPage() {
@@ -156,6 +296,14 @@ export default function ClienteDetailPage() {
   const [cliente, setCliente] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+
+  // Estado do modal
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
+  const [modalData, setModalData] = useState({
+    data: new Date().toISOString().split("T")[0],
+    valor: "",
+    prazo: "",
+  });
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
@@ -171,19 +319,59 @@ export default function ClienteDetailPage() {
       });
   }, [id, router]);
 
-  const updateStatus = async (newStatus: string) => {
+  const updateStatus = async (newStatus: string, extraData: Record<string, any> = {}) => {
     setUpdatingStatus(true);
+    const updates: Record<string, any> = { status: newStatus, ...extraData };
     const { error } = await supabase
       .from("clientes")
-      .update({ status: newStatus })
+      .update(updates)
       .eq("id", id);
     if (error) {
       toast.error("Erro ao atualizar status.");
     } else {
-      setCliente((c: any) => ({ ...c, status: newStatus }));
+      setCliente((c: any) => ({ ...c, status: newStatus, ...extraData }));
       toast.success("Status atualizado!");
     }
     setUpdatingStatus(false);
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    if (MODAL_STAGES.includes(newStatus)) {
+      setPendingStatus(newStatus);
+      setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "" });
+    } else {
+      updateStatus(newStatus, {});
+    }
+  };
+
+  const handleModalConfirm = async () => {
+    if (!pendingStatus) return;
+    const extraData: Record<string, any> = {};
+
+    if (pendingStatus === "proposta_enviada") {
+      extraData.data_proposta_enviada = modalData.data;
+    } else if (pendingStatus === "proposta_aceita") {
+      extraData.data_fechamento = modalData.data;
+      if (modalData.valor) {
+        extraData.valor_fechamento = parseFloat(modalData.valor.replace(/\D/g, "")) / 100;
+      }
+    } else if (pendingStatus === "em_execucao") {
+      extraData.data_inicio_execucao = modalData.data;
+      if (modalData.prazo) {
+        extraData.prazo_execucao_dias = parseInt(modalData.prazo, 10);
+      }
+    }
+
+    await updateStatus(pendingStatus, extraData);
+    setPendingStatus(null);
+  };
+
+  const handleModalCancel = () => {
+    setPendingStatus(null);
+  };
+
+  const handleModalFieldChange = (field: "data" | "valor" | "prazo", value: string) => {
+    setModalData((prev) => ({ ...prev, [field]: value }));
   };
 
   if (loading) return (
@@ -198,10 +386,27 @@ export default function ClienteDetailPage() {
   const tiposSolucao: string[] = cliente.tipos_solucao || (cliente.tipo_solucao ? cliente.tipo_solucao.split(", ") : []);
   const doresB2b: string[] = cliente.dores_b2b || [];
 
+  const diasRestantes =
+    cliente.data_inicio_execucao && cliente.prazo_execucao_dias
+      ? calcDiasRestantes(cliente.data_inicio_execucao, cliente.prazo_execucao_dias)
+      : null;
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       <main className="flex-1 p-8 max-w-4xl">
+
+        {/* Modal contextual de status */}
+        {pendingStatus && (
+          <StatusModal
+            status={pendingStatus}
+            data={modalData}
+            onChange={handleModalFieldChange}
+            onConfirm={handleModalConfirm}
+            onCancel={handleModalCancel}
+            loading={updatingStatus}
+          />
+        )}
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-slate-400 mb-6">
@@ -219,8 +424,31 @@ export default function ClienteDetailPage() {
               {cliente.segmento} · {cliente.whatsapp}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Link href={`/admin/clientes/${id}/proposta`} className="btn-primary text-sm py-2">+ Criar proposta</Link>
+          <div className="flex gap-2 flex-wrap justify-end">
+            {/* Botão de aceite manual — aparece quando proposta foi enviada e ainda não foi aceita */}
+            {["proposta_elaborada", "proposta_enviada"].includes(cliente.status) && !cliente.data_fechamento && (
+              <button
+                onClick={() => handleStatusChange("proposta_aceita")}
+                className="text-sm py-2 px-4 rounded-xl font-semibold transition-all duration-200"
+                style={{
+                  background: "linear-gradient(135deg, #10b981, #059669)",
+                  color: "white",
+                  border: "none",
+                }}
+              >
+                ✅ Registrar aceite
+              </button>
+            )}
+            {/* Editar valor de fechamento quando já aceito */}
+            {cliente.status === "proposta_aceita" && (
+              <button
+                onClick={() => handleStatusChange("proposta_aceita")}
+                className="btn-secondary text-sm py-2"
+              >
+                💰 Editar fechamento
+              </button>
+            )}
+            <Link href={`/admin/clientes/${id}/proposta`} className="btn-primary text-sm py-2">+ Proposta</Link>
             <Link href={`/admin/clientes/${id}/prd`} className="btn-secondary text-sm py-2">PRD</Link>
           </div>
         </div>
@@ -231,9 +459,10 @@ export default function ClienteDetailPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <select
               value={cliente.status}
-              onChange={e => updateStatus(e.target.value)}
+              onChange={(e) => handleStatusChange(e.target.value)}
               disabled={updatingStatus}
               className="input-field w-auto text-sm"
+              aria-label="Estágio no pipeline"
             >
               {PIPELINE_STAGES.map(s => (
                 <option key={s.value} value={s.value}>{s.label}</option>
@@ -242,6 +471,48 @@ export default function ClienteDetailPage() {
             {updatingStatus && <span className="text-xs text-slate-400">Salvando...</span>}
           </div>
         </div>
+
+        {/* Banner de fechamento */}
+        {(cliente.data_fechamento || cliente.valor_fechamento) && (
+          <div className="flex items-center gap-2 px-4 py-3 mb-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+            <span aria-hidden="true">✅</span>
+            <span>
+              {cliente.data_fechamento && (
+                <>Fechado em <strong>{formatDate(cliente.data_fechamento)}</strong></>
+              )}
+              {cliente.data_fechamento && cliente.valor_fechamento && <span className="mx-1.5 text-emerald-400">|</span>}
+              {cliente.valor_fechamento && (
+                <>Valor: <strong>{formatCurrency(cliente.valor_fechamento)}</strong></>
+              )}
+            </span>
+          </div>
+        )}
+
+        {/* Banner de execução */}
+        {cliente.data_inicio_execucao && (
+          <div className="flex items-center gap-2 px-4 py-3 mb-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-sm">
+            <span aria-hidden="true">🚀</span>
+            <span>
+              Execução iniciada em <strong>{formatDate(cliente.data_inicio_execucao)}</strong>
+              {cliente.prazo_execucao_dias && (
+                <>
+                  <span className="mx-1.5 text-blue-400">|</span>
+                  Prazo: <strong>{cliente.prazo_execucao_dias} dias</strong>
+                  {diasRestantes !== null && (
+                    <>
+                      <span className="mx-1.5 text-blue-400">|</span>
+                      <span className={diasRestantes < 0 ? "text-red-600 font-semibold" : ""}>
+                        {diasRestantes < 0
+                          ? `${Math.abs(diasRestantes)} dias em atraso`
+                          : `${diasRestantes} dias restantes`}
+                      </span>
+                    </>
+                  )}
+                </>
+              )}
+            </span>
+          </div>
+        )}
 
         {/* ── Identificação ── */}
         <Section title="📋 Identificação">

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { BrandingSidebar } from "@/components/layout/BrandingSidebar";
+import { TechCarousel, SocialLinks } from "@/components/layout/TechCarousel";
 import { ChoiceCard } from "@/components/form/ChoiceCard";
 import { HintTooltip } from "@/components/form/HintTooltip";
 import { ProgressBar } from "@/components/form/ProgressBar";
@@ -295,6 +296,12 @@ export default function ClienteFormPage() {
                 Começar →
               </button>
               <p className="text-sm text-slate-400 mt-4">Suas informações são confidenciais e seguras.</p>
+
+              {/* Carrossel de tecnologias — visível somente no mobile (desktop usa BrandingSidebar) */}
+              <div className="lg:hidden mt-10 -mx-6 px-3 py-6 rounded-2xl" style={{ background: "#0f2044" }}>
+                <TechCarousel compact />
+                <SocialLinks className="mt-5" />
+              </div>
             </div>
           )}
 

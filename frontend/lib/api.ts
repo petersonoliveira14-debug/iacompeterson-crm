@@ -38,6 +38,9 @@ export interface Proposta {
   cliente: {
     nome_contato: string;
     nome_empresa?: string;
+    dores_b2b?: string[];
+    tipos_solucao?: string[];
+    tipo_solucao?: string;
   };
   pacotes: PacoteProposta[];
 }
@@ -67,7 +70,7 @@ export async function getProposta(token: string): Promise<Proposta> {
     .from("propostas")
     .select(`
       id, token, status, validade_ate,
-      clientes (nome_contato, nome_empresa),
+      clientes (nome_contato, nome_empresa, dores_b2b, tipos_solucao, tipo_solucao),
       proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque)
     `)
     .eq("token", token)
@@ -86,6 +89,9 @@ export async function getProposta(token: string): Promise<Proposta> {
     cliente: {
       nome_contato: cliente?.nome_contato || "",
       nome_empresa: cliente?.nome_empresa || undefined,
+      dores_b2b: cliente?.dores_b2b || [],
+      tipos_solucao: cliente?.tipos_solucao || [],
+      tipo_solucao: cliente?.tipo_solucao || undefined,
     },
     pacotes,
   };

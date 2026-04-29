@@ -1,3 +1,5 @@
+import { TechCarousel, SocialLinks } from "./TechCarousel";
+
 export function BrandingSidebar() {
   return (
     <div
@@ -14,7 +16,7 @@ export function BrandingSidebar() {
         style={{ background: "#163566" }}
       />
 
-      <div className="relative z-10 flex flex-col justify-center flex-1 px-12 py-16 max-w-[560px] mx-auto">
+      <div className="relative z-10 flex flex-col justify-center flex-1 px-12 py-16 max-w-[560px] mx-auto w-full">
         {/* Logo lockup */}
         <div className="flex items-center gap-3 mb-10">
           <div
@@ -33,9 +35,9 @@ export function BrandingSidebar() {
 
         <h1
           className="text-white font-bold mb-4 leading-tight"
-          style={{ fontSize: "3.75rem", fontFamily: "'General Sans', sans-serif" }}
+          style={{ fontSize: "2.75rem", fontFamily: "'General Sans', sans-serif" }}
         >
-          Transforme sua operação com IA
+          Transforme sua<br />operação com IA
         </h1>
         <p className="text-lg mb-10 leading-relaxed" style={{ color: "#d0def4" }}>
           Sistemas personalizados, bots de atendimento e automações que trabalham enquanto você dorme.
@@ -60,6 +62,14 @@ export function BrandingSidebar() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Tech carousel — credibilidade das ferramentas */}
+        <TechCarousel compact />
+
+        {/* Redes sociais */}
+        <div className="mt-6">
+          <SocialLinks className="justify-start" />
         </div>
       </div>
     </div>

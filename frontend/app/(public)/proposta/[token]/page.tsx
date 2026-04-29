@@ -5,28 +5,33 @@ import { useParams, useRouter } from "next/navigation";
 import { getProposta, aceitarProposta, type Proposta, type PacoteProposta } from "@/lib/api";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { TechCarousel, SocialLinks } from "@/components/layout/TechCarousel";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
 const NAVY = "#0f2044";
 const GOLD  = "#c9a84c";
 
-// ─── Tech stack para carrossel ────────────────────────────────────────────────
+// ─── Mapeamentos Antes / Depois ───────────────────────────────────────────────
 
-const TECH_STACK = [
-  { name: "Supabase",  color: "#3ECF8E" },
-  { name: "OpenAI",    color: "#10a37f" },
-  { name: "Anthropic", color: "#d4826a" },
-  { name: "Claude",    color: "#d97706" },
-  { name: "Google",    color: "#4285f4" },
-  { name: "Meta AI",   color: "#0082fb" },
-  { name: "GitHub",    color: "#6e5494" },
-  { name: "Lovable",   color: "#e11d48" },
-  { name: "Canva",     color: "#00c4cc" },
-  { name: "n8n",       color: "#ea4b4b" },
-  { name: "Vercel",    color: "#888888" },
-  { name: "Next.js",   color: "#0070f3" },
-];
+const DORES_ANTES: Record<string, string> = {
+  sem_followup: "Clientes perdidos por falta de follow-up",
+  sem_registro: "Equipe não registra o que acontece em cada atendimento",
+  atendimento_lento: "Atendimento lento fazendo perder vendas",
+  sem_visibilidade_funil: "Funil comercial invisível, sem controle",
+  tarefas_repetitivas: "Tempo desperdiçado em tarefas que se repetem todo dia",
+  escala_sem_contratar: "Impossível crescer sem contratar mais gente",
+  sem_metricas: "Decisões tomadas no achômetro, sem dados",
+  vendas_desorganizadas: "Processo de vendas bagunçado e imprevisível",
+};
+
+const SOLUCOES_DEPOIS: Record<string, string> = {
+  sistema: "Sistema personalizado gerenciando tudo automaticamente",
+  atendimento: "Bot de IA atendendo e qualificando 24/7 no WhatsApp",
+  assistente: "Assistente de IA treinado no seu negócio",
+  site_lp: "Presença digital que converte visitante em cliente",
+  plataforma: "Plataforma completa com área de membros e gestão",
+};
 
 // ─── Página principal ─────────────────────────────────────────────────────────
 
@@ -169,6 +174,72 @@ export default function PropostaPage() {
         </div>
       </section>
 
+      {/* ── 2b. ANTES / DEPOIS ── */}
+      {(() => {
+        const doresCliente = proposta.cliente.dores_b2b || [];
+        const tiposCliente: string[] = proposta.cliente.tipos_solucao || (proposta.cliente.tipo_solucao ? proposta.cliente.tipo_solucao.split(", ") : []);
+
+        const itensAntes = doresCliente.length > 0
+          ? doresCliente.map((d: string) => DORES_ANTES[d] || d)
+          : ["Processos manuais consumindo tempo da equipe", "Falta de automação no atendimento ao cliente", "Dificuldade para escalar sem aumentar custos", "Decisões tomadas sem dados confiáveis"];
+
+        const itensDepois = tiposCliente.length > 0
+          ? tiposCliente.map((t: string) => SOLUCOES_DEPOIS[t] || t)
+          : ["Sistema automatizado funcionando 24/7", "Equipe focada em atividades estratégicas", "Escala sem necessidade de contratar mais", "Dados e métricas em tempo real"];
+
+        return (
+          <section className="py-16 px-6">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-center text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
+                A transformação
+              </p>
+              <h2 className="text-center text-2xl font-bold mb-10" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+                O que muda com esta solução
+              </h2>
+
+              <div className="relative grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden" style={{ border: "1px solid #e2e8f0" }}>
+                {/* Coluna ANTES */}
+                <div className="p-6 bg-slate-50">
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center text-sm text-red-500 font-bold">✗</span>
+                    <p className="font-bold text-slate-700">Situação atual</p>
+                  </div>
+                  <ul className="space-y-3">
+                    {itensAntes.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="text-red-400 mt-0.5 flex-shrink-0 font-bold">✗</span>
+                        <span className="text-sm text-slate-600">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Divisor visual central */}
+                <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                  <div className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center text-lg font-bold shadow-md" style={{ borderColor: GOLD, color: GOLD }}>→</div>
+                </div>
+
+                {/* Coluna DEPOIS */}
+                <div className="p-6" style={{ background: "rgba(15,32,68,0.03)" }}>
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "rgba(201,168,76,0.15)", color: GOLD }}>✓</span>
+                    <p className="font-bold" style={{ color: NAVY }}>Com a solução</p>
+                  </div>
+                  <ul className="space-y-3">
+                    {itensDepois.map((item: string, i: number) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="mt-0.5 flex-shrink-0 font-bold" style={{ color: GOLD }}>✓</span>
+                        <span className="text-sm text-slate-700 font-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* ── 3. PACKAGES ── */}
       <section className="pb-20 px-6">
         <div className="max-w-6xl mx-auto">
@@ -269,8 +340,9 @@ export default function PropostaPage() {
       )}
 
       {/* ── FOOTER ── */}
-      <footer className="py-10 text-center">
-        <p className="text-sm text-slate-400">
+      <footer className="py-12 text-center px-6" style={{ background: NAVY }}>
+        <SocialLinks className="mb-4" />
+        <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
           Dúvidas? Fale com Peterson pelo WhatsApp antes de assinar.
         </p>
       </footer>
@@ -474,48 +546,4 @@ function ComparisonTable({ pacotes, selected, onSelect }: {
   );
 }
 
-// ─── TechCarousel ─────────────────────────────────────────────────────────────
-
-function TechCarousel() {
-  const doubled = [...TECH_STACK, ...TECH_STACK];
-
-  return (
-    <section style={{ background: NAVY }} className="py-16 overflow-hidden">
-      <div className="max-w-3xl mx-auto text-center mb-10 px-6">
-        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD }}>
-          Tecnologia de ponta
-        </p>
-        <h2 className="text-2xl font-bold text-white" style={{ fontFamily: "'General Sans', sans-serif" }}>
-          Construído com as melhores ferramentas do mundo
-        </h2>
-      </div>
-
-      <div className="relative overflow-hidden">
-        {/* Fade nas bordas */}
-        <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-          style={{ background: `linear-gradient(to right, ${NAVY}, transparent)` }} />
-        <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
-          style={{ background: `linear-gradient(to left, ${NAVY}, transparent)` }} />
-
-        <div className="flex gap-3 animate-scroll-x" style={{ width: "max-content", paddingLeft: "12px" }}>
-          {doubled.map((tech, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-2.5 px-5 py-3 rounded-xl flex-shrink-0"
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: tech.color }} />
-              <span className="text-sm font-semibold text-white whitespace-nowrap">
-                {tech.name}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+// TechCarousel is now imported from @/components/layout/TechCarousel

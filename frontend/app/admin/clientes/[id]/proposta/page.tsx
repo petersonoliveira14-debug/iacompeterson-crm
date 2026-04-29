@@ -123,26 +123,74 @@ export default function PropostaBuilderPage() {
   const [validade, setValidade] = useState("");
   const [pacotes, setPacotes] = useState<Pacote[]>(defaultPacotes());
   const [saving, setSaving] = useState(false);
-  const [createdToken, setCreatedToken] = useState<string | null>(null);
+
+  // Estado para proposta existente
+  const [existingPropostaId, setExistingPropostaId] = useState<string | null>(null);
+  const [existingToken, setExistingToken] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false); // true = editando proposta existente
+
+  // Exibição pós-save
+  const [savedToken, setSavedToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
+
     // Validade padrão: 7 dias a partir de hoje
     const hoje = new Date();
     hoje.setDate(hoje.getDate() + 7);
-    setValidade(hoje.toISOString().split("T")[0]);
+    const defaultValidade = hoje.toISOString().split("T")[0];
+    setValidade(defaultValidade);
 
-    supabase
-      .from("clientes")
-      .select("*")
-      .eq("id", id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setCliente(data);
-          setPacotes(gerarPacotes(data));
+    const loadData = async () => {
+      // 1) Carregar cliente
+      const { data: clienteData } = await supabase
+        .from("clientes")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (!clienteData) return;
+      setCliente(clienteData);
+
+      // 2) Verificar se já existe proposta para este cliente
+      const { data: propostaExistente } = await supabase
+        .from("propostas")
+        .select("id, token, validade_ate, proposta_pacotes(id, nome, descricao, itens, valor, prazo_dias, destaque)")
+        .eq("cliente_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (propostaExistente) {
+        // Carregar dados da proposta existente
+        setExistingPropostaId(propostaExistente.id);
+        setExistingToken(propostaExistente.token);
+        setIsEditing(true);
+
+        if (propostaExistente.validade_ate) {
+          setValidade(propostaExistente.validade_ate.split("T")[0]);
         }
-      });
+
+        const pacotesExistentes = (propostaExistente.proposta_pacotes as any[]) || [];
+        if (pacotesExistentes.length > 0) {
+          setPacotes(
+            pacotesExistentes.map((p: any) => ({
+              nome: p.nome || "",
+              descricao: p.descricao || "",
+              itens: Array.isArray(p.itens) ? p.itens.join("\n") : p.itens || "",
+              valor: String(p.valor ?? ""),
+              prazo_dias: String(p.prazo_dias ?? ""),
+              destaque: !!p.destaque,
+            }))
+          );
+        }
+      } else {
+        // Nova proposta: pré-preencher com base no briefing
+        setPacotes(gerarPacotes(clienteData));
+      }
+    };
+
+    loadData();
   }, [id, router]);
 
   const updatePacote = (i: number, field: keyof Pacote, value: string | boolean) => {
@@ -158,47 +206,80 @@ export default function PropostaBuilderPage() {
 
     setSaving(true);
     try {
-      const token = Array.from(crypto.getRandomValues(new Uint8Array(12)))
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
+      const pacoteRows = validPacotes.map(p => ({
+        nome: p.nome,
+        descricao: p.descricao || null,
+        itens: p.itens.split("\n").filter(Boolean),
+        valor: parseFloat(p.valor.replace(",", ".")),
+        prazo_dias: parseInt(p.prazo_dias),
+        destaque: p.destaque,
+      }));
 
-      const { data: proposta, error: propostaError } = await supabase
-        .from("propostas")
-        .insert({ cliente_id: id, token, validade_ate: validade || null, status: "rascunho" })
-        .select("id, token")
-        .single();
+      if (isEditing && existingPropostaId) {
+        // ── UPDATE proposta existente ──────────────────────────────────────────
+        const { error: updateError } = await supabase
+          .from("propostas")
+          .update({ validade_ate: validade || null })
+          .eq("id", existingPropostaId);
 
-      if (propostaError || !proposta) throw propostaError || new Error("Erro ao criar proposta");
+        if (updateError) throw updateError;
 
-      const { error: pacotesError } = await supabase
-        .from("proposta_pacotes")
-        .insert(
-          validPacotes.map(p => ({
-            proposta_id: proposta.id,
-            nome: p.nome,
-            descricao: p.descricao || null,
-            itens: p.itens.split("\n").filter(Boolean),
-            valor: parseFloat(p.valor.replace(",", ".")),
-            prazo_dias: parseInt(p.prazo_dias),
-            destaque: p.destaque,
-          }))
-        );
+        // Deletar pacotes antigos e reinserir
+        const { error: deleteError } = await supabase
+          .from("proposta_pacotes")
+          .delete()
+          .eq("proposta_id", existingPropostaId);
 
-      if (pacotesError) throw pacotesError;
+        if (deleteError) throw deleteError;
 
-      await supabase.from("clientes").update({ status: "proposta_elaborada" }).eq("id", id);
-      setCreatedToken(proposta.token);
-      toast.success("Proposta criada com sucesso!");
+        const { error: insertError } = await supabase
+          .from("proposta_pacotes")
+          .insert(pacoteRows.map(p => ({ proposta_id: existingPropostaId, ...p })));
+
+        if (insertError) throw insertError;
+
+        toast.success("Proposta atualizada com sucesso!");
+        setSavedToken(existingToken);
+      } else {
+        // ── INSERT nova proposta ───────────────────────────────────────────────
+        const token = Array.from(crypto.getRandomValues(new Uint8Array(12)))
+          .map(b => b.toString(16).padStart(2, "0"))
+          .join("");
+
+        const { data: proposta, error: propostaError } = await supabase
+          .from("propostas")
+          .insert({ cliente_id: id, token, validade_ate: validade || null, status: "rascunho" })
+          .select("id, token")
+          .single();
+
+        if (propostaError || !proposta) throw propostaError || new Error("Erro ao criar proposta");
+
+        const { error: pacotesError } = await supabase
+          .from("proposta_pacotes")
+          .insert(pacoteRows.map(p => ({ proposta_id: proposta.id, ...p })));
+
+        if (pacotesError) throw pacotesError;
+
+        await supabase.from("clientes").update({ status: "proposta_elaborada" }).eq("id", id);
+
+        setExistingPropostaId(proposta.id);
+        setExistingToken(proposta.token);
+        setIsEditing(true);
+        setSavedToken(proposta.token);
+        toast.success("Proposta criada com sucesso!");
+      }
     } catch (err: any) {
-      toast.error(err?.message || "Erro ao criar proposta.");
+      toast.error(err?.message || "Erro ao salvar proposta.");
     } finally {
       setSaving(false);
     }
   };
 
-  const propostaLink = createdToken
-    ? `${typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/proposta/${createdToken}`
-    : null;
+  const propostaLink = savedToken
+    ? `${typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/proposta/${savedToken}`
+    : existingToken
+      ? `${typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/proposta/${existingToken}`
+      : null;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -214,106 +295,123 @@ export default function PropostaBuilderPage() {
           <span className="text-slate-700">Proposta</span>
         </div>
 
-        <h1 className="text-2xl text-slate-900 mb-5">Builder de Proposta</h1>
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="text-2xl text-slate-900">
+            {isEditing ? "Editar Proposta" : "Builder de Proposta"}
+          </h1>
+          {isEditing && (
+            <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+              ✏️ Editando proposta existente
+            </span>
+          )}
+        </div>
 
-        {createdToken ? (
-          <div className="card p-6">
-            <div className="text-center mb-6">
-              <div className="text-5xl mb-3">🎉</div>
-              <h2 className="text-xl font-bold text-slate-900">Proposta criada!</h2>
-              <p className="text-slate-500 text-sm mt-1">Copie o link e envie para o cliente pelo WhatsApp</p>
-            </div>
-            <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mb-4">
-              <p className="text-xs font-semibold text-navy-800 mb-2">🔗 Link da proposta:</p>
-              <div className="flex gap-2">
-                <code className="text-sm text-navy-800 flex-1 overflow-x-auto break-all">{propostaLink}</code>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(propostaLink!); toast.success("Copiado!"); }}
-                  className="btn-primary py-1.5 px-3 text-xs flex-shrink-0"
-                >
-                  Copiar
-                </button>
-              </div>
-            </div>
-            <div className="flex gap-2 justify-center">
-              <Link href={`/admin/clientes/${id}`} className="btn-secondary text-sm py-2">← Voltar ao cliente</Link>
+        {/* Link da proposta existente (sempre visível quando existe) */}
+        {propostaLink && (
+          <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mb-5">
+            <p className="text-xs font-semibold text-navy-800 mb-2">🔗 Link da proposta:</p>
+            <div className="flex gap-2">
+              <code className="text-sm text-navy-800 flex-1 overflow-x-auto break-all">{propostaLink}</code>
               <button
-                onClick={() => { setCreatedToken(null); if (cliente) setPacotes(gerarPacotes(cliente)); }}
-                className="btn-secondary text-sm py-2"
+                onClick={() => { navigator.clipboard.writeText(propostaLink!); toast.success("Copiado!"); }}
+                className="btn-primary py-1.5 px-3 text-xs flex-shrink-0"
               >
-                + Nova proposta
+                Copiar
               </button>
             </div>
           </div>
-        ) : (
-          <>
-            {/* Aviso de pré-preenchimento */}
-            {cliente && (
-              <div className="bg-gold-50 border border-gold-200 rounded-xl p-3 mb-5 text-sm text-navy-800">
-                ✨ Pacotes pré-preenchidos com base no briefing de <strong>{cliente.nome_empresa || cliente.nome_contato}</strong>. Revise e ajuste os valores antes de criar.
-              </div>
-            )}
-
-            <div className="card p-5 mb-5">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Validade da proposta
-                <span className="ml-2 text-xs font-normal text-slate-400">(padrão: 7 dias a partir de hoje)</span>
-              </label>
-              <input type="date" className="input-field w-auto" value={validade} onChange={e => setValidade(e.target.value)} />
-            </div>
-
-            <div className="space-y-4 mb-6">
-              {pacotes.map((p, i) => (
-                <div key={i} className={`card p-5 ${p.destaque ? "border-gold-300" : ""}`}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <h3 className="font-bold text-slate-800">Pacote {i + 1}</h3>
-                    {p.destaque && <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">⭐ Destaque</span>}
-                    <label className="flex items-center gap-1.5 text-xs text-slate-500 ml-auto cursor-pointer">
-                      <input type="checkbox" checked={p.destaque}
-                        onChange={e => updatePacote(i, "destaque", e.target.checked)}
-                        className="accent-gold-500" />
-                      Marcar como destaque
-                    </label>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Nome *</label>
-                      <input className="input-field" value={p.nome}
-                        onChange={e => updatePacote(i, "nome", e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Valor (R$) *</label>
-                      <input className="input-field" value={p.valor}
-                        onChange={e => updatePacote(i, "valor", e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Prazo (dias úteis) *</label>
-                      <input className="input-field" value={p.prazo_dias}
-                        onChange={e => updatePacote(i, "prazo_dias", e.target.value)} />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-600 mb-1">Descrição curta</label>
-                      <input className="input-field" value={p.descricao}
-                        onChange={e => updatePacote(i, "descricao", e.target.value)} />
-                    </div>
-                    <div className="col-span-2">
-                      <label className="block text-xs font-medium text-slate-600 mb-1">
-                        O que está incluso (1 item por linha)
-                      </label>
-                      <textarea className="input-field h-28 resize-none pt-2 text-xs"
-                        value={p.itens}
-                        onChange={e => updatePacote(i, "itens", e.target.value)} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button onClick={handleSave} disabled={saving} className="btn-primary w-full py-4 text-base">
-              {saving ? "Criando proposta..." : "✅ Criar proposta e gerar link"}
-            </button>
-          </>
         )}
+
+        {/* Aviso de pré-preenchimento */}
+        {cliente && !isEditing && (
+          <div className="bg-gold-50 border border-gold-200 rounded-xl p-3 mb-5 text-sm text-navy-800">
+            ✨ Pacotes pré-preenchidos com base no briefing de <strong>{cliente.nome_empresa || cliente.nome_contato}</strong>. Revise e ajuste os valores antes de criar.
+          </div>
+        )}
+
+        <div className="card p-5 mb-5">
+          <label className="block text-sm font-medium text-slate-700 mb-1.5">
+            Validade da proposta
+            <span className="ml-2 text-xs font-normal text-slate-400">(padrão: 7 dias a partir de hoje)</span>
+          </label>
+          <input type="date" className="input-field w-auto" value={validade} onChange={e => setValidade(e.target.value)} />
+        </div>
+
+        <div className="space-y-4 mb-6">
+          {pacotes.map((p, i) => (
+            <div key={i} className={`card p-5 ${p.destaque ? "border-gold-300" : ""}`}>
+              <div className="flex items-center gap-2 mb-4">
+                <h3 className="font-bold text-slate-800">Pacote {i + 1}</h3>
+                {p.destaque && <span className="text-xs bg-gold-100 text-gold-700 px-2 py-0.5 rounded-full font-medium">⭐ Destaque</span>}
+                <label className="flex items-center gap-1.5 text-xs text-slate-500 ml-auto cursor-pointer">
+                  <input type="checkbox" checked={p.destaque}
+                    onChange={e => updatePacote(i, "destaque", e.target.checked)}
+                    className="accent-gold-500" />
+                  Marcar como destaque
+                </label>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Nome *</label>
+                  <input className="input-field" value={p.nome}
+                    onChange={e => updatePacote(i, "nome", e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Valor (R$) *</label>
+                  <input className="input-field" value={p.valor}
+                    onChange={e => updatePacote(i, "valor", e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Prazo (dias úteis) *</label>
+                  <input className="input-field" value={p.prazo_dias}
+                    onChange={e => updatePacote(i, "prazo_dias", e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Descrição curta</label>
+                  <input className="input-field" value={p.descricao}
+                    onChange={e => updatePacote(i, "descricao", e.target.value)} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">
+                    O que está incluso (1 item por linha)
+                  </label>
+                  <textarea className="input-field h-28 resize-none pt-2 text-xs"
+                    value={p.itens}
+                    onChange={e => updatePacote(i, "itens", e.target.value)} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex gap-3">
+          <button onClick={handleSave} disabled={saving} className="btn-primary flex-1 py-4 text-base">
+            {saving
+              ? (isEditing ? "Salvando alterações..." : "Criando proposta...")
+              : isEditing
+                ? "💾 Salvar alterações"
+                : "✅ Criar proposta e gerar link"}
+          </button>
+          {isEditing && (
+            <button
+              onClick={() => {
+                if (cliente) setPacotes(gerarPacotes(cliente));
+                setIsEditing(false);
+                setExistingPropostaId(null);
+                setExistingToken(null);
+                setSavedToken(null);
+              }}
+              className="btn-secondary py-4 px-5 text-sm"
+              title="Criar uma nova proposta do zero"
+            >
+              + Nova proposta
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-2 mt-4 justify-center">
+          <Link href={`/admin/clientes/${id}`} className="btn-secondary text-sm py-2">← Voltar ao cliente</Link>
+        </div>
       </main>
     </div>
   );

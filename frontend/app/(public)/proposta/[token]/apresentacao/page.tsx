@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { CarouselTrack, SocialLinks } from "@/components/layout/TechCarousel";
 
 // ─── Mapas de rótulos ─────────────────────────────────────────────────────────
 
@@ -353,7 +354,30 @@ function Slide7ProximosPassos({ data }: { data: ApresentacaoData }) {
   );
 }
 
-function Slide8CTA({ data }: { data: ApresentacaoData }) {
+function Slide8Stack() {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center overflow-hidden"
+      style={{ background: "#0f2044" }}>
+      <div className="text-center mb-10 px-6">
+        <p className="text-xs font-bold uppercase tracking-widest mb-3"
+          style={{ color: "#c9a84c" }}>
+          Tecnologia de ponta
+        </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-2"
+          style={{ fontFamily: "'General Sans', sans-serif" }}>
+          Construído com as melhores ferramentas do mundo
+        </h2>
+        <p className="text-sm" style={{ color: "rgba(255,255,255,0.35)" }}>
+          Passe o mouse sobre cada ícone para ver o nome
+        </p>
+      </div>
+      <CarouselTrack />
+      <SocialLinks className="mt-10" />
+    </div>
+  );
+}
+
+function Slide9CTA({ data }: { data: ApresentacaoData }) { // era Slide8CTA
   return (
     <SlideWrapper dark>
       <div className="max-w-2xl mx-auto text-center">
@@ -417,7 +441,7 @@ export default function ApresentacaoPage() {
       });
   }, [token]);
 
-  const TOTAL_SLIDES = 8;
+  const TOTAL_SLIDES = 9;
   const prev = useCallback(() => setSlide(s => Math.max(0, s - 1)), []);
   const next = useCallback(() => setSlide(s => Math.min(TOTAL_SLIDES - 1, s + 1)), []);
 
@@ -453,7 +477,8 @@ export default function ApresentacaoPage() {
     <Slide5ROI     key={4} data={data} />,
     <Slide6Pacotes key={5} data={data} />,
     <Slide7ProximosPassos key={6} data={data} />,
-    <Slide8CTA     key={7} data={data} />,
+    <Slide8Stack   key={7} />,
+    <Slide9CTA     key={8} data={data} />,
   ];
 
   return (
