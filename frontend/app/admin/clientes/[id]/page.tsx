@@ -425,27 +425,39 @@ export default function ClienteDetailPage() {
             </p>
           </div>
           <div className="flex gap-2 flex-wrap justify-end">
-            {/* Botão de aceite manual — aparece quando proposta foi enviada e ainda não foi aceita */}
+            {/* Registrar aceite — proposta enviada/elaborada sem fechamento registrado */}
             {["proposta_elaborada", "proposta_enviada"].includes(cliente.status) && !cliente.data_fechamento && (
               <button
                 onClick={() => handleStatusChange("proposta_aceita")}
                 className="text-sm py-2 px-4 rounded-xl font-semibold transition-all duration-200"
-                style={{
-                  background: "linear-gradient(135deg, #10b981, #059669)",
-                  color: "white",
-                  border: "none",
-                }}
+                style={{ background: "linear-gradient(135deg, #10b981, #059669)", color: "white", border: "none" }}
               >
                 ✅ Registrar aceite
               </button>
             )}
-            {/* Editar valor de fechamento quando já aceito */}
-            {cliente.status === "proposta_aceita" && (
+            {/* Registrar fechamento — qualquer estágio pós-proposta sem valor registrado */}
+            {["proposta_aceita", "em_execucao", "entregue", "pos_venda"].includes(cliente.status) && !cliente.data_fechamento && (
               <button
-                onClick={() => handleStatusChange("proposta_aceita")}
+                onClick={() => {
+                  setPendingStatus("proposta_aceita");
+                  setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "" });
+                }}
+                className="text-sm py-2 px-4 rounded-xl font-semibold transition-all duration-200"
+                style={{ background: "linear-gradient(135deg, #c9a84c, #a07830)", color: "white", border: "none" }}
+              >
+                💰 Registrar fechamento
+              </button>
+            )}
+            {/* Editar fechamento quando já existe */}
+            {cliente.data_fechamento && (
+              <button
+                onClick={() => {
+                  setPendingStatus("proposta_aceita");
+                  setModalData({ data: cliente.data_fechamento?.split("T")[0] || new Date().toISOString().split("T")[0], valor: cliente.valor_fechamento ? String(cliente.valor_fechamento * 100) : "", prazo: "" });
+                }}
                 className="btn-secondary text-sm py-2"
               >
-                💰 Editar fechamento
+                ✏️ Editar fechamento
               </button>
             )}
             <Link href={`/admin/clientes/${id}/proposta`} className="btn-primary text-sm py-2">+ Proposta</Link>
