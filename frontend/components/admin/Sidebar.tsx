@@ -17,12 +17,12 @@ const NAV_ITEMS = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true); // dark por padrão
 
-  // Apply theme on mount and sync across navigations
   useEffect(() => {
     const saved = localStorage.getItem("admin_theme");
-    const isDark = saved === "dark";
+    // Dark por padrão — só vai para light se o usuário explicitamente escolheu "light"
+    const isDark = saved !== "light";
     setDarkMode(isDark);
     applyTheme(isDark);
   }, []);
@@ -50,7 +50,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col py-6 px-4"
+      className="w-64 min-h-screen flex flex-col py-6 px-4 flex-shrink-0"
       style={{ background: "#0f2044" }}
     >
       <div className="flex items-center gap-3 px-2 mb-8">

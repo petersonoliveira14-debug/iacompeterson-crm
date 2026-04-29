@@ -89,17 +89,18 @@ export default function PipelinePage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen" style={{ background: "#0a1628" }}>
       <Sidebar />
       <main className="flex-1 p-6 overflow-x-auto">
-        <h1 className="text-2xl font-bold text-slate-900 mb-6">
+        <h1 className="text-2xl font-bold mb-6" style={{ color: "#f1f5f9" }}>
           Pipeline Kanban
         </h1>
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-slate-400">
+          <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.40)" }}>
             <span
-              className="inline-block w-4 h-4 rounded-full border-2 border-slate-300 border-t-slate-500 animate-spin"
+              className="inline-block w-4 h-4 rounded-full border-2 animate-spin"
+              style={{ borderColor: "rgba(255,255,255,0.20)", borderTopColor: "rgba(255,255,255,0.60)" }}
               aria-hidden="true"
             />
             Carregando pipeline...
@@ -110,7 +111,14 @@ export default function PipelinePage() {
               const items = clientes.filter((c) => c.status === stage.id);
               return (
                 <div key={stage.id} className="w-52 flex-shrink-0">
-                  <div className="rounded-2xl border border-slate-200 bg-slate-100/50 p-3">
+                  {/* Column container — inline style para garantir dark look */}
+                  <div
+                    className="rounded-2xl p-3"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.10)",
+                    }}
+                  >
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3">
                       <span
@@ -118,10 +126,20 @@ export default function PipelinePage() {
                         style={{ background: stage.dot }}
                         aria-hidden="true"
                       />
-                      <p className="text-xs font-bold text-slate-600 uppercase tracking-wide flex-1 leading-tight">
+                      <p
+                        className="text-xs font-bold uppercase tracking-wide flex-1 leading-tight"
+                        style={{ color: "rgba(255,255,255,0.65)" }}
+                      >
                         {stage.label}
                       </p>
-                      <span className="text-xs bg-white border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded-full font-medium tabular-nums">
+                      <span
+                        className="text-xs px-1.5 py-0.5 rounded-full font-medium tabular-nums"
+                        style={{
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          color: "rgba(255,255,255,0.70)",
+                        }}
+                      >
                         {items.length}
                       </span>
                     </div>
@@ -129,7 +147,10 @@ export default function PipelinePage() {
                     {/* Cards */}
                     <div className="space-y-2">
                       {items.length === 0 && (
-                        <p className="text-xs text-slate-400 text-center py-6">
+                        <p
+                          className="text-xs text-center py-6"
+                          style={{ color: "rgba(255,255,255,0.28)" }}
+                        >
                           Vazio
                         </p>
                       )}
@@ -179,27 +200,35 @@ function PipelineCard({ cliente: c, pct, dias }: PipelineCardProps) {
   return (
     <Link
       href={`/admin/clientes/${c.id}`}
-      className="block bg-white rounded-xl p-3 border transition-all duration-150 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400"
+      className="block rounded-xl p-3 transition-all duration-150 focus:outline-none"
       style={{
-        borderColor: hovered ? "#c9a84c" : "#e2e8f0",
+        background: hovered ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.06)",
+        border: `1px solid ${hovered ? "#c9a84c" : "rgba(255,255,255,0.12)"}`,
+        boxShadow: hovered ? "0 2px 8px rgba(0,0,0,0.30)" : "none",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       aria-label={`Ver cliente ${c.nome_empresa || c.nome_contato}`}
     >
-      <p className="text-sm font-semibold text-slate-800 truncate leading-tight">
+      <p
+        className="text-sm font-semibold truncate leading-tight"
+        style={{ color: "#e2e8f0" }}
+      >
         {c.nome_empresa || c.nome_contato || "—"}
       </p>
 
       {subtitulo && (
-        <p className="text-xs text-slate-500 mt-0.5 truncate">{subtitulo}</p>
+        <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(255,255,255,0.48)" }}>
+          {subtitulo}
+        </p>
       )}
 
       {/* Checklist progress bar */}
       {pct !== undefined && (
         <div className="mt-2">
           <div
-            className="h-1.5 bg-slate-100 rounded-full overflow-hidden"
+            className="h-1.5 rounded-full overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.10)" }}
             role="progressbar"
             aria-valuenow={pct}
             aria-valuemin={0}
@@ -211,11 +240,13 @@ function PipelineCard({ cliente: c, pct, dias }: PipelineCardProps) {
               style={{ width: `${pct}%`, background: "#c9a84c" }}
             />
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">{pct}% concluído</p>
+          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.40)" }}>
+            {pct}% concluído
+          </p>
         </div>
       )}
 
-      {/* Prazo de execucao */}
+      {/* Prazo de execução */}
       {dias !== null && (
         <p
           className="text-xs mt-1.5 font-medium"

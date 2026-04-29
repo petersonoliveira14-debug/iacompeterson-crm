@@ -152,17 +152,16 @@ export default function PropostaBuilderPage() {
       if (!clienteData) return;
       setCliente(clienteData);
 
-      // 2) Verificar se já existe proposta para este cliente
+      // 2) Query 1: verificar se já existe proposta para este cliente (sem join)
       const { data: propostaExistente } = await supabase
         .from("propostas")
-        .select("id, token, validade_ate, proposta_pacotes(id, nome, descricao, itens, valor, prazo_dias, destaque)")
+        .select("id, token, validade_ate, status")
         .eq("cliente_id", id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
       if (propostaExistente) {
-        // Carregar dados da proposta existente
         setExistingPropostaId(propostaExistente.id);
         setExistingToken(propostaExistente.token);
         setIsEditing(true);
@@ -171,10 +170,15 @@ export default function PropostaBuilderPage() {
           setValidade(propostaExistente.validade_ate.split("T")[0]);
         }
 
-        const pacotesExistentes = (propostaExistente.proposta_pacotes as any[]) || [];
-        if (pacotesExistentes.length > 0) {
+        // Query 2: buscar pacotes separadamente (evita problema de maybeSingle + join 1→N)
+        const { data: pacotesData } = await supabase
+          .from("proposta_pacotes")
+          .select("*")
+          .eq("proposta_id", propostaExistente.id);
+
+        if (pacotesData && pacotesData.length > 0) {
           setPacotes(
-            pacotesExistentes.map((p: any) => ({
+            pacotesData.map((p: any) => ({
               nome: p.nome || "",
               descricao: p.descricao || "",
               itens: Array.isArray(p.itens) ? p.itens.join("\n") : p.itens || "",
@@ -308,10 +312,16 @@ export default function PropostaBuilderPage() {
 
         {/* Link da proposta existente (sempre visível quando existe) */}
         {propostaLink && (
-          <div className="bg-gold-50 border border-gold-200 rounded-xl p-4 mb-5">
-            <p className="text-xs font-semibold text-navy-800 mb-2">🔗 Link da proposta:</p>
+          <div
+            className="rounded-xl p-4 mb-5"
+            style={{
+              background: "rgba(201,168,76,0.10)",
+              border: "1px solid rgba(201,168,76,0.28)",
+            }}
+          >
+            <p className="text-xs font-semibold mb-2" style={{ color: "#c9a84c" }}>🔗 Link da proposta:</p>
             <div className="flex gap-2">
-              <code className="text-sm text-navy-800 flex-1 overflow-x-auto break-all">{propostaLink}</code>
+              <code className="text-sm flex-1 overflow-x-auto break-all" style={{ color: "#e8c96a" }}>{propostaLink}</code>
               <button
                 onClick={() => { navigator.clipboard.writeText(propostaLink!); toast.success("Copiado!"); }}
                 className="btn-primary py-1.5 px-3 text-xs flex-shrink-0"
@@ -324,8 +334,16 @@ export default function PropostaBuilderPage() {
 
         {/* Aviso de pré-preenchimento */}
         {cliente && !isEditing && (
-          <div className="bg-gold-50 border border-gold-200 rounded-xl p-3 mb-5 text-sm text-navy-800">
-            ✨ Pacotes pré-preenchidos com base no briefing de <strong>{cliente.nome_empresa || cliente.nome_contato}</strong>. Revise e ajuste os valores antes de criar.
+          <div
+            className="rounded-xl p-3 mb-5 text-sm"
+            style={{
+              background: "rgba(201,168,76,0.12)",
+              border: "1px solid rgba(201,168,76,0.30)",
+              color: "#c9a84c",
+            }}
+          >
+            ✨ Pacotes pré-preenchidos com base no briefing de{" "}
+            <strong style={{ color: "#e8c96a" }}>{cliente.nome_empresa || cliente.nome_contato}</strong>. Revise e ajuste os valores antes de criar.
           </div>
         )}
 
