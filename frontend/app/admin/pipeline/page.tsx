@@ -89,7 +89,7 @@ export default function PipelinePage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#0a1628" }}>
+    <div className="flex min-h-screen" style={{ background: "#07101f" }}>
       <Sidebar />
       <main className="flex-1 p-6 overflow-x-auto">
         <h1 className="text-2xl font-bold mb-6" style={{ color: "#f1f5f9" }}>
@@ -111,12 +111,12 @@ export default function PipelinePage() {
               const items = clientes.filter((c) => c.status === stage.id);
               return (
                 <div key={stage.id} className="w-52 flex-shrink-0">
-                  {/* Column container — inline style para garantir dark look */}
+                  {/* Column container */}
                   <div
                     className="rounded-2xl p-3"
                     style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.10)",
+                      background: "#0f2044",
+                      border: "1px solid rgba(255,255,255,0.12)",
                     }}
                   >
                     {/* Column header */}
@@ -128,16 +128,16 @@ export default function PipelinePage() {
                       />
                       <p
                         className="text-xs font-bold uppercase tracking-wide flex-1 leading-tight"
-                        style={{ color: "rgba(255,255,255,0.65)" }}
+                        style={{ color: "rgba(255,255,255,0.85)" }}
                       >
                         {stage.label}
                       </p>
                       <span
                         className="text-xs px-1.5 py-0.5 rounded-full font-medium tabular-nums"
                         style={{
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.12)",
-                          color: "rgba(255,255,255,0.70)",
+                          background: "rgba(255,255,255,0.12)",
+                          border: "1px solid rgba(255,255,255,0.18)",
+                          color: "rgba(255,255,255,0.90)",
                         }}
                       >
                         {items.length}
@@ -149,7 +149,7 @@ export default function PipelinePage() {
                       {items.length === 0 && (
                         <p
                           className="text-xs text-center py-6"
-                          style={{ color: "rgba(255,255,255,0.28)" }}
+                          style={{ color: "rgba(255,255,255,0.38)" }}
                         >
                           Vazio
                         </p>
@@ -202,9 +202,9 @@ function PipelineCard({ cliente: c, pct, dias }: PipelineCardProps) {
       href={`/admin/clientes/${c.id}`}
       className="block rounded-xl p-3 transition-all duration-150 focus:outline-none"
       style={{
-        background: hovered ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.06)",
-        border: `1px solid ${hovered ? "#c9a84c" : "rgba(255,255,255,0.12)"}`,
-        boxShadow: hovered ? "0 2px 8px rgba(0,0,0,0.30)" : "none",
+        background: hovered ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.10)",
+        border: `1px solid ${hovered ? "#c9a84c" : "rgba(255,255,255,0.16)"}`,
+        boxShadow: hovered ? "0 2px 8px rgba(0,0,0,0.40)" : "0 1px 3px rgba(0,0,0,0.20)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
