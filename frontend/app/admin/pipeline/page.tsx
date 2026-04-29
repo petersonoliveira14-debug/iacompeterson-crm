@@ -67,15 +67,12 @@ export default function PipelinePage() {
     Promise.all([
       supabase
         .from("clientes")
-        .select(
-          "id, nome_contato, nome_empresa, status, segmento, faixa_investimento, data_inicio_execucao, prazo_execucao_dias"
-        )
+        .select("id, nome_contato, nome_empresa, status, segmento, faixa_investimento, data_inicio_execucao, prazo_execucao_dias")
         .order("created_at", { ascending: false })
         .limit(200),
       supabase.from("checklists").select("cliente_id, itens"),
     ]).then(([clientesRes, checklistsRes]) => {
       setClientes((clientesRes.data as Cliente[]) || []);
-
       const map: Record<string, number> = {};
       for (const ch of (checklistsRes.data as ChecklistRow[]) || []) {
         const itens = ch.itens || [];
@@ -89,18 +86,18 @@ export default function PipelinePage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#07101f" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--admin-page-bg)" }}>
       <Sidebar />
       <main className="flex-1 p-6 overflow-x-auto">
-        <h1 className="text-2xl font-bold mb-6" style={{ color: "#f1f5f9" }}>
+        <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--admin-text-1)" }}>
           Pipeline Kanban
         </h1>
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm" style={{ color: "rgba(255,255,255,0.40)" }}>
+          <div className="flex items-center gap-2 text-sm" style={{ color: "var(--admin-text-3)" }}>
             <span
               className="inline-block w-4 h-4 rounded-full border-2 animate-spin"
-              style={{ borderColor: "rgba(255,255,255,0.20)", borderTopColor: "rgba(255,255,255,0.60)" }}
+              style={{ borderColor: "var(--admin-spinner-1)", borderTopColor: "var(--admin-spinner-2)" }}
               aria-hidden="true"
             />
             Carregando pipeline...
@@ -111,12 +108,11 @@ export default function PipelinePage() {
               const items = clientes.filter((c) => c.status === stage.id);
               return (
                 <div key={stage.id} className="w-52 flex-shrink-0">
-                  {/* Column container */}
                   <div
                     className="rounded-2xl p-3"
                     style={{
-                      background: "#0f2044",
-                      border: "1px solid rgba(255,255,255,0.12)",
+                      background: "var(--admin-col-bg)",
+                      border: "1px solid var(--admin-col-border)",
                     }}
                   >
                     {/* Column header */}
@@ -128,16 +124,16 @@ export default function PipelinePage() {
                       />
                       <p
                         className="text-xs font-bold uppercase tracking-wide flex-1 leading-tight"
-                        style={{ color: "rgba(255,255,255,0.85)" }}
+                        style={{ color: "var(--admin-text-2)" }}
                       >
                         {stage.label}
                       </p>
                       <span
                         className="text-xs px-1.5 py-0.5 rounded-full font-medium tabular-nums"
                         style={{
-                          background: "rgba(255,255,255,0.12)",
-                          border: "1px solid rgba(255,255,255,0.18)",
-                          color: "rgba(255,255,255,0.90)",
+                          background: "var(--admin-badge-bg)",
+                          border: "1px solid var(--admin-badge-border)",
+                          color: "var(--admin-badge-text)",
                         }}
                       >
                         {items.length}
@@ -147,28 +143,15 @@ export default function PipelinePage() {
                     {/* Cards */}
                     <div className="space-y-2">
                       {items.length === 0 && (
-                        <p
-                          className="text-xs text-center py-6"
-                          style={{ color: "rgba(255,255,255,0.38)" }}
-                        >
+                        <p className="text-xs text-center py-6" style={{ color: "var(--admin-text-3)" }}>
                           Vazio
                         </p>
                       )}
                       {items.map((c) => {
                         const pct = checklistMap[c.id];
-                        const dias =
-                          stage.id === "em_execucao"
-                            ? diasRestantes(c)
-                            : null;
-
+                        const dias = stage.id === "em_execucao" ? diasRestantes(c) : null;
                         return (
-                          <PipelineCard
-                            key={c.id}
-                            cliente={c}
-                            stageDot={stage.dot}
-                            pct={pct}
-                            dias={dias}
-                          />
+                          <PipelineCard key={c.id} cliente={c} pct={pct} dias={dias} />
                         );
                       })}
                     </div>
@@ -185,50 +168,42 @@ export default function PipelinePage() {
 
 interface PipelineCardProps {
   cliente: Cliente;
-  stageDot: string;
   pct: number | undefined;
   dias: number | null;
 }
 
 function PipelineCard({ cliente: c, pct, dias }: PipelineCardProps) {
   const [hovered, setHovered] = useState(false);
-
-  const subtitulo = [c.segmento, c.faixa_investimento]
-    .filter(Boolean)
-    .join(" · ");
+  const subtitulo = [c.segmento, c.faixa_investimento].filter(Boolean).join(" · ");
 
   return (
     <Link
       href={`/admin/clientes/${c.id}`}
       className="block rounded-xl p-3 transition-all duration-150 focus:outline-none"
       style={{
-        background: hovered ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.10)",
-        border: `1px solid ${hovered ? "#c9a84c" : "rgba(255,255,255,0.16)"}`,
-        boxShadow: hovered ? "0 2px 8px rgba(0,0,0,0.40)" : "0 1px 3px rgba(0,0,0,0.20)",
+        background: hovered ? "var(--admin-card-bg-hover)" : "var(--admin-card-bg)",
+        border: `1px solid ${hovered ? "#c9a84c" : "var(--admin-card-border)"}`,
+        boxShadow: hovered ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       aria-label={`Ver cliente ${c.nome_empresa || c.nome_contato}`}
     >
-      <p
-        className="text-sm font-semibold truncate leading-tight"
-        style={{ color: "#e2e8f0" }}
-      >
+      <p className="text-sm font-semibold truncate leading-tight" style={{ color: "var(--admin-text-1)" }}>
         {c.nome_empresa || c.nome_contato || "—"}
       </p>
 
       {subtitulo && (
-        <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(255,255,255,0.48)" }}>
+        <p className="text-xs mt-0.5 truncate" style={{ color: "var(--admin-text-2)" }}>
           {subtitulo}
         </p>
       )}
 
-      {/* Checklist progress bar */}
       {pct !== undefined && (
         <div className="mt-2">
           <div
             className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.10)" }}
+            style={{ background: "var(--admin-badge-bg)" }}
             role="progressbar"
             aria-valuenow={pct}
             aria-valuemin={0}
@@ -240,21 +215,15 @@ function PipelineCard({ cliente: c, pct, dias }: PipelineCardProps) {
               style={{ width: `${pct}%`, background: "#c9a84c" }}
             />
           </div>
-          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.40)" }}>
+          <p className="text-xs mt-0.5" style={{ color: "var(--admin-text-3)" }}>
             {pct}% concluído
           </p>
         </div>
       )}
 
-      {/* Prazo de execução */}
       {dias !== null && (
-        <p
-          className="text-xs mt-1.5 font-medium"
-          style={{ color: dias >= 0 ? "#f97316" : "#ef4444" }}
-        >
-          {dias >= 0
-            ? `⏱ ${dias} dias restantes`
-            : `⚠️ Prazo vencido há ${Math.abs(dias)} dias`}
+        <p className="text-xs mt-1.5 font-medium" style={{ color: dias >= 0 ? "#f97316" : "#ef4444" }}>
+          {dias >= 0 ? `⏱ ${dias} dias restantes` : `⚠️ Prazo vencido há ${Math.abs(dias)} dias`}
         </p>
       )}
     </Link>

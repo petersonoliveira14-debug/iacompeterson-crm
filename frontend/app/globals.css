@@ -105,11 +105,45 @@ h3 { letter-spacing: -0.015em; }
   animation-play-state: paused;
 }
 
+/* ─── CSS Variables para o tema admin (light por padrão) ───────────────────── */
+
+:root {
+  --admin-page-bg:      #f1f5f9;
+  --admin-col-bg:       #e2e8f0;
+  --admin-col-border:   rgba(0,0,0,0.10);
+  --admin-card-bg:      #ffffff;
+  --admin-card-bg-hover:#f8fafc;
+  --admin-card-border:  rgba(0,0,0,0.10);
+  --admin-text-1:       #0f172a;
+  --admin-text-2:       #475569;
+  --admin-text-3:       #94a3b8;
+  --admin-badge-bg:     rgba(0,0,0,0.06);
+  --admin-badge-border: rgba(0,0,0,0.12);
+  --admin-badge-text:   #334155;
+  --admin-spinner-1:    rgba(0,0,0,0.15);
+  --admin-spinner-2:    rgba(0,0,0,0.50);
+}
+
 /* ─── Admin dark theme ("small dark") ──────────────────────────────────────── */
 
+html.admin-dark {
+  --admin-page-bg:      #07101f;
+  --admin-col-bg:       #0f2044;
+  --admin-col-border:   rgba(255,255,255,0.12);
+  --admin-card-bg:      rgba(255,255,255,0.10);
+  --admin-card-bg-hover:rgba(255,255,255,0.16);
+  --admin-card-border:  rgba(255,255,255,0.16);
+  --admin-text-1:       #f1f5f9;
+  --admin-text-2:       rgba(255,255,255,0.70);
+  --admin-text-3:       rgba(255,255,255,0.38);
+  --admin-badge-bg:     rgba(255,255,255,0.12);
+  --admin-badge-border: rgba(255,255,255,0.18);
+  --admin-badge-text:   rgba(255,255,255,0.90);
+  --admin-spinner-1:    rgba(255,255,255,0.20);
+  --admin-spinner-2:    rgba(255,255,255,0.60);
+}
+
 .admin-dark {
-  min-height: 100vh;
-  background: #0a1628;
   color-scheme: dark;
 }
 
