@@ -279,11 +279,9 @@ export default function PropostaBuilderPage() {
     }
   };
 
-  const propostaLink = savedToken
-    ? `${typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/proposta/${savedToken}`
-    : existingToken
-      ? `${typeof window !== "undefined" ? window.location.origin : "https://iacompeterson.com.br"}/proposta/${existingToken}`
-      : null;
+  // Sempre usa o domínio principal — nunca master.* (que seria 404 via middleware)
+  const token = savedToken || existingToken;
+  const propostaLink = token ? `https://iacompeterson.com.br/proposta/${token}` : null;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
