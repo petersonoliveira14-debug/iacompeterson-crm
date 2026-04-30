@@ -477,10 +477,10 @@ function PacoteCard({ pacote, selected, onSelect }: {
     >
       {pacote.destaque && (
         <div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap"
+          className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
           style={{ background: GOLD, color: NAVY }}
         >
-          ⭐ Mais escolhido
+          ✦ Ideal para você
         </div>
       )}
 

@@ -349,9 +349,9 @@ function Slide6Pacotes({ data }: { data: ApresentacaoData }) {
                 background: p.destaque ? "#fffbf0" : "white",
               }}>
               {p.destaque && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-sm font-bold text-white"
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold text-white"
                   style={{ background: GOLD }}>
-                  ⭐ Mais escolhido
+                  ✦ Ideal para você
                 </div>
               )}
               <p className="text-base font-bold text-slate-800 mb-1">{p.nome}</p>
