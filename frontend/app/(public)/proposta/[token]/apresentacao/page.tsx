@@ -442,6 +442,18 @@ export default function ApresentacaoPage() {
   }, [token]);
 
   const TOTAL_SLIDES = 9;
+  // Slides com fundo escuro (navy) — navegação usa cores claras
+  // Slides 0,2,4,7,8 = dark; 1,3,5,6 = light
+  const DARK_SLIDES = new Set([0, 2, 4, 7, 8]);
+  const isDarkSlide = DARK_SLIDES.has(slide);
+  const navBtnBg    = isDarkSlide ? "rgba(255,255,255,0.15)" : "rgba(15,32,68,0.12)";
+  const navBtnColor = isDarkSlide ? "#ffffff" : NAVY;
+  const navDotInactive = isDarkSlide ? "rgba(255,255,255,0.35)" : "rgba(15,32,68,0.25)";
+  const navCounterBg   = isDarkSlide ? "rgba(0,0,0,0.35)" : "rgba(15,32,68,0.10)";
+  const navCounterColor = isDarkSlide ? "rgba(255,255,255,0.65)" : "rgba(15,32,68,0.55)";
+  const navBackBg    = isDarkSlide ? "rgba(255,255,255,0.10)" : "rgba(15,32,68,0.08)";
+  const navBackColor = isDarkSlide ? "rgba(255,255,255,0.75)" : "rgba(15,32,68,0.65)";
+
   const prev = useCallback(() => setSlide(s => Math.max(0, s - 1)), []);
   const next = useCallback(() => setSlide(s => Math.min(TOTAL_SLIDES - 1, s + 1)), []);
 
@@ -494,7 +506,7 @@ export default function ApresentacaoPage() {
           onClick={prev}
           disabled={slide === 0}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
-          style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
+          style={{ background: navBtnBg, color: navBtnColor, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
         >
           ←
         </button>
@@ -509,7 +521,7 @@ export default function ApresentacaoPage() {
               style={{
                 width: i === slide ? 24 : 8,
                 height: 8,
-                background: i === slide ? GOLD : "rgba(255,255,255,0.3)",
+                background: i === slide ? GOLD : navDotInactive,
               }}
             />
           ))}
@@ -519,7 +531,7 @@ export default function ApresentacaoPage() {
           onClick={next}
           disabled={slide === TOTAL_SLIDES - 1}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
-          style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
+          style={{ background: navBtnBg, color: navBtnColor, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
         >
           →
         </button>
@@ -527,7 +539,7 @@ export default function ApresentacaoPage() {
 
       {/* Slide counter */}
       <div className="fixed top-4 right-4 text-xs z-50 px-3 py-1.5 rounded-full"
-        style={{ background: "rgba(0,0,0,0.3)", color: "rgba(255,255,255,0.6)" }}>
+        style={{ background: navCounterBg, color: navCounterColor }}>
         {slide + 1} / {TOTAL_SLIDES}
       </div>
 
@@ -535,7 +547,7 @@ export default function ApresentacaoPage() {
       <Link
         href={`/proposta/${token}`}
         className="fixed top-4 left-4 z-50 text-xs px-3 py-1.5 rounded-full transition-all"
-        style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+        style={{ background: navBackBg, color: navBackColor }}
       >
         ← Proposta
       </Link>
