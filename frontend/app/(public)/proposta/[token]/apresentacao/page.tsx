@@ -294,6 +294,11 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
           )}
         </div>
 
+        {/* Disclaimer */}
+        <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.28)" }}>
+          * Investimento referente ao desenvolvimento do projeto. Custos com IA (tokens/API), hospedagem e banco de dados são por conta do cliente.
+        </p>
+
         {/* ROI callout */}
         <div className="rounded-2xl p-5 text-left" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
           {budgetLabel && paybackMeses ? (

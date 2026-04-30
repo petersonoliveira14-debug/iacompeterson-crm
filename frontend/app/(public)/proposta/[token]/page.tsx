@@ -301,6 +301,11 @@ export default function PropostaPage() {
                       )}
                     </div>
 
+                    {/* Disclaimer */}
+                    <p className="text-xs text-center mb-3" style={{ color: "rgba(255,255,255,0.3)" }}>
+                      * Os valores acima referem-se ao desenvolvimento do projeto. Custos com IA (tokens/API), hospedagem e banco de dados são por conta do cliente.
+                    </p>
+
                     {/* ROI text */}
                     <div className="rounded-xl p-4" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.18)" }}>
                       <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
