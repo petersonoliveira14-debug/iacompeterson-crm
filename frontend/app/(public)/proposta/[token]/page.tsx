@@ -190,9 +190,28 @@ export default function PropostaPage() {
           ? doresCliente.map((d: string) => DORES_ANTES[d] || d)
           : ["Processos manuais consumindo tempo da equipe", "Falta de automação no atendimento ao cliente", "Dificuldade para escalar sem aumentar custos", "Decisões tomadas sem dados confiáveis"];
 
-        const itensDepois = tiposCliente.length > 0
+        // Benefícios funcionais (baseados na solução escolhida)
+        const beneficiosFuncionais = tiposCliente.length > 0
           ? tiposCliente.map((t: string) => SOLUCOES_DEPOIS[t] || t)
-          : ["Sistema automatizado funcionando 24/7", "Equipe focada em atividades estratégicas", "Escala sem necessidade de contratar mais", "Dados e métricas em tempo real"];
+          : ["Sistema automatizado funcionando 24/7", "Equipe focada em atividades estratégicas"];
+
+        // Intangíveis — sempre adicionados para enriquecer e superar a lista de dores
+        const INTANGIVEIS = [
+          "Horas por semana recuperadas para o que realmente importa",
+          "Decisões baseadas em dados, não em intuição",
+          "Operação funcionando mesmo quando você não está",
+          "Escala sem aumento proporcional de custo",
+          "Processos documentados, replicáveis e auditáveis",
+          "Tranquilidade de saber que nada cai pelo vão",
+        ];
+
+        // Monta a lista "depois" e garante que seja sempre maior que "antes"
+        const itensDepoisBase = [...beneficiosFuncionais];
+        let idx = 0;
+        while (itensDepoisBase.length <= itensAntes.length && idx < INTANGIVEIS.length) {
+          itensDepoisBase.push(INTANGIVEIS[idx++]);
+        }
+        const itensDepois = itensDepoisBase;
 
         return (
           <section className="py-16 px-6">
