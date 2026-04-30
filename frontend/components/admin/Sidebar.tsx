@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/admin/pipeline",      emoji: "🔀", label: "Pipeline" },
   { href: "/admin/produtos",      emoji: "📦", label: "Produtos" },
   { href: "/admin/metricas",      emoji: "📈", label: "Métricas" },
+  { href: "/admin/fluxo-de-caixa", emoji: "💸", label: "Fluxo de Caixa" },
   { href: "/admin/configuracoes", emoji: "⚙️", label: "Configurações" },
 ];
 
