@@ -23,15 +23,27 @@ const PIPELINE_STAGES = [
   { value: "em_execucao", label: "Em Execução" },
   { value: "entregue", label: "Entregue" },
   { value: "pos_venda", label: "Pós-venda" },
+  { value: "negativa", label: "❌ Negativa" },
 ];
 
-const MODAL_STAGES = ["proposta_enviada", "proposta_aceita", "em_execucao"];
+const MODAL_STAGES = ["proposta_enviada", "proposta_aceita", "em_execucao", "negativa"];
 
 const MODAL_CONFIG: Record<string, { title: string; icon: string }> = {
   proposta_enviada: { title: "Proposta Enviada", icon: "📤" },
   proposta_aceita: { title: "Fechamento Registrado", icon: "🤝" },
   em_execucao: { title: "Início da Execução", icon: "🚀" },
+  negativa: { title: "Registrar Negativa", icon: "❌" },
 };
+
+const MOTIVOS_PERDA = [
+  "Preço fora do orçamento",
+  "Escolheu concorrente / outra solução",
+  "Sem urgência no momento",
+  "Projeto pausado ou cancelado internamente",
+  "Sem alinhamento de expectativas",
+  "Falta de budget aprovado",
+  "Outro",
+];
 
 // ─── Mapas de rótulos legíveis ────────────────────────────────────────────────
 
@@ -180,8 +192,8 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 
 interface StatusModalProps {
   status: string;
-  data: { data: string; valor: string; prazo: string };
-  onChange: (field: "data" | "valor" | "prazo", value: string) => void;
+  data: { data: string; valor: string; prazo: string; motivo: string; fup: string };
+  onChange: (field: "data" | "valor" | "prazo" | "motivo" | "fup", value: string) => void;
   onConfirm: () => void;
   onCancel: () => void;
   loading: boolean;
@@ -190,6 +202,8 @@ interface StatusModalProps {
 function StatusModal({ status, data, onChange, onConfirm, onCancel, loading }: StatusModalProps) {
   const config = MODAL_CONFIG[status];
   if (!config) return null;
+
+  const isNegativa = status === "negativa";
 
   return (
     <div
@@ -203,28 +217,33 @@ function StatusModal({ status, data, onChange, onConfirm, onCancel, loading }: S
         {/* Cabeçalho */}
         <div className="flex items-center gap-3 mb-5">
           <span className="text-3xl" aria-hidden="true">{config.icon}</span>
-          <h2 id="modal-title" className="text-lg font-semibold text-slate-800">
-            {config.title}
-          </h2>
+          <div>
+            <h2 id="modal-title" className="text-lg font-semibold text-slate-800">{config.title}</h2>
+            {isNegativa && (
+              <p className="text-xs text-slate-400 mt-0.5">Registre o motivo e agende um FUP para retomar no futuro</p>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">
-          {/* Campo de data — presente em todos os status */}
-          <div>
-            <label htmlFor="modal-data" className="text-sm font-medium text-slate-600 block mb-1">
-              {status === "proposta_enviada" && "Data de envio"}
-              {status === "proposta_aceita" && "Data de fechamento"}
-              {status === "em_execucao" && "Data de início"}
-            </label>
-            <input
-              id="modal-data"
-              type="date"
-              value={data.data}
-              onChange={(e) => onChange("data", e.target.value)}
-              className="input-field w-full"
-              disabled={loading}
-            />
-          </div>
+          {/* Campo de data */}
+          {!isNegativa && (
+            <div>
+              <label htmlFor="modal-data" className="text-sm font-medium text-slate-600 block mb-1">
+                {status === "proposta_enviada" && "Data de envio"}
+                {status === "proposta_aceita" && "Data de fechamento"}
+                {status === "em_execucao" && "Data de início"}
+              </label>
+              <input
+                id="modal-data"
+                type="date"
+                value={data.data}
+                onChange={(e) => onChange("data", e.target.value)}
+                className="input-field w-full"
+                disabled={loading}
+              />
+            </div>
+          )}
 
           {/* Valor de fechamento — apenas proposta_aceita */}
           {status === "proposta_aceita" && (
@@ -262,25 +281,82 @@ function StatusModal({ status, data, onChange, onConfirm, onCancel, loading }: S
               />
             </div>
           )}
+
+          {/* ── Campos de NEGATIVA ── */}
+          {isNegativa && (
+            <>
+              {/* Data da negativa */}
+              <div>
+                <label htmlFor="modal-data-neg" className="text-sm font-medium text-slate-600 block mb-1">
+                  Data da negativa
+                </label>
+                <input
+                  id="modal-data-neg"
+                  type="date"
+                  value={data.data}
+                  onChange={(e) => onChange("data", e.target.value)}
+                  className="input-field w-full"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Motivo */}
+              <div>
+                <label htmlFor="modal-motivo" className="text-sm font-medium text-slate-600 block mb-1">
+                  Motivo da perda <span className="text-red-400">*</span>
+                </label>
+                <select
+                  id="modal-motivo"
+                  value={data.motivo}
+                  onChange={(e) => onChange("motivo", e.target.value)}
+                  className="input-field w-full"
+                  disabled={loading}
+                >
+                  <option value="">Selecione o motivo...</option>
+                  {MOTIVOS_PERDA.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Agendamento de FUP */}
+              <div>
+                <label htmlFor="modal-fup" className="text-sm font-medium text-slate-600 block mb-1">
+                  📅 Agendar FUP (follow-up)
+                  <span className="text-slate-400 font-normal ml-1">— opcional</span>
+                </label>
+                <input
+                  id="modal-fup"
+                  type="date"
+                  value={data.fup}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => onChange("fup", e.target.value)}
+                  className="input-field w-full"
+                  disabled={loading}
+                />
+                {data.fup && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    ⏰ Este lead vai aparecer na sua lista de FUPs em {new Date(data.fup + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Botões */}
         <div className="flex gap-3 mt-6">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={loading}
-            className="btn-secondary flex-1"
-          >
+          <button type="button" onClick={onCancel} disabled={loading} className="btn-secondary flex-1">
             Cancelar
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            disabled={loading}
+            disabled={loading || (isNegativa && !data.motivo)}
             className="btn-primary flex-1"
+            style={isNegativa ? { background: "#ef4444" } : {}}
           >
-            {loading ? "Salvando..." : "Confirmar"}
+            {loading ? "Salvando..." : isNegativa ? "Registrar negativa" : "Confirmar"}
           </button>
         </div>
       </div>
@@ -303,6 +379,8 @@ export default function ClienteDetailPage() {
     data: new Date().toISOString().split("T")[0],
     valor: "",
     prazo: "",
+    motivo: "",
+    fup: "",
   });
 
   useEffect(() => {
@@ -338,7 +416,7 @@ export default function ClienteDetailPage() {
   const handleStatusChange = (newStatus: string) => {
     if (MODAL_STAGES.includes(newStatus)) {
       setPendingStatus(newStatus);
-      setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "" });
+      setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "", motivo: "", fup: "" });
     } else {
       updateStatus(newStatus, {});
     }
@@ -360,6 +438,12 @@ export default function ClienteDetailPage() {
       if (modalData.prazo) {
         extraData.prazo_execucao_dias = parseInt(modalData.prazo, 10);
       }
+    } else if (pendingStatus === "negativa") {
+      extraData.data_perda = modalData.data;
+      extraData.motivo_perda = modalData.motivo;
+      if (modalData.fup) {
+        extraData.data_fup = new Date(modalData.fup + "T12:00:00").toISOString();
+      }
     }
 
     await updateStatus(pendingStatus, extraData);
@@ -370,7 +454,7 @@ export default function ClienteDetailPage() {
     setPendingStatus(null);
   };
 
-  const handleModalFieldChange = (field: "data" | "valor" | "prazo", value: string) => {
+  const handleModalFieldChange = (field: "data" | "valor" | "prazo" | "motivo" | "fup", value: string) => {
     setModalData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -440,7 +524,7 @@ export default function ClienteDetailPage() {
               <button
                 onClick={() => {
                   setPendingStatus("proposta_aceita");
-                  setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "" });
+                  setModalData({ data: new Date().toISOString().split("T")[0], valor: "", prazo: "", motivo: "", fup: "" });
                 }}
                 className="text-sm py-2 px-4 rounded-xl font-semibold transition-all duration-200"
                 style={{ background: "linear-gradient(135deg, #c9a84c, #a07830)", color: "white", border: "none" }}
@@ -453,7 +537,7 @@ export default function ClienteDetailPage() {
               <button
                 onClick={() => {
                   setPendingStatus("proposta_aceita");
-                  setModalData({ data: cliente.data_fechamento?.split("T")[0] || new Date().toISOString().split("T")[0], valor: cliente.valor_fechamento ? String(cliente.valor_fechamento * 100) : "", prazo: "" });
+                  setModalData({ data: cliente.data_fechamento?.split("T")[0] || new Date().toISOString().split("T")[0], valor: cliente.valor_fechamento ? String(cliente.valor_fechamento * 100) : "", prazo: "", motivo: "", fup: "" });
                 }}
                 className="btn-secondary text-sm py-2"
               >
@@ -497,6 +581,29 @@ export default function ClienteDetailPage() {
                 <>Valor: <strong>{formatCurrency(cliente.valor_fechamento)}</strong></>
               )}
             </span>
+          </div>
+        )}
+
+        {/* Banner de negativa */}
+        {cliente.status === "negativa" && (
+          <div className="flex items-start gap-3 px-4 py-3 mb-4 rounded-xl text-sm"
+            style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)" }}>
+            <span aria-hidden="true" className="mt-0.5">❌</span>
+            <div className="flex-1">
+              <p className="font-semibold text-red-700">
+                Negativa registrada
+                {cliente.data_perda && <> em <strong>{formatDate(cliente.data_perda.split("T")[0])}</strong></>}
+              </p>
+              {cliente.motivo_perda && (
+                <p className="text-red-600 text-xs mt-0.5">Motivo: {cliente.motivo_perda}</p>
+              )}
+              {cliente.data_fup && (
+                <p className="text-xs mt-1" style={{ color: "#c9a84c" }}>
+                  📅 FUP agendado para{" "}
+                  <strong>{new Date(cliente.data_fup).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</strong>
+                </p>
+              )}
+            </div>
           </div>
         )}
 

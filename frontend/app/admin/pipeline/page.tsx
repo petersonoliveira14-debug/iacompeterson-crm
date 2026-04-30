@@ -20,6 +20,7 @@ const STAGES = [
   { id: "em_execucao",         label: "Em Execução",       dot: "#f97316" },
   { id: "entregue",            label: "Entregue ✓",        dot: "#22c55e" },
   { id: "pos_venda",           label: "Pós-venda",         dot: "#a78bfa" },
+  { id: "negativa",            label: "❌ Negativa",        dot: "#ef4444" },
 ];
 
 interface Cliente {
