@@ -33,6 +33,13 @@ const SOLUCOES_DEPOIS: Record<string, string> = {
   plataforma: "Plataforma completa com área de membros e gestão",
 };
 
+const BUDGET_LABELS: Record<string, string> = {
+  menos_5k: "menos de R$5k/mês",
+  "5k_15k": "R$5k–R$15k/mês",
+  "15k_50k": "R$15k–R$50k/mês",
+  mais_50k: "mais de R$50k/mês",
+};
+
 // ─── Página principal ─────────────────────────────────────────────────────────
 
 export default function PropostaPage() {
@@ -235,6 +242,95 @@ export default function PropostaPage() {
                   </ul>
                 </div>
               </div>
+
+              {/* ── Argumento financeiro ── */}
+              {(() => {
+                const budget = proposta.cliente.budget_mensal;
+                const budgetLabel = budget ? BUDGET_LABELS[budget] : null;
+                const pacoteDestaque = proposta.pacotes.find(p => p.destaque) || proposta.pacotes[1];
+
+                // Custo mensal estimado por faixa para cálculo de payback
+                const BUDGET_MENSAL_VALOR: Record<string, number> = {
+                  menos_5k: 3500, "5k_15k": 8000, "15k_50k": 25000, mais_50k: 60000,
+                };
+                const custoMensal = budget ? BUDGET_MENSAL_VALOR[budget] : null;
+                const investimento = pacoteDestaque?.valor ?? 0;
+                const paybackMeses = custoMensal && investimento
+                  ? Math.ceil(investimento / (custoMensal * 0.4)) // estimativa: IA libera 40% do custo
+                  : null;
+
+                return (
+                  <div className="mt-8 rounded-2xl p-8" style={{ background: NAVY }}>
+                    <p className="text-xs font-bold tracking-widest uppercase mb-1 text-center" style={{ color: GOLD }}>
+                      O argumento financeiro
+                    </p>
+                    <h3 className="text-2xl font-bold text-white text-center mb-2" style={{ fontFamily: "'General Sans', sans-serif" }}>
+                      Por que investir agora?
+                    </h3>
+                    <p className="text-center text-sm mb-8" style={{ color: "rgba(255,255,255,0.5)" }}>
+                      Automatizar custa menos do que continuar pagando pelo problema
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-4 mb-6 items-center">
+                      {/* Custo atual */}
+                      <div className="rounded-xl p-5 text-center" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                        <p className="text-xs font-medium mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
+                          Custo atual da operação
+                        </p>
+                        <p className="text-xl font-bold text-white leading-tight">
+                          {budgetLabel ?? "~R$2.400/mês"}
+                        </p>
+                        <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>por mês</p>
+                      </div>
+
+                      {/* Seta */}
+                      <div className="text-center">
+                        <p className="text-3xl" style={{ color: "rgba(255,255,255,0.3)" }}>→</p>
+                        <p className="text-xs mt-1" style={{ color: GOLD }}>com IA</p>
+                      </div>
+
+                      {/* Investimento */}
+                      {pacoteDestaque && (
+                        <div className="rounded-xl p-5 text-center" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)" }}>
+                          <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento no projeto</p>
+                          <p className="text-xl font-bold text-white leading-tight">
+                            R$ {pacoteDestaque.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                          </p>
+                          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>pagamento único</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ROI text */}
+                    <div className="rounded-xl p-4" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.18)" }}>
+                      <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+                        💡{" "}
+                        {budgetLabel && paybackMeses ? (
+                          <>
+                            Com um custo atual de <strong style={{ color: "white" }}>{budgetLabel}</strong>,
+                            o projeto se paga em aproximadamente{" "}
+                            <strong style={{ color: GOLD }}>{paybackMeses} {paybackMeses === 1 ? "mês" : "meses"}</strong>.
+                            A partir daí, cada real economizado vira <strong style={{ color: GOLD }}>lucro direto</strong>.
+                          </>
+                        ) : (
+                          <>
+                            Um atendente CLT com salário mínimo custa{" "}
+                            <strong style={{ color: "white" }}>~R$2.400/mês</strong> com encargos.
+                            Em 12 meses são <strong style={{ color: "white" }}>~R$28.800</strong> {" "}
+                            — e a IA entrega mais, não tira férias e escala sem custo adicional.
+                            {pacoteDestaque && (
+                              <>{" "}O payback deste projeto é de apenas{" "}
+                              <strong style={{ color: GOLD }}>
+                                {Math.ceil(pacoteDestaque.valor / 2400)} {Math.ceil(pacoteDestaque.valor / 2400) === 1 ? "mês" : "meses"}
+                              </strong>.</>
+                            )}
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </section>
         );

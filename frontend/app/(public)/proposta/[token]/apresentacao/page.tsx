@@ -227,6 +227,23 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
   const budget = data.cliente.budget_mensal;
   const budgetLabel = budget ? BUDGET_LABELS[budget] : null;
   const pacoteDestaque = data.pacotes.find(p => p.destaque) || data.pacotes[1];
+
+  // Custo mensal estimado por faixa (valor central da faixa)
+  const BUDGET_VALOR: Record<string, number> = {
+    menos_5k: 3500, "5k_15k": 8000, "15k_50k": 25000, mais_50k: 60000,
+  };
+  const custoMensal = budget ? BUDGET_VALOR[budget] : null;
+  const investimento = pacoteDestaque?.valor ?? 0;
+
+  // Payback: investimento / (40% do custo mensal liberado pela IA)
+  const paybackMeses = custoMensal && investimento
+    ? Math.ceil(investimento / (custoMensal * 0.4))
+    : null;
+
+  // Sem budget informado: comparação CLT salário mínimo 2025 (R$1.518 + ~60% encargos ≈ R$2.430)
+  const CLT_CUSTO = 2430;
+  const paybackCLT = investimento ? Math.ceil(investimento / CLT_CUSTO) : null;
+
   return (
     <SlideWrapper dark>
       <div className="max-w-3xl mx-auto w-full text-center">
@@ -239,16 +256,33 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
         <p className="text-lg mb-10" style={{ color: "#d0def4" }}>
           Automatizar custa menos do que continuar pagando pelo problema
         </p>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {/* Custo atual */}
           <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <p className="text-xs font-medium mb-2" style={{ color: "#8ba3c7" }}>Custo atual da operação</p>
-            <p className="text-2xl font-bold text-white">{budgetLabel || "A calcular"}</p>
-            <p className="text-xs mt-1" style={{ color: "#8ba3c7" }}>por mês</p>
+            {budgetLabel ? (
+              <>
+                <p className="text-2xl font-bold text-white">{budgetLabel}</p>
+                <p className="text-xs mt-1" style={{ color: "#8ba3c7" }}>por mês</p>
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-bold text-white">~R$2.430/mês</p>
+                <p className="text-xs mt-1 leading-snug" style={{ color: "#8ba3c7" }}>
+                  equivale a 1 atendente CLT<br />com salário mínimo + encargos
+                </p>
+              </>
+            )}
           </div>
+
+          {/* Seta */}
           <div className="rounded-2xl p-6 flex flex-col items-center justify-center">
-            <span className="text-4xl">→</span>
+            <span className="text-4xl" style={{ color: "rgba(255,255,255,0.3)" }}>→</span>
             <p className="text-xs mt-2" style={{ color: GOLD }}>com IA</p>
           </div>
+
+          {/* Investimento */}
           {pacoteDestaque && (
             <div className="rounded-2xl p-6" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)" }}>
               <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento no projeto</p>
@@ -259,11 +293,32 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
             </div>
           )}
         </div>
+
+        {/* ROI callout */}
         <div className="rounded-2xl p-5 text-left" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
-          <p className="text-sm" style={{ color: "#d0def4" }}>
-            💡 Se você gasta hoje <strong style={{ color: "white" }}>{budgetLabel || "valor significativo"}</strong> com processos manuais,
-            a solução se paga em poucos meses — e o que sobra vira <strong style={{ color: GOLD }}>lucro direto</strong>.
-          </p>
+          {budgetLabel && paybackMeses ? (
+            <p className="text-sm" style={{ color: "#d0def4" }}>
+              💡 Com o custo atual de <strong style={{ color: "white" }}>{budgetLabel}</strong>,
+              a solução se paga em aproximadamente{" "}
+              <strong style={{ color: GOLD }}>
+                {paybackMeses} {paybackMeses === 1 ? "mês" : "meses"}
+              </strong>.
+              {" "}A partir daí, cada real economizado vira <strong style={{ color: GOLD }}>lucro direto</strong>.
+            </p>
+          ) : (
+            <p className="text-sm" style={{ color: "#d0def4" }}>
+              🔥 Um atendente CLT com salário mínimo custa{" "}
+              <strong style={{ color: "white" }}>~R$2.430/mês</strong> com todos os encargos.
+              Em 12 meses você gasta <strong style={{ color: "white" }}>~R$29.160</strong> {" "}
+              — e a IA faz mais, não tira férias e não pede aumento.
+              {paybackCLT && (
+                <>{" "}O payback deste projeto é de apenas{" "}
+                <strong style={{ color: GOLD, fontSize: "1.05em" }}>
+                  {paybackCLT} {paybackCLT === 1 ? "mês" : "meses"}
+                </strong>. 🚀</>
+              )}
+            </p>
+          )}
         </div>
       </div>
     </SlideWrapper>
