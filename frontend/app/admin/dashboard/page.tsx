@@ -21,6 +21,7 @@ interface Cliente {
   data_fechamento?: string;
   data_inicio_execucao?: string;
   prazo_execucao_dias?: number;
+  faixa_investimento?: string;
 }
 
 interface ChecklistRow {
@@ -269,6 +270,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [custos, setCustos] = useState<{ ia: number; fixo: number; variavel: number }>({ ia: 0, fixo: 0, variavel: 0 });
 
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) {
@@ -276,11 +278,16 @@ export default function DashboardPage() {
       return;
     }
 
+    const savedCustos = localStorage.getItem("dashboard_custos");
+    if (savedCustos) {
+      try { setCustos(JSON.parse(savedCustos)); } catch {}
+    }
+
     Promise.all([
       supabase
         .from("clientes")
         .select(
-          "id, nome_contato, nome_empresa, tipo_solucao, status, created_at, valor_fechamento, data_fechamento, data_inicio_execucao, prazo_execucao_dias"
+          "id, nome_contato, nome_empresa, tipo_solucao, status, created_at, valor_fechamento, data_fechamento, data_inicio_execucao, prazo_execucao_dias, faixa_investimento"
         )
         .order("created_at", { ascending: false }),
       supabase.from("checklists").select("cliente_id, itens"),
@@ -392,6 +399,59 @@ export default function DashboardPage() {
     () => todosClientes.slice(0, 8),
     [todosClientes]
   );
+
+  // -------------------------------------------------------------------------
+  // Funil de conversão
+  // -------------------------------------------------------------------------
+
+  const emNegociacaoFunil = useMemo(
+    () => todosClientes.filter(c => ["formulario_recebido","prd_elaborado","reuniao_1","prd_aprovado","proposta_elaborada"].includes(c.status)).length,
+    [todosClientes]
+  );
+  const emPropostaFunil = useMemo(
+    () => todosClientes.filter(c => ["proposta_enviada","proposta_aceita"].includes(c.status)).length,
+    [todosClientes]
+  );
+  const fechadosFunil = useMemo(
+    () => todosClientes.filter(c => ["proposta_aceita","em_execucao","entregue","pos_venda"].includes(c.status)).length,
+    [todosClientes]
+  );
+  const negativasFunil = useMemo(
+    () => todosClientes.filter(c => c.status === "negativa").length,
+    [todosClientes]
+  );
+
+  // -------------------------------------------------------------------------
+  // Pipeline de faturamento
+  // -------------------------------------------------------------------------
+
+  const FAIXA_VALORES: Record<string, number> = { ate_2k: 2000, "2k_5k": 3500, "5k_15k": 10000, acima_15k: 20000 };
+  const receitaRealizada = useMemo(
+    () => todosClientes.reduce((sum, c) => sum + (c.valor_fechamento ?? 0), 0),
+    [todosClientes]
+  );
+  const pipelineEmAberto = useMemo(
+    () => todosClientes.filter(c => ["proposta_enviada","proposta_elaborada"].includes(c.status)),
+    [todosClientes]
+  );
+  const pipelineValor = useMemo(
+    () => pipelineEmAberto.reduce((sum, c) => sum + (FAIXA_VALORES[c.faixa_investimento || ""] || 0), 0),
+    [pipelineEmAberto]
+  );
+
+  // -------------------------------------------------------------------------
+  // ROI
+  // -------------------------------------------------------------------------
+
+  const projFechados = fechadosFunil;
+  const custoTotal = custos.ia + custos.fixo + (projFechados * custos.variavel);
+  const lucro = receitaRealizada - custoTotal;
+  const roi = custoTotal > 0 ? Math.round((lucro / custoTotal) * 100) : null;
+
+  function saveCustos(newCustos: typeof custos) {
+    setCustos(newCustos);
+    localStorage.setItem("dashboard_custos", JSON.stringify(newCustos));
+  }
 
   // -------------------------------------------------------------------------
   // Clipboard
@@ -533,6 +593,138 @@ export default function DashboardPage() {
                       </table>
                     </div>
                   )}
+                </div>
+              </section>
+            </div>
+
+            {/* ── Funil de Conversão ─────────────────────────────────────── */}
+            <section aria-label="Funil de conversão">
+              <div className="card p-6">
+                <h2 className="font-bold text-slate-900 text-lg mb-1">Funil de Conversão</h2>
+                <p className="text-sm text-slate-500 mb-6">Do lead ao projeto fechado</p>
+                <div className="flex items-center justify-between gap-2 overflow-x-auto">
+                  {[
+                    { label: "Leads", value: totalLeads, color: "#64748b" },
+                    { label: "Negociação", value: emNegociacaoFunil, color: "#8b5cf6" },
+                    { label: "Proposta", value: emPropostaFunil, color: "#c9a84c" },
+                    { label: "Fechados", value: fechadosFunil, color: "#10b981" },
+                    { label: "Negativas", value: negativasFunil, color: "#ef4444" },
+                  ].map((etapa, i, arr) => (
+                    <div key={etapa.label} className="flex items-center gap-2 flex-shrink-0">
+                      <div className="text-center min-w-[72px]">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-1"
+                          style={{ background: etapa.color }}>
+                          {etapa.value}
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium">{etapa.label}</p>
+                        {i > 0 && totalLeads > 0 && (
+                          <p className="text-xs font-semibold mt-0.5" style={{ color: etapa.color }}>
+                            {Math.round((etapa.value / totalLeads) * 100)}%
+                          </p>
+                        )}
+                      </div>
+                      {i < arr.length - 1 && (
+                        <span className="text-slate-300 text-xl flex-shrink-0">→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ── Pipeline de Faturamento + ROI ─────────────────────────── */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+              {/* Pipeline de faturamento */}
+              <section aria-label="Pipeline de faturamento">
+                <div className="card p-6 h-full">
+                  <h2 className="font-bold text-slate-900 text-lg mb-1">Pipeline de Faturamento</h2>
+                  <p className="text-sm text-slate-500 mb-6">Receita realizada vs potencial em aberto</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
+                      <div>
+                        <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Receita realizada</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-0.5" style={{ fontFamily: "'General Sans',sans-serif" }}>
+                          R$ {formatBRL(receitaRealizada)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">{fechadosFunil} projetos fechados</p>
+                      </div>
+                      <span className="text-3xl">✅</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "#c9a84c" }}>Potencial em pipeline</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-0.5" style={{ fontFamily: "'General Sans',sans-serif" }}>
+                          R$ {formatBRL(pipelineValor)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">{pipelineEmAberto.length} proposta{pipelineEmAberto.length !== 1 ? "s" : ""} em aberto</p>
+                      </div>
+                      <span className="text-3xl">📤</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50">
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total acumulado</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-0.5" style={{ fontFamily: "'General Sans',sans-serif" }}>
+                          R$ {formatBRL(receitaRealizada + pipelineValor)}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">realizado + pipeline</p>
+                      </div>
+                      <span className="text-3xl">📊</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* ROI */}
+              <section aria-label="ROI do negócio">
+                <div className="card p-6 h-full">
+                  <h2 className="font-bold text-slate-900 text-lg mb-1">ROI do Negócio</h2>
+                  <p className="text-sm text-slate-500 mb-4">Informe seus custos para calcular o retorno</p>
+                  <div className="space-y-3 mb-5">
+                    {[
+                      { key: "ia" as const, label: "💻 Custo com IA / APIs (mensal)", placeholder: "0" },
+                      { key: "fixo" as const, label: "🏠 Custo fixo mensal", placeholder: "0" },
+                      { key: "variavel" as const, label: "📦 Custo variável por projeto", placeholder: "0" },
+                    ].map(({ key, label, placeholder }) => (
+                      <div key={key}>
+                        <label className="text-xs font-medium text-slate-500 block mb-1">{label}</label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-slate-400 font-medium">R$</span>
+                          <input
+                            type="number"
+                            min={0}
+                            value={custos[key] || ""}
+                            onChange={(e) => saveCustos({ ...custos, [key]: Number(e.target.value) || 0 })}
+                            placeholder={placeholder}
+                            className="input-field flex-1 text-sm h-10"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-2 pt-4 border-t border-slate-100">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Receita realizada</span>
+                      <span className="font-semibold text-slate-800">R$ {formatBRL(receitaRealizada)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Custos estimados</span>
+                      <span className="font-semibold text-slate-800">R$ {formatBRL(custoTotal)}</span>
+                    </div>
+                    <div className="flex justify-between text-base font-bold pt-2 border-t border-slate-100">
+                      <span style={{ color: lucro >= 0 ? "#10b981" : "#ef4444" }}>Lucro estimado</span>
+                      <span style={{ color: lucro >= 0 ? "#10b981" : "#ef4444" }}>R$ {formatBRL(lucro)}</span>
+                    </div>
+                    {roi !== null && (
+                      <div className="mt-3 text-center py-3 rounded-xl" style={{ background: roi >= 0 ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)" }}>
+                        <p className="text-xs text-slate-500 mb-0.5">ROI</p>
+                        <p className="text-3xl font-bold" style={{ color: roi >= 0 ? "#10b981" : "#ef4444", fontFamily: "'General Sans',sans-serif" }}>
+                          {roi > 0 ? "+" : ""}{roi}%
+                        </p>
+                      </div>
+                    )}
+                    <p className="text-xs text-slate-400 text-center pt-1">💡 Valores salvos localmente no navegador</p>
+                  </div>
                 </div>
               </section>
             </div>
