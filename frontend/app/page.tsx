@@ -657,12 +657,6 @@ export default function LandingPage() {
                 <p style={{ color: GOLD, fontSize: "0.8rem", margin: "3px 0 0" }}>Criador do Método LEAP</p>
               </div>
 
-              {/* Stage photo badge */}
-              <div style={{ position: "absolute", top: 20, left: 20, borderRadius: 12, overflow: "hidden", width: 88, height: 88, border: "2px solid rgba(201,168,76,0.35)", boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
-                <img src="/photos/peterson-stage.jpg" alt="Peterson no palco"
-                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
-              </div>
-              <p style={{ position: "absolute", top: 114, left: 20, fontSize: 10, color: "rgba(255,255,255,0.38)", letterSpacing: "0.12em", textTransform: "uppercase", margin: 0 }}>no palco</p>
             </div>
 
             {/* Bio */}
@@ -675,13 +669,25 @@ export default function LandingPage() {
                 Não é guru. É quem faz, documenta e ensina o que funciona na prática. O OCTUS, uma plataforma de criação de conteúdo com IA, é o case mais visível do que ele ensina: construído por ele, usado por ele, vendido por ele.
               </p>
 
-              {/* Credential grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+              {/* Credential grid — row 1: outputs */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 12 }}>
                 {[
-                  { n: "10+", l: "Sistemas de IA",  icon: "🤖" },
-                  { n: "10+", l: "Sites e LPs",      icon: "🌐" },
-                  { n: "5",   l: "SaaS criados",     icon: "📦" },
-                  { n: "3m",  l: "Entregando",       icon: "⚡" },
+                  { n: "10+", l: "Sistemas de IA", icon: "🤖" },
+                  { n: "10+", l: "Sites e LPs",    icon: "🌐" },
+                  { n: "5",   l: "SaaS criados",   icon: "📦" },
+                ].map(c => (
+                  <div key={c.l} style={{ textAlign: "center", padding: "16px 12px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div style={{ fontSize: "1.1rem", marginBottom: 4 }}>{c.icon}</div>
+                    <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "1.4rem", color: GOLD, lineHeight: 1, marginBottom: 4 }}>{c.n}</p>
+                    <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.3 }}>{c.l}</p>
+                  </div>
+                ))}
+              </div>
+              {/* Credential grid — row 2: experiência */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 12, marginBottom: 28 }}>
+                {[
+                  { n: "10+", l: "Anos em gestão e projetos", icon: "📊" },
+                  { n: "~4",  l: "Anos com IA e automação",   icon: "🧠" },
                 ].map(c => (
                   <div key={c.l} style={{ textAlign: "center", padding: "16px 12px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                     <div style={{ fontSize: "1.1rem", marginBottom: 4 }}>{c.icon}</div>
