@@ -4,50 +4,31 @@ import Link from "next/link";
 import { useState } from "react";
 import { CarouselTrack, SocialLinks } from "@/components/layout/TechCarousel";
 
-// ─── Design tokens ─────────────────────────────────────────────────────────────
+/* ─── Design tokens ─────────────────────────────────────────────────────────── */
 const NAVY = "#0f2044";
 const GOLD = "#c9a84c";
 
-// ─── Dados dos produtos ────────────────────────────────────────────────────────
-
+/* ─── Dados ──────────────────────────────────────────────────────────────────── */
 const CURSOS = [
   {
-    tag: "Disponível agora",
-    tagColor: "#34d399",
-    nome: "LEAP BUILD",
-    tagline: "Do problema ao sistema",
+    tag: "Disponível agora", tagColor: "#34d399", active: true,
+    nome: "LEAP BUILD", tagline: "Do problema ao sistema",
     desc: "Você constrói um sistema real de gestão de frota corporativa — do zero ao deploy — em 22 aulas. Sem programar uma linha de código.",
-    preco: "R$498",
-    precoFull: "R$998 depois",
-    cta: "Entrar no BUILD",
-    href: "/cliente",
-    accent: GOLD,
+    preco: "R$498", precoFull: "R$998 depois", cta: "Entrar no BUILD →", href: "/cliente", accent: GOLD,
     features: ["22 aulas + 4 bônus", "Case real de frota corporativa", "Método LEAP fase a fase", "Acesso vitalício"],
   },
   {
-    tag: "Em breve",
-    tagColor: "#60a5fa",
-    nome: "LEAP RUN",
-    tagline: "Produtividade no modo gestor",
+    tag: "Em breve", tagColor: "#60a5fa", active: false,
+    nome: "LEAP RUN", tagline: "Produtividade no modo gestor",
     desc: "Seu assistente pessoal de IA configurado para a rotina do gestor — agenda, briefings, follow-ups, pesquisas e decisões.",
-    preco: "R$498",
-    precoFull: "R$998 depois",
-    cta: "Garantir preço zero",
-    href: "/cliente",
-    accent: "#60a5fa",
+    preco: "R$498", precoFull: "R$998 depois", cta: "Garantir preço zero →", href: "/cliente", accent: "#60a5fa",
     features: ["Assistente IA personalizado", "Rotina de gestor automatizada", "Sem ferramentas genéricas", "Acesso prioritário BUILD"],
   },
   {
-    tag: "Em breve",
-    tagColor: "#60a5fa",
-    nome: "LEAP SCALE",
-    tagline: "Vendas no piloto automático",
+    tag: "Em breve", tagColor: "#60a5fa", active: false,
+    nome: "LEAP SCALE", tagline: "Vendas no piloto automático",
     desc: "Sistema completo de atendimento, qualificação de leads e follow-up automatizado. O negócio vendendo 24/7 sem depender de você.",
-    preco: "R$498",
-    precoFull: "R$998 depois",
-    cta: "Garantir preço zero",
-    href: "/cliente",
-    accent: "#34d399",
+    preco: "R$498", precoFull: "R$998 depois", cta: "Garantir preço zero →", href: "/cliente", accent: "#34d399",
     features: ["Atendimento IA 24/7", "SDR automatizado", "Follow-up inteligente", "Acesso prioritário BUILD"],
   },
 ];
@@ -59,372 +40,431 @@ const DORES = [
   "Você sabe que IA pode transformar seu negócio mas não sabe por onde começar.",
 ];
 
-const RESULTADOS = [
-  { numero: "60%", desc: "de redução em tarefas operacionais nos primeiros 30 dias" },
-  { numero: "10",  desc: "dias para montar o primeiro sistema funcionando" },
-  { numero: "24/7", desc: "sua operação trabalhando mesmo quando você está dormindo" },
-  { numero: "0",   desc: "linhas de código necessárias para aplicar o Método LEAP" },
-];
-
 const SAAS_CASES = [
-  { nome: "IAra",       categoria: "Assistente de IA",                          stack: ["Claude", "Next.js"],          accent: GOLD,      emoji: "🤖" },
-  { nome: "OCTUS",      categoria: "Criação de conteúdo com IA",                stack: ["Claude Code", "Supabase"],    accent: "#60a5fa", emoji: "✍️" },
-  { nome: "Lead Radar", categoria: "Gestão de desempenho para pequenas equipes", stack: ["IA", "Automação"],           accent: "#34d399", emoji: "📡" },
-  { nome: "Black Table",categoria: "Reserva de mesas e descontos",               stack: ["IA", "Next.js"],             accent: "#a78bfa", emoji: "🍽️" },
-  { nome: "SafeNow",    categoria: "ERP para controle de EPIs",                  stack: ["IA", "Supabase"],            accent: "#f97316", emoji: "🦺" },
+  { nome: "IAra",        categoria: "Assistente de IA",                           stack: ["Claude", "Next.js"],         accent: GOLD,      emoji: "🤖" },
+  { nome: "OCTUS",       categoria: "Criação de conteúdo com IA",                 stack: ["Claude Code", "Supabase"],   accent: "#60a5fa", emoji: "✍️" },
+  { nome: "Lead Radar",  categoria: "Gestão de desempenho para pequenas equipes", stack: ["IA", "Automação"],           accent: "#34d399", emoji: "📡" },
+  { nome: "Black Table", categoria: "Reserva de mesas e descontos",               stack: ["IA", "Next.js"],             accent: "#a78bfa", emoji: "🍽️" },
+  { nome: "SafeNow",     categoria: "ERP para controle de EPIs",                  stack: ["IA", "Supabase"],            accent: "#f97316", emoji: "🦺" },
 ];
 
 const FAQ_ITEMS = [
-  { q: "Preciso saber programar?", a: "Não. O Método LEAP foi criado especificamente para gestores, não desenvolvedores. Você vai construir sistemas reais de IA sem escrever uma única linha de código." },
-  { q: "Funciona para o meu nicho?", a: "Sim. Qualquer operação com processos repetitivos se beneficia de IA. Já foram construídos sistemas para varejo, saúde, advocacia, educação, logística e muito mais." },
-  { q: "Quanto tempo por semana preciso dedicar?", a: "De 2 a 4 horas por semana durante as primeiras 4 semanas é suficiente para entregar o primeiro sistema funcionando." },
-  { q: "Qual a diferença entre LEAP e FGI?", a: "LEAP é o método prático em formato de cursos online — você aprende construindo. FGI é a imersão ao vivo com certificado de Gestor de IA, para quem quer ir além e ter formação reconhecida." },
-  { q: "E se eu não gostar?", a: "Garantia incondicional de 7 dias. Se em qualquer momento dentro dos primeiros 7 dias você sentir que não era o que esperava, devolvo 100% do valor sem perguntas e sem burocracia." },
-  { q: "Posso parcelar?", a: "Sim, em até 12x no cartão de crédito. O valor de R$498 fica em parcelas de menos de R$42/mês — menos que uma assinatura de streaming." },
+  { q: "Preciso saber programar?",                   a: "Não. O Método LEAP foi criado especificamente para gestores, não desenvolvedores. Você vai construir sistemas reais de IA sem escrever uma única linha de código." },
+  { q: "Funciona para o meu nicho?",                 a: "Sim. Qualquer operação com processos repetitivos se beneficia de IA. Já foram construídos sistemas para varejo, saúde, advocacia, educação, logística e muito mais." },
+  { q: "Quanto tempo por semana preciso dedicar?",   a: "De 2 a 4 horas por semana durante as primeiras 4 semanas é suficiente para entregar o primeiro sistema funcionando." },
+  { q: "Qual a diferença entre LEAP e FGI?",         a: "LEAP é o método prático em formato de cursos online — você aprende construindo. FGI é a imersão ao vivo com certificado de Gestor de IA, para quem quer ir além e ter formação reconhecida." },
+  { q: "E se eu não gostar?",                        a: "Garantia incondicional de 7 dias. Se em qualquer momento dentro dos primeiros 7 dias você sentir que não era o que esperava, devolvo 100% do valor sem perguntas e sem burocracia." },
+  { q: "Posso parcelar?",                            a: "Sim, em até 12x no cartão de crédito. O valor de R$498 fica em parcelas de menos de R$42/mês — menos que uma assinatura de streaming." },
 ];
 
-// ─── Divisor dourado ──────────────────────────────────────────────────────────
+/* ─── Componentes internos ───────────────────────────────────────────────────── */
+
 function GoldDivider() {
   return (
-    <div className="max-w-6xl mx-auto px-6">
-      <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent 0%, rgba(201,168,76,0.3) 30%, rgba(201,168,76,0.5) 50%, rgba(201,168,76,0.3) 70%, transparent 100%)" }} />
+    <div style={{ padding: "0 1.5rem" }}>
+      <div style={{ maxWidth: 1152, margin: "0 auto", height: 1, background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.35) 30%, rgba(201,168,76,0.55) 50%, rgba(201,168,76,0.35) 70%, transparent)" }} />
     </div>
   );
 }
 
-// ─── Componente principal ─────────────────────────────────────────────────────
+function SectionLabel({ children, color = GOLD }: { children: React.ReactNode; color?: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 12 }}>
+      <div style={{ width: 20, height: 1, background: color, opacity: 0.5 }} />
+      <p style={{ color, fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase" }}>{children}</p>
+      <div style={{ width: 20, height: 1, background: color, opacity: 0.5 }} />
+    </div>
+  );
+}
+
+/* ─── Página ─────────────────────────────────────────────────────────────────── */
 
 export default function LandingPage() {
   const [faqAberto, setFaqAberto] = useState<number | null>(null);
 
   return (
-    <div style={{ background: NAVY, fontFamily: "'DM Sans', sans-serif" }} className="min-h-screen">
+    <>
+      {/* Animações CSS */}
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-8px); }
+        }
+        @keyframes pulse-ring {
+          0%   { transform: scale(1);   opacity: 0.75; }
+          100% { transform: scale(2.2); opacity: 0; }
+        }
+        @keyframes fade-up {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .btn-gold {
+          background: linear-gradient(110deg, #c9a84c 0%, #e8c96a 40%, #c9a84c 60%, #b8943c 100%);
+          background-size: 200% auto;
+          transition: background-position 0.5s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        }
+        .btn-gold:hover {
+          background-position: right center;
+          transform: scale(1.03);
+          box-shadow: 0 0 80px rgba(201,168,76,0.55);
+        }
+        .leap-card:hover .leap-letter {
+          transform: scale(1.08) translateY(-4px);
+          opacity: 0.08;
+        }
+        .portfolio-card:hover .portfolio-overlay {
+          opacity: 1;
+        }
+        .faq-answer {
+          overflow: hidden;
+          transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease;
+        }
+        .grain-bg::after {
+          content: '';
+          position: fixed;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          opacity: 0.028;
+          pointer-events: none;
+          z-index: 9999;
+        }
+        @media (max-width: 768px) {
+          .hide-mobile { display: none !important; }
+        }
+      `}</style>
 
-      {/* ── NAV ─────────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b" style={{ background: "rgba(15,32,68,0.95)", borderColor: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
-              style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}>
-              🤖
+      <div className="grain-bg" style={{ background: NAVY, fontFamily: "'Satoshi', 'DM Sans', sans-serif", minHeight: "100vh" }}>
+
+        {/* ── NAV ─────────────────────────────────────────────────────────── */}
+        <nav style={{
+          position: "sticky", top: 0, zIndex: 50,
+          background: "rgba(15,32,68,0.92)", backdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)"
+        }}>
+          <div style={{ maxWidth: 1152, margin: "0 auto", padding: "0 1.5rem", height: 64, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}>🤖</div>
+              <span style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: 14 }}>IA com Peterson</span>
             </div>
-            <span className="font-bold text-white text-sm" style={{ fontFamily: "'General Sans', sans-serif" }}>
-              IA com Peterson
-            </span>
-          </div>
 
-          {/* Links de âncora — ocultos em mobile */}
-          <div className="hidden md:flex items-center gap-6">
-            {[
-              { label: "Método", href: "#metodo" },
-              { label: "Cursos", href: "#cursos" },
-              { label: "Consultoria", href: "#consultoria" },
-              { label: "Sobre", href: "#sobre" },
-            ].map(item => (
-              <a key={item.href} href={item.href}
-                className="text-sm transition-colors duration-200"
-                style={{ color: "rgba(255,255,255,0.45)" }}
-                onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.85)")}
-                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}>
-                {item.label}
-              </a>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link href="/member/login"
-              className="text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200"
-              style={{ color: "rgba(255,255,255,0.5)" }}>
-              Área de membros →
-            </Link>
-            <Link href="/cliente"
-              className="text-sm font-bold px-5 py-2 rounded-lg transition-all duration-200"
-              style={{ background: GOLD, color: NAVY }}>
-              Quero entrar
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* ── HERO ────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-20 pb-24 px-6">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full opacity-10 blur-3xl pointer-events-none"
-          style={{ background: GOLD }} />
-        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-8 blur-3xl pointer-events-none"
-          style={{ background: "#1a4fd6" }} />
-        <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at 50% 60%, ${GOLD} 0%, transparent 65%)` }} />
-
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 text-xs font-bold uppercase tracking-widest"
-            style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)", color: GOLD }}>
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
-            </span>
-            LEAP BUILD aberto · Turma Zero · R$498
-          </div>
-
-          <h1 className="font-bold text-white leading-tight mb-4"
-            style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.05, textShadow: "0 2px 40px rgba(0,0,0,0.3)" }}>
-            Você usa IA.<br />
-            Enquanto seu concorrente<br />
-            <span style={{ color: GOLD }}>a comanda.</span>
-          </h1>
-
-          <p className="text-lg font-bold mb-6 max-w-2xl mx-auto"
-            style={{ color: GOLD, fontFamily: "'General Sans', sans-serif", letterSpacing: "-0.01em" }}>
-            Torne-se um Gestor de IA com o Método LEAP e saia da plateia de uma vez por todas.
-          </p>
-
-          <p className="text-lg mb-10 max-w-2xl mx-auto leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.55)", fontFamily: "'Libre Baskerville', serif", fontStyle: "italic" }}>
-            O Método LEAP transforma você no profissional que o mercado está buscando: quem não só usa IA, mas lidera, automatiza e faz o negócio escalar com ela. Sem programar uma linha de código.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/cliente"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200 hover:scale-105"
-              style={{ background: GOLD, color: NAVY, boxShadow: `0 0 40px rgba(201,168,76,0.3)` }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 60px rgba(201,168,76,0.5)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 40px rgba(201,168,76,0.3)"; }}>
-              Dê o salto agora →
-            </Link>
-            <Link href="/member/login"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-200"
-              style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.12)" }}>
-              Já sou membro
-            </Link>
-          </div>
-
-          <p className="text-xs mt-6" style={{ color: "rgba(255,255,255,0.25)" }}>
-            LEAP BUILD · 22 aulas · Acesso vitalício · Garantia de 7 dias
-          </p>
-        </div>
-      </section>
-
-      {/* ── NÚMEROS ─────────────────────────────────────────────────────────── */}
-      <section className="border-y py-12 px-6" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(255,255,255,0.02)" }}>
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          {RESULTADOS.map((r) => (
-            <div key={r.numero} className="text-center">
-              <div className="font-bold mb-1"
-                style={{ fontSize: "clamp(2rem, 4vw, 3rem)", color: GOLD, fontFamily: "'General Sans', sans-serif" }}>
-                {r.numero}
-              </div>
-              <div className="w-8 h-0.5 mx-auto my-2 rounded-full" style={{ background: GOLD }} />
-              <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{r.desc}</p>
+            <div className="hide-mobile" style={{ display: "flex", alignItems: "center", gap: 24 }}>
+              {[["Método","#metodo"],["Cursos","#cursos"],["Consultoria","#consultoria"],["Sobre","#sobre"]].map(([label, href]) => (
+                <a key={href} href={href} style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", textDecoration: "none", transition: "color 0.2s" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.9)")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}>
+                  {label}
+                </a>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
 
-      <GoldDivider />
-
-      {/* ── DOR / AGITAÇÃO ──────────────────────────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "rgba(255,255,255,0.3)", letterSpacing: "0.2em" }}>
-            Seja honesto
-          </p>
-          <h2 className="font-bold text-white mb-10"
-            style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-            Você reconhece<br />
-            <span style={{ color: GOLD }}>algum destes cenários?</span>
-          </h2>
-
-          <div className="space-y-4 mb-10">
-            {DORES.map((dor, i) => (
-              <div key={i} className="flex gap-4 p-5 rounded-xl transition-all duration-200"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.2)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)"; }}>
-                <span className="font-bold flex-shrink-0 mt-0.5" style={{ color: GOLD }}>→</span>
-                <p className="text-base leading-loose" style={{ color: "rgba(255,255,255,0.65)" }}>{dor}</p>
-              </div>
-            ))}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Link href="/member/login" style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.45)", textDecoration: "none" }}>Membros →</Link>
+              <Link href="/cliente" className="btn-gold" style={{ fontSize: 13, fontWeight: 700, padding: "8px 18px", borderRadius: 10, color: NAVY, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                Quero entrar
+              </Link>
+            </div>
           </div>
+        </nav>
 
-          <div className="p-6 rounded-2xl border-l-4" style={{ background: "rgba(201,168,76,0.06)", borderColor: GOLD }}>
-            <p className="font-bold text-white text-lg mb-2">
-              O problema não é falta de informação. É falta de método.
+        {/* ── HERO ────────────────────────────────────────────────────────── */}
+        <section style={{ position: "relative", overflow: "hidden", paddingTop: 96, paddingBottom: 112, paddingLeft: "1.5rem", paddingRight: "1.5rem" }}>
+          {/* Orbs de fundo */}
+          <div style={{ position: "absolute", top: -160, right: -160, width: 640, height: 640, borderRadius: "50%", background: GOLD, opacity: 0.07, filter: "blur(120px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: -160, left: -160, width: 520, height: 520, borderRadius: "50%", background: "#1a4fd6", opacity: 0.08, filter: "blur(100px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translateX(-50%)", width: 800, height: 400, background: `radial-gradient(ellipse, ${GOLD}10 0%, transparent 70%)`, pointerEvents: "none" }} />
+
+          <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+            {/* Badge turma */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 16px", borderRadius: 100, background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", marginBottom: 36 }}>
+              <span style={{ position: "relative", display: "flex", width: 8, height: 8 }}>
+                <span style={{ position: "absolute", display: "inline-flex", width: "100%", height: "100%", borderRadius: "50%", background: "#4ade80", animation: "pulse-ring 1.5s cubic-bezier(0,0,0.2,1) infinite", opacity: 0.7 }} />
+                <span style={{ position: "relative", display: "inline-flex", borderRadius: "50%", width: 8, height: 8, background: "#4ade80" }} />
+              </span>
+              <span style={{ color: GOLD, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" }}>LEAP BUILD aberto · Turma Zero · R$498</span>
+            </div>
+
+            {/* Título principal */}
+            <h1 style={{
+              fontFamily: "'General Sans',sans-serif",
+              fontSize: "clamp(2.8rem, 7vw, 5.5rem)",
+              fontWeight: 700, lineHeight: 1.02,
+              color: "white", marginBottom: 20,
+              letterSpacing: "-0.03em",
+              textShadow: "0 4px 60px rgba(0,0,0,0.4)",
+            }}>
+              Você usa IA.<br />
+              Enquanto seu concorrente<br />
+              <span style={{ color: GOLD }}>a comanda.</span>
+            </h1>
+
+            {/* Subtítulo */}
+            <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", fontWeight: 700, color: GOLD, marginBottom: 18, letterSpacing: "-0.01em", fontFamily: "'General Sans',sans-serif" }}>
+              Torne-se um Gestor de IA com o Método LEAP e saia da plateia de uma vez por todas.
             </p>
-            <p className="leading-loose" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Você tem ferramentas. O que falta é saber como usá-las de forma integrada, estratégica e lucrativa — e é exatamente isso que o <strong className="text-white">Método LEAP</strong> ensina.
+            <p style={{ fontSize: "clamp(0.95rem, 1.5vw, 1.1rem)", color: "rgba(255,255,255,0.5)", marginBottom: 44, maxWidth: 620, margin: "0 auto 44px", lineHeight: 1.75, fontStyle: "italic", fontFamily: "'Libre Baskerville',serif" }}>
+              O Método LEAP transforma você no profissional que o mercado está buscando: quem não só usa IA, mas lidera, automatiza e faz o negócio escalar com ela. Sem programar uma linha de código.
+            </p>
+
+            {/* CTAs */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 52 }}>
+              <Link href="/cliente" className="btn-gold" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "16px 36px", borderRadius: 16, fontWeight: 700,
+                fontSize: "1.05rem", color: NAVY, textDecoration: "none",
+                boxShadow: "0 0 48px rgba(201,168,76,0.35)",
+              }}>
+                Dê o salto agora →
+              </Link>
+              <Link href="/member/login" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "16px 32px", borderRadius: 16, fontWeight: 700,
+                fontSize: "1.05rem", color: "rgba(255,255,255,0.65)",
+                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                textDecoration: "none", transition: "all 0.2s"
+              }}>
+                Já sou membro
+              </Link>
+            </div>
+
+            {/* Floating proof badges */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
+              {[
+                { icon: "🏗️", text: "10+ sistemas de IA construídos" },
+                { icon: "📦", text: "5 SaaS em produção" },
+                { icon: "⚡", text: "0 linhas de código necessárias" },
+              ].map(p => (
+                <div key={p.text} style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "7px 14px", borderRadius: 100,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)",
+                  fontSize: 12, color: "rgba(255,255,255,0.5)"
+                }}>
+                  <span>{p.icon}</span>{p.text}
+                </div>
+              ))}
+            </div>
+
+            <p style={{ fontSize: 11, marginTop: 28, color: "rgba(255,255,255,0.2)", letterSpacing: "0.04em" }}>
+              LEAP BUILD · 22 aulas · Acesso vitalício · Garantia de 7 dias
             </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
-
-      {/* ── MÉTODO LEAP ─────────────────────────────────────────────────────── */}
-      <section id="metodo" className="py-20 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>A solução</p>
-            <h2 className="font-bold text-white"
-              style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-              O Gestor de IA não usa mais ferramentas.<br />
-              <span style={{ color: GOLD }}>Ele as comanda.</span>
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-3 mb-12">
+        {/* ── NÚMEROS ─────────────────────────────────────────────────────── */}
+        <section style={{ padding: "64px 1.5rem", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
             {[
-              { letra: "L", titulo: "Liderar", desc: "Estratégia antes da ferramenta. O que automatizar vs. o que manter humano.", cor: GOLD },
-              { letra: "E", titulo: "Escalar", desc: "O ecossistema certo — ferramentas que conversam entre si sem você tocar em código.", cor: "#60a5fa" },
-              { letra: "A", titulo: "Automatizar", desc: "Agentes de IA trabalhando 24/7 — conteúdo, atendimento e vendas no automático.", cor: "#34d399" },
-              { letra: "P", titulo: "Performar", desc: "IA sem métrica é brinquedo. Dashboard, otimização e monetização real.", cor: "#a78bfa" },
-            ].map((fase) => (
-              <div key={fase.letra}
-                className="p-6 rounded-2xl border cursor-default transition-all duration-200"
-                style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.10)" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.4)"; (e.currentTarget as HTMLElement).style.background = "rgba(201,168,76,0.04)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.10)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}>
-                <div className="text-4xl font-bold mb-3" style={{ color: fase.cor, fontFamily: "'General Sans', sans-serif" }}>
-                  {fase.letra}
-                </div>
-                <div className="font-bold text-white text-lg mb-2">{fase.titulo}</div>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>{fase.desc}</p>
+              { n: "60%",  d: "redução em tarefas operacionais" },
+              { n: "10",   d: "dias para o primeiro sistema rodando" },
+              { n: "24/7", d: "sua operação no piloto automático" },
+              { n: "0",    d: "linhas de código necessárias" },
+            ].map(r => (
+              <div key={r.n} style={{ textAlign: "center", padding: "28px 16px", borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "clamp(2.2rem,4vw,3.2rem)", color: GOLD, lineHeight: 1, marginBottom: 8 }}>{r.n}</div>
+                <div style={{ width: 24, height: 2, background: GOLD, margin: "0 auto 10px", borderRadius: 2 }} />
+                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>{r.d}</p>
               </div>
             ))}
           </div>
+        </section>
 
-          <div className="text-center p-8 rounded-2xl"
-            style={{ background: `linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(15,32,68,0) 100%)`, border: `1px solid rgba(201,168,76,0.2)` }}>
-            <p className="text-lg font-bold text-white mb-2">
-              Peterson Oliveira criou o Método LEAP e formou uma nova categoria profissional:
-            </p>
-            <p className="text-2xl font-bold" style={{ color: GOLD, fontFamily: "'General Sans', sans-serif" }}>
-              O Gestor de IA.
-            </p>
-            <p className="mt-3 text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-              O profissional que lidera, escala, automatiza e performa com inteligência artificial — sem precisar saber programar.
-            </p>
-          </div>
-        </div>
-      </section>
+        <GoldDivider />
 
-      <GoldDivider />
-
-      {/* ── TRILOGIA ────────────────────────────────────────────────────────── */}
-      <section id="cursos" className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>Os produtos</p>
-            <h2 className="font-bold text-white"
-              style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-              Três cursos.<br />
-              <span style={{ color: GOLD }}>Uma jornada completa.</span>
+        {/* ── DOR / AGITAÇÃO ──────────────────────────────────────────────── */}
+        <section style={{ padding: "96px 1.5rem" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <SectionLabel>Seja honesto</SectionLabel>
+            <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1, textAlign: "center", marginBottom: 48 }}>
+              Você reconhece{" "}
+              <span style={{ color: GOLD }}>algum destes cenários?</span>
             </h2>
-            <p className="mt-4 text-base" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Quem entrar no BUILD agora garante o preço turma zero nos três.
-            </p>
-          </div>
 
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            {CURSOS.map((curso) => (
-              <div key={curso.nome} className="rounded-2xl overflow-hidden border flex flex-col"
-                style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)" }}>
-                <div className="h-1" style={{ background: curso.accent }} />
-                <div className="p-6 flex-1">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded-md"
-                      style={{ background: `${curso.tagColor}18`, color: curso.tagColor }}>
-                      {curso.tag}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-white text-xl mb-1" style={{ fontFamily: "'General Sans', sans-serif" }}>
-                    {curso.nome}
-                  </h3>
-                  <p className="text-xs mb-4 font-medium" style={{ color: curso.accent }}>{curso.tagline}</p>
-                  <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.5)" }}>{curso.desc}</p>
-                  <ul className="space-y-1.5">
-                    {curso.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
-                        <span style={{ color: curso.accent }}>✓</span> {f}
-                      </li>
-                    ))}
-                  </ul>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
+              {DORES.map((dor, i) => (
+                <div key={i}
+                  style={{ display: "flex", gap: 16, padding: "20px 24px", borderRadius: 14, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", transition: "all 0.2s", cursor: "default" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.25)"; (e.currentTarget as HTMLElement).style.background = "rgba(201,168,76,0.04)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)"; }}>
+                  <span style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: GOLD, fontSize: 12, flexShrink: 0, marginTop: 3, opacity: 0.7 }}>0{i + 1}</span>
+                  <p style={{ fontSize: "0.95rem", lineHeight: 1.7, color: "rgba(255,255,255,0.65)", margin: 0 }}>{dor}</p>
                 </div>
-                <div className="p-6 pt-0">
-                  <div className="flex items-end justify-between mb-4">
-                    <div>
-                      <p className="text-2xl font-bold text-white" style={{ fontFamily: "'General Sans', sans-serif" }}>{curso.preco}</p>
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Turma zero · {curso.precoFull}</p>
-                    </div>
-                  </div>
-                  <Link href={curso.href}
-                    className="w-full flex items-center justify-center py-3 rounded-xl font-bold text-sm transition-all duration-200"
-                    style={{ background: `${curso.accent}20`, color: curso.accent, border: `1px solid ${curso.accent}40` }}>
-                    {curso.cta} →
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Bundle */}
-          <div className="p-6 md:p-8 rounded-2xl border-l-4 flex flex-col md:flex-row items-center justify-between gap-6"
-            style={{ background: "rgba(124,58,237,0.08)", borderColor: "#7c3aed" }}>
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#a78bfa" }}>Bundle · Leve 3 Pague 2</span>
-              <h3 className="text-2xl font-bold text-white mt-1 mb-2" style={{ fontFamily: "'General Sans', sans-serif" }}>Trilogia LEAP Completa</h3>
-              <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
-                Os três cursos pelo preço de dois. Quem entra no BUILD agora garante esse preço quando os outros lançarem.
+            <div style={{ padding: "24px 28px", borderRadius: 16, background: "rgba(201,168,76,0.06)", borderLeft: "4px solid " + GOLD }}>
+              <p style={{ fontWeight: 700, color: "white", fontSize: "1.05rem", marginBottom: 8 }}>O problema não é falta de informação. É falta de método.</p>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", lineHeight: 1.8, margin: 0 }}>
+                Você tem ferramentas. O que falta é saber como usá-las de forma integrada, estratégica e lucrativa — e é exatamente isso que o <strong style={{ color: "white" }}>Método LEAP</strong> ensina.
               </p>
             </div>
-            <div className="text-center md:text-right flex-shrink-0">
-              <p className="text-sm line-through" style={{ color: "rgba(255,255,255,0.25)" }}>3 × R$498 = R$1.494</p>
-              <p className="text-5xl font-bold" style={{ color: "#a78bfa", fontFamily: "'General Sans', sans-serif" }}>R$998</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>bundle turma zero · R$1.998 depois</p>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
+        <GoldDivider />
 
-      {/* ── FGI ─────────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-6" style={{ background: "rgba(59,130,246,0.04)", borderTop: "1px solid rgba(59,130,246,0.1)" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="md:grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#60a5fa", letterSpacing: "0.2em" }}>
-                Formação Completa · Junho/2025
-              </p>
-              <h2 className="font-bold text-white mb-4"
-                style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)", lineHeight: 1.1 }}>
-                FGI — Formação Gestores de IA
+        {/* ── MÉTODO LEAP ─────────────────────────────────────────────────── */}
+        <section id="metodo" style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 64 }}>
+              <SectionLabel>A solução</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
+                O Gestor de IA não usa mais ferramentas.<br />
+                <span style={{ color: GOLD }}>Ele as comanda.</span>
               </h2>
-              <p className="text-base leading-loose mb-6" style={{ color: "rgba(255,255,255,0.55)" }}>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 48 }}>
+              {[
+                { letra: "L", titulo: "Liderar",    desc: "Estratégia antes da ferramenta. O que automatizar vs. o que manter humano.", cor: GOLD },
+                { letra: "E", titulo: "Escalar",    desc: "O ecossistema certo — ferramentas que conversam entre si sem tocar em código.", cor: "#60a5fa" },
+                { letra: "A", titulo: "Automatizar",desc: "Agentes de IA trabalhando 24/7 — conteúdo, atendimento e vendas no automático.", cor: "#34d399" },
+                { letra: "P", titulo: "Performar",  desc: "IA sem métrica é brinquedo. Dashboard, otimização e monetização real.", cor: "#a78bfa" },
+              ].map(f => (
+                <div key={f.letra} className="leap-card"
+                  style={{ padding: "28px 24px", borderRadius: 20, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", position: "relative", overflow: "hidden", cursor: "default", transition: "border-color 0.2s, box-shadow 0.2s" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = f.cor + "60"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${f.cor}15`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.09)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
+                  {/* Giant watermark letter */}
+                  <div className="leap-letter" style={{ position: "absolute", top: -8, right: -8, fontSize: "7rem", fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: f.cor, opacity: 0.05, lineHeight: 1, userSelect: "none", transition: "all 0.3s ease", pointerEvents: "none" }}>{f.letra}</div>
+                  <div style={{ fontFamily: "'General Sans',sans-serif", fontSize: "2.5rem", fontWeight: 700, color: f.cor, marginBottom: 12, position: "relative" }}>{f.letra}</div>
+                  <div style={{ fontWeight: 700, color: "white", fontSize: "1.05rem", marginBottom: 10 }}>{f.titulo}</div>
+                  <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.65, margin: 0 }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ textAlign: "center", padding: "36px 32px", borderRadius: 20, background: "linear-gradient(135deg,rgba(201,168,76,0.08),rgba(15,32,68,0))", border: "1px solid rgba(201,168,76,0.18)" }}>
+              <p style={{ fontWeight: 700, color: "white", fontSize: "1.1rem", marginBottom: 8 }}>Peterson Oliveira criou o Método LEAP e formou uma nova categoria profissional:</p>
+              <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "1.8rem", color: GOLD, margin: "0 0 8px" }}>O Gestor de IA.</p>
+              <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.35)", margin: 0 }}>O profissional que lidera, escala, automatiza e performa com inteligência artificial — sem precisar saber programar.</p>
+            </div>
+          </div>
+        </section>
+
+        <GoldDivider />
+
+        {/* ── TRILOGIA ────────────────────────────────────────────────────── */}
+        <section id="cursos" style={{ padding: "96px 1.5rem" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 64 }}>
+              <SectionLabel>Os produtos</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
+                Três cursos. <span style={{ color: GOLD }}>Uma jornada completa.</span>
+              </h2>
+              <p style={{ marginTop: 16, fontSize: "0.95rem", color: "rgba(255,255,255,0.35)" }}>Quem entrar no BUILD agora garante o preço turma zero nos três.</p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20, marginBottom: 24 }}>
+              {CURSOS.map(c => (
+                <div key={c.nome} style={{
+                  borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column",
+                  background: "rgba(255,255,255,0.03)",
+                  border: c.active ? `1px solid rgba(201,168,76,0.4)` : "1px solid rgba(255,255,255,0.08)",
+                  boxShadow: c.active ? "0 0 40px rgba(201,168,76,0.10), inset 0 1px 0 rgba(201,168,76,0.15)" : "none",
+                  position: "relative"
+                }}>
+                  {/* Accent bar */}
+                  <div style={{ height: 3, background: c.accent }} />
+
+                  {/* Active badge */}
+                  {c.active && (
+                    <div style={{ position: "absolute", top: 16, right: 16, padding: "4px 10px", borderRadius: 100, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)", fontSize: 10, fontWeight: 700, color: GOLD, letterSpacing: "0.1em" }}>
+                      ✦ Disponível
+                    </div>
+                  )}
+                  {!c.active && (
+                    <div style={{ position: "absolute", top: 16, right: 16, padding: "4px 10px", borderRadius: 100, background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.2)", fontSize: 10, fontWeight: 700, color: "#60a5fa", letterSpacing: "0.1em" }}>
+                      Em breve
+                    </div>
+                  )}
+
+                  <div style={{ padding: "24px 24px 16px", flex: 1 }}>
+                    <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.25rem", marginBottom: 4 }}>{c.nome}</h3>
+                    <p style={{ fontSize: "0.8rem", fontWeight: 600, color: c.accent, marginBottom: 16 }}>{c.tagline}</p>
+                    <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: 20 }}>{c.desc}</p>
+                    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                      {c.features.map(f => (
+                        <li key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.8rem", color: "rgba(255,255,255,0.45)" }}>
+                          <span style={{ color: c.accent, fontSize: 10 }}>✓</span>{f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div style={{ padding: "16px 24px 24px" }}>
+                    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 16 }}>
+                      <div>
+                        <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.75rem", lineHeight: 1 }}>{c.preco}</p>
+                        <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.28)", marginTop: 4 }}>Turma zero · {c.precoFull}</p>
+                      </div>
+                    </div>
+                    <Link href={c.href} style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      padding: "12px 20px", borderRadius: 12, fontWeight: 700, fontSize: "0.85rem",
+                      background: `${c.accent}18`, color: c.accent, border: `1px solid ${c.accent}35`,
+                      textDecoration: "none", transition: "all 0.2s"
+                    }}>
+                      {c.cta}
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Bundle */}
+            <div style={{ padding: "32px 40px", borderRadius: 20, borderLeft: "4px solid #7c3aed", background: "rgba(124,58,237,0.07)", border: "1px solid rgba(124,58,237,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#a78bfa" }}>Bundle · Leve 3 Pague 2</span>
+                <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.5rem", margin: "6px 0 8px" }}>Trilogia LEAP Completa</h3>
+                <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.4)", margin: 0 }}>Os três cursos pelo preço de dois. Quem entra no BUILD agora garante esse preço quando os outros lançarem.</p>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <p style={{ textDecoration: "line-through", color: "rgba(255,255,255,0.2)", fontSize: "0.85rem", marginBottom: 4 }}>3 × R$498 = R$1.494</p>
+                <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "3.2rem", color: "#a78bfa", lineHeight: 1 }}>R$998</p>
+                <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)", marginTop: 4 }}>bundle turma zero · R$1.998 depois</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <GoldDivider />
+
+        {/* ── FGI ─────────────────────────────────────────────────────────── */}
+        <section style={{ padding: "96px 1.5rem", background: "rgba(59,130,246,0.03)", borderTop: "1px solid rgba(59,130,246,0.08)" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
+            <div>
+              <SectionLabel color="#60a5fa">Formação Completa · Junho 2025</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", lineHeight: 1.1, marginBottom: 20 }}>
+                FGI — Formação<br />Gestores de IA
+              </h2>
+              <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.8, marginBottom: 16, fontSize: "0.95rem" }}>
                 A imersão completa que cria a nova categoria profissional. Mais do que um curso: é uma certificação em uma profissão que o mercado está pedindo agora.
               </p>
-              <p className="text-sm mb-8" style={{ color: "rgba(255,255,255,0.4)" }}>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.85rem", marginBottom: 32, lineHeight: 1.7 }}>
                 Quem faz o LEAP BUILD tem acesso prioritário à FGI — e os cases que você construiu no BUILD viram portfólio na imersão.
               </p>
-              <Link href="/cliente"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-200"
-                style={{ background: "rgba(59,130,246,0.15)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.3)" }}>
+              <Link href="/cliente" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, fontWeight: 700, fontSize: "0.9rem", background: "rgba(59,130,246,0.12)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.25)", textDecoration: "none", transition: "all 0.2s" }}>
                 Quero acesso prioritário →
               </Link>
             </div>
-            <div className="mt-10 md:mt-0 grid grid-cols-1 gap-3">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
                 { plan: "FGI — Essencial", price: "R$1.498", features: ["Imersão ao vivo", "Certificado de Gestor de IA", "Material exclusivo", "Comunidade privada"] },
                 { plan: "FGI — Premium",   price: "R$2.498", features: ["Tudo do Essencial", "Mentoria em grupo", "Acesso lifetime às gravações", "Bônus exclusivos"] },
-              ].map((p) => (
-                <div key={p.plan} className="p-5 rounded-xl border"
-                  style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(59,130,246,0.2)" }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-white text-sm">{p.plan}</span>
-                    <span className="font-bold text-xl" style={{ color: "#60a5fa", fontFamily: "'General Sans', sans-serif" }}>{p.price}</span>
+              ].map(p => (
+                <div key={p.plan} style={{ padding: "20px 24px", borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(59,130,246,0.18)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <span style={{ fontWeight: 700, color: "white", fontSize: "0.9rem" }}>{p.plan}</span>
+                    <span style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "1.35rem", color: "#60a5fa" }}>{p.price}</span>
                   </div>
-                  <ul className="space-y-1">
-                    {p.features.map((f) => (
-                      <li key={f} className="text-xs flex items-center gap-2" style={{ color: "rgba(255,255,255,0.4)" }}>
-                        <span style={{ color: "#60a5fa" }}>✓</span> {f}
+                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                    {p.features.map(f => (
+                      <li key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}>
+                        <span style={{ color: "#60a5fa", fontSize: 10 }}>✓</span>{f}
                       </li>
                     ))}
                   </ul>
@@ -432,413 +472,368 @@ export default function LandingPage() {
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
+        <GoldDivider />
 
-      {/* ── CONSULTORIA ─────────────────────────────────────────────────────── */}
-      <section id="consultoria" className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl p-8 md:p-12 relative overflow-hidden"
-            style={{ background: "rgba(201,168,76,0.04)", borderLeft: "4px solid #c9a84c", border: "1px solid rgba(201,168,76,0.15)" }}>
+        {/* ── CONSULTORIA ─────────────────────────────────────────────────── */}
+        <section id="consultoria" style={{ padding: "96px 1.5rem" }}>
+          <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+            <div style={{ borderRadius: 24, padding: "56px 64px", background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.18)", borderLeft: "4px solid " + GOLD, position: "relative", overflow: "hidden" }}>
+              {/* Background decoration */}
+              <div style={{ position: "absolute", top: -80, right: -80, width: 320, height: 320, borderRadius: "50%", background: GOLD, opacity: 0.03, pointerEvents: "none" }} />
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6"
-              style={{ background: "rgba(239,68,68,0.12)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)" }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-              Vagas limitadas
-            </span>
-
-            <div className="md:grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>
-                  Consultoria
-                </p>
-                <h2 className="font-bold text-white mb-4"
-                  style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)", lineHeight: 1.1 }}>
-                  Seu negócio precisa de um sistema feito para ele.
-                </h2>
-                <p className="text-base mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>
-                  Nem todo problema cabe dentro de um curso. Alguns precisam de um projeto.
-                </p>
-                <p className="text-base leading-loose mb-8" style={{ color: "rgba(255,255,255,0.45)" }}>
-                  Você tem uma operação com gargalos específicos. Um fluxo que precisa de IA customizada. Um sistema que não existe ainda. Peterson mergulha no seu negócio, mapeia os pontos de atrito e constrói a solução, sem deixar você para trás no processo.
-                </p>
-                <ul className="space-y-3 mb-8">
-                  {["Diagnóstico completo da operação", "Mapeamento de automações prioritárias", "Construção de agentes e sistemas sob medida", "Acompanhamento até o sistema estar rodando"].map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>
-                      <span style={{ color: GOLD }}>→</span>{item}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/cliente"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-200"
-                  style={{ background: GOLD, color: NAVY }}>
-                  Quero um projeto →
-                </Link>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 100, background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", marginBottom: 32 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#f87171", display: "inline-block" }} />
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#f87171" }}>Vagas limitadas</span>
               </div>
 
-              <div className="mt-10 md:mt-0">
-                <div className="p-6 rounded-2xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <p className="font-bold text-white mb-4 text-sm">O que você recebe:</p>
-                  {[
-                    { num: "01", titulo: "Discovery call", desc: "Peterson entende sua operação em profundidade antes de propor qualquer coisa" },
-                    { num: "02", titulo: "Proposta sob medida", desc: "Escopo, prazo e investimento definidos juntos, sem surpresas" },
-                    { num: "03", titulo: "Execução acompanhada", desc: "Você participa de cada decisão ao longo do desenvolvimento" },
-                    { num: "04", titulo: "Entrega e treinamento", desc: "Sistema rodando e equipe treinada para manter tudo funcionando" },
-                  ].map((step) => (
-                    <div key={step.num} className="flex gap-4 mb-5 last:mb-0">
-                      <span className="font-bold text-xs flex-shrink-0 mt-0.5" style={{ color: GOLD }}>{step.num}</span>
-                      <div>
-                        <p className="font-bold text-white text-sm mb-0.5">{step.titulo}</p>
-                        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>{step.desc}</p>
-                      </div>
-                    </div>
-                  ))}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "flex-start" }}>
+                <div>
+                  <SectionLabel>Consultoria</SectionLabel>
+                  <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(1.6rem,3vw,2.4rem)", lineHeight: 1.1, marginBottom: 16 }}>
+                    Seu negócio precisa de um sistema feito para ele.
+                  </h2>
+                  <p style={{ color: "rgba(255,255,255,0.55)", marginBottom: 12, fontSize: "0.95rem" }}>
+                    Nem todo problema cabe dentro de um curso. Alguns precisam de um projeto.
+                  </p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.8, marginBottom: 32, fontSize: "0.9rem" }}>
+                    Você tem uma operação com gargalos específicos. Um fluxo que precisa de IA customizada. Um sistema que não existe ainda. Peterson mergulha no seu negócio, mapeia os pontos de atrito e constrói a solução, sem deixar você para trás no processo.
+                  </p>
+                  <ul style={{ listStyle: "none", padding: 0, margin: "0 0 32px", display: "flex", flexDirection: "column", gap: 12 }}>
+                    {["Diagnóstico completo da operação","Mapeamento de automações prioritárias","Construção de agentes e sistemas sob medida","Acompanhamento até o sistema estar rodando"].map(item => (
+                      <li key={item} style={{ display: "flex", alignItems: "center", gap: 12, fontSize: "0.9rem", color: "rgba(255,255,255,0.65)" }}>
+                        <span style={{ color: GOLD }}>→</span>{item}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/cliente" className="btn-gold" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 14, fontWeight: 700, fontSize: "0.9rem", color: NAVY, textDecoration: "none" }}>
+                    Quero um projeto →
+                  </Link>
                 </div>
-                <p className="text-xs mt-4 text-center" style={{ color: "rgba(255,255,255,0.25)" }}>
-                  Peterson atende poucos clientes por vez para garantir profundidade.
-                </p>
+
+                <div>
+                  <div style={{ padding: "24px", borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
+                    <p style={{ fontWeight: 700, color: "white", fontSize: "0.85rem", marginBottom: 20 }}>O que você recebe:</p>
+                    {[
+                      { n: "01", t: "Discovery call",         d: "Peterson entende sua operação em profundidade antes de propor qualquer coisa" },
+                      { n: "02", t: "Proposta sob medida",    d: "Escopo, prazo e investimento definidos juntos, sem surpresas" },
+                      { n: "03", t: "Execução acompanhada",   d: "Você participa de cada decisão ao longo do desenvolvimento" },
+                      { n: "04", t: "Entrega e treinamento",  d: "Sistema rodando e equipe treinada para manter tudo funcionando" },
+                    ].map(s => (
+                      <div key={s.n} style={{ display: "flex", gap: 14, marginBottom: 18 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: GOLD, flexShrink: 0, marginTop: 2 }}>{s.n}</span>
+                        <div>
+                          <p style={{ fontWeight: 700, color: "white", fontSize: "0.85rem", marginBottom: 3 }}>{s.t}</p>
+                          <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.6, margin: 0 }}>{s.d}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.2)", textAlign: "center" }}>Peterson atende poucos clientes por vez para garantir profundidade.</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
+        <GoldDivider />
 
-      {/* ── SOBRE PETERSON ──────────────────────────────────────────────────── */}
-      <section id="sobre" className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="md:grid md:grid-cols-[42%_58%] gap-14 items-center">
+        {/* ── SOBRE PETERSON ──────────────────────────────────────────────── */}
+        <section id="sobre" style={{ padding: "96px 1.5rem" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "420px 1fr", gap: 64, alignItems: "center" }}>
 
-            {/* Coluna foto */}
-            <div className="relative mb-10 md:mb-0">
-              {/* Foto principal */}
-              <div className="relative rounded-2xl overflow-hidden"
-                style={{ boxShadow: "0 0 0 1px rgba(201,168,76,0.3), 0 0 60px rgba(201,168,76,0.08)" }}>
-                <img
-                  src="/photos/peterson-headshot.jpg"
-                  alt="Peterson Oliveira"
-                  className="w-full object-cover"
-                  style={{ maxHeight: 520, objectPosition: "top" }}
-                />
-                {/* Overlay gradiente inferior */}
-                <div className="absolute bottom-0 left-0 right-0 h-24"
-                  style={{ background: "linear-gradient(to top, rgba(15,32,68,0.8), transparent)" }} />
+            {/* Foto */}
+            <div style={{ position: "relative" }}>
+              <div style={{ borderRadius: 24, overflow: "hidden", position: "relative", boxShadow: "0 0 0 1px rgba(201,168,76,0.25), 0 32px 80px rgba(0,0,0,0.5)" }}>
+                <img src="/photos/peterson-headshot.jpg" alt="Peterson Oliveira" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 540, objectPosition: "top center" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15,32,68,0.7) 0%, transparent 50%)" }} />
+                {/* Name overlay */}
+                <div style={{ position: "absolute", bottom: 20, left: 24, right: 24 }}>
+                  <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.1rem", margin: 0 }}>Peterson Oliveira</p>
+                  <p style={{ color: GOLD, fontSize: "0.8rem", margin: "2px 0 0" }}>Criador do Método LEAP</p>
+                </div>
               </div>
 
-              {/* Thumbnail "em ação" */}
-              <div className="absolute -bottom-4 -right-4 w-28 h-28 rounded-xl overflow-hidden border-2"
-                style={{ borderColor: NAVY, boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }}>
-                <img
-                  src="/photos/peterson-evento.jpg"
-                  alt="Peterson em evento"
-                  className="w-full h-full object-cover object-top"
-                />
+              {/* Thumbnail evento */}
+              <div style={{ position: "absolute", bottom: -16, right: -16, width: 100, height: 100, borderRadius: 14, overflow: "hidden", border: `2px solid ${NAVY}`, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+                <img src="/photos/peterson-evento.jpg" alt="Peterson em evento" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
               </div>
             </div>
 
-            {/* Coluna bio */}
+            {/* Bio */}
             <div>
-              <span className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4"
-                style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)", color: GOLD }}>
-                Criador do Método LEAP
-              </span>
-
-              <h2 className="font-bold text-white mb-4"
-                style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(2rem, 4vw, 3rem)" }}>
-                Peterson Oliveira
-              </h2>
-
-              <p className="text-base leading-loose mb-4" style={{ color: "rgba(255,255,255,0.60)" }}>
+              <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.8, marginBottom: 16, fontSize: "0.95rem" }}>
                 Criou o Método LEAP depois de perceber que o mercado estava cheio de ferramentas de IA sem nenhum método para usá-las estrategicamente. Em menos de 3 meses, construiu mais de 10 sistemas de IA, 10 sites e landing pages e 5 SaaS que já estão rodando com clientes reais.
               </p>
-
-              <p className="text-base leading-loose mb-8" style={{ color: "rgba(255,255,255,0.45)" }}>
+              <p style={{ color: "rgba(255,255,255,0.4)", lineHeight: 1.8, marginBottom: 36, fontSize: "0.9rem" }}>
                 Não é guru. É quem faz, documenta e ensina o que funciona na prática. O OCTUS, uma plataforma de criação de conteúdo com IA, é o case mais visível do que ele ensina: construído por ele, usado por ele, vendido por ele.
               </p>
 
-              {/* Credential strip */}
-              <div className="grid grid-cols-4 gap-3 mb-8">
+              {/* Credential grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
                 {[
-                  { num: "10+", label: "Sistemas de IA" },
-                  { num: "10+", label: "Sites & LPs" },
-                  { num: "5",   label: "SaaS criados" },
-                  { num: "3m",  label: "De entrega" },
-                ].map(({ num, label }) => (
-                  <div key={label} className="text-center p-3 rounded-xl"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <p className="text-xl font-bold mb-0.5" style={{ color: GOLD, fontFamily: "'General Sans', sans-serif" }}>{num}</p>
-                    <p className="text-xs leading-tight" style={{ color: "rgba(255,255,255,0.4)" }}>{label}</p>
+                  { n: "10+", l: "Sistemas de IA",  icon: "🤖" },
+                  { n: "10+", l: "Sites e LPs",      icon: "🌐" },
+                  { n: "5",   l: "SaaS criados",     icon: "📦" },
+                  { n: "3m",  l: "Entregando",       icon: "⚡" },
+                ].map(c => (
+                  <div key={c.l} style={{ textAlign: "center", padding: "16px 12px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    <div style={{ fontSize: "1.1rem", marginBottom: 4 }}>{c.icon}</div>
+                    <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "1.4rem", color: GOLD, lineHeight: 1, marginBottom: 4 }}>{c.n}</p>
+                    <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.3 }}>{c.l}</p>
                   </div>
                 ))}
               </div>
 
               {/* SaaS badges */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {["IAra", "OCTUS", "Lead Radar", "Black Table", "SafeNow"].map((saas) => (
-                  <span key={saas}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg"
-                    style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", color: "rgba(255,255,255,0.6)" }}>
-                    {saas}
-                  </span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
+                {["IAra", "OCTUS", "Lead Radar", "Black Table", "SafeNow"].map(s => (
+                  <span key={s} style={{ fontSize: "0.78rem", fontWeight: 600, padding: "6px 12px", borderRadius: 8, background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.18)", color: "rgba(255,255,255,0.55)" }}>{s}</span>
                 ))}
               </div>
 
               <SocialLinks />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
+        <GoldDivider />
 
-      {/* ── PORTFOLIO / CASES ───────────────────────────────────────────────── */}
-      <section className="py-20 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>Portfólio</p>
-            <h2 className="font-bold text-white"
-              style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-              O que foi construído
-            </h2>
-            <p className="mt-4 text-base max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Peterson não ensina o que leu. Ensina o que construiu. Cada um desses sistemas existe, roda e tem clientes reais.
-            </p>
-          </div>
+        {/* ── PORTFOLIO / CASES ───────────────────────────────────────────── */}
+        <section style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 64 }}>
+              <SectionLabel>Portfólio</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1 }}>
+                O que foi construído
+              </h2>
+              <p style={{ marginTop: 16, fontSize: "0.9rem", color: "rgba(255,255,255,0.35)", maxWidth: 480, margin: "16px auto 0" }}>
+                Peterson não ensina o que leu. Ensina o que construiu. Cada um desses sistemas existe, roda e tem clientes reais.
+              </p>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {SAAS_CASES.map((s, i) => (
-              <div
-                key={s.nome}
-                className="p-6 rounded-2xl border transition-all duration-200 cursor-default"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  borderColor: "rgba(255,255,255,0.08)",
-                  gridColumn: i === 4 ? "2" : undefined,
-                }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = s.accent + "60"; (e.currentTarget as HTMLElement).style.background = s.accent + "08"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
-              >
-                <div className="text-3xl mb-4">{s.emoji}</div>
-                <div className="h-0.5 w-8 rounded-full mb-4" style={{ background: s.accent }} />
-                <h3 className="font-bold text-white text-xl mb-1" style={{ fontFamily: "'General Sans', sans-serif" }}>
-                  {s.nome}
-                </h3>
-                <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>{s.categoria}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {s.stack.map(t => (
-                    <span key={t} className="text-xs px-2 py-1 rounded-md"
-                      style={{ background: `${s.accent}15`, color: s.accent, border: `1px solid ${s.accent}30` }}>
-                      {t}
-                    </span>
-                  ))}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+              {SAAS_CASES.map((s, i) => (
+                <div key={s.nome} className="portfolio-card"
+                  style={{
+                    borderRadius: 18, overflow: "hidden", position: "relative", cursor: "default",
+                    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
+                    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.2s",
+                    gridColumn: i === 4 ? "2" : "auto",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = s.accent + "50"; (e.currentTarget as HTMLElement).style.boxShadow = `0 12px 40px ${s.accent}12`; (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+                  {/* Top color strip */}
+                  <div style={{ height: 3, background: s.accent }} />
+
+                  <div style={{ padding: "24px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                      <div style={{ width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", background: `${s.accent}15`, border: `1px solid ${s.accent}25`, flexShrink: 0 }}>{s.emoji}</div>
+                      <div>
+                        <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.05rem", margin: 0 }}>{s.nome}</h3>
+                        <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", margin: 0 }}>{s.categoria}</p>
+                      </div>
+                    </div>
+                    {/* Stack pills */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                      {s.stack.map(t => (
+                        <span key={t} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 10px", borderRadius: 6, background: `${s.accent}12`, color: s.accent, border: `1px solid ${s.accent}25` }}>{t}</span>
+                      ))}
+                      <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }}>Em produção ✓</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <GoldDivider />
-
-      {/* ── DEPOIMENTOS ─────────────────────────────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>Prova social</p>
-            <h2 className="font-bold text-white"
-              style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-              O que estão dizendo
-            </h2>
-            <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full"
-              style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.2)" }}>
-              <span className="w-2 h-2 rounded-full" style={{ background: "#fbbf24" }} />
-              <span className="text-xs font-medium" style={{ color: "#fbbf24" }}>Turma Zero em formação — depoimentos chegando em breve</span>
+              ))}
             </div>
           </div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-4">
-            {[
-              { inicial: "C", nome: "Carlos M.",    empresa: "E-commerce",        cargo: "Fundador",           texto: "O sistema de atendimento automatizado que construí no LEAP está respondendo 80% dos clientes sem minha intervenção." },
-              { inicial: "A", nome: "Ana Paula S.", empresa: "Clínica de Saúde",  cargo: "Gestora",            texto: "Em 10 dias já tinha o primeiro fluxo rodando. Nunca imaginei que conseguiria sem saber programar." },
-              { inicial: "R", nome: "Rafael T.",    empresa: "Agência Digital",   cargo: "Sócio-diretor",      texto: "O Método LEAP mudou como entrego resultados para meus clientes. IA deixou de ser custo e virou diferencial." },
-            ].map((dep) => (
-              <div key={dep.nome} className="relative rounded-2xl p-6 overflow-hidden"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                {/* Conteúdo do card */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-base flex-shrink-0"
-                    style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.25)", color: GOLD }}>
-                    {dep.inicial}
-                  </div>
-                  <div>
-                    <p className="font-bold text-white text-sm">{dep.nome}</p>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{dep.cargo} · {dep.empresa}</p>
-                  </div>
-                </div>
-                <div className="flex gap-0.5 mb-3">
-                  {[1,2,3,4,5].map(i => (
-                    <span key={i} style={{ color: GOLD }}>★</span>
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>"{dep.texto}"</p>
+        <GoldDivider />
 
-                {/* Overlay "em breve" */}
-                <div className="absolute inset-0 rounded-2xl flex flex-col items-center justify-center"
-                  style={{ background: "rgba(15,32,68,0.82)", backdropFilter: "blur(4px)" }}>
-                  <span className="text-2xl mb-3">✦</span>
-                  <span className="text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full"
-                    style={{ background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24" }}>
-                    Em breve
-                  </span>
-                  <p className="text-xs mt-2" style={{ color: "rgba(255,255,255,0.3)" }}>coletando depoimentos</p>
-                </div>
+        {/* ── DEPOIMENTOS ─────────────────────────────────────────────────── */}
+        <section style={{ padding: "96px 1.5rem" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 56 }}>
+              <SectionLabel>Prova social</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1, marginBottom: 16 }}>
+                O que estão dizendo
+              </h2>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 100, background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.18)" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", display: "inline-block" }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#fbbf24" }}>Turma Zero em formação — depoimentos chegando em breve</span>
               </div>
-            ))}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+              {[
+                { i: "CM", n: "Carlos M.",    e: "E-commerce",      c: "Fundador",      t: "O sistema de atendimento automatizado que construí no LEAP está respondendo 80% dos clientes sem minha intervenção." },
+                { i: "AP", n: "Ana Paula S.", e: "Clínica de Saúde", c: "Gestora",       t: "Em 10 dias já tinha o primeiro fluxo rodando. Nunca imaginei que conseguiria sem saber programar." },
+                { i: "RT", n: "Rafael T.",    e: "Agência Digital",  c: "Sócio-diretor", t: "O Método LEAP mudou como entrego resultados para meus clientes. IA deixou de ser custo e virou diferencial." },
+              ].map(d => (
+                <div key={d.n} style={{ position: "relative", borderRadius: 18, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.85rem", flexShrink: 0, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.22)", color: GOLD }}>{d.i}</div>
+                    <div>
+                      <p style={{ fontWeight: 700, color: "white", fontSize: "0.85rem", margin: 0 }}>{d.n}</p>
+                      <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", margin: 0 }}>{d.c} · {d.e}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>{[1,2,3,4,5].map(i => <span key={i} style={{ color: GOLD, fontSize: "0.85rem" }}>★</span>)}</div>
+                  <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: 0 }}>"{d.t}"</p>
+
+                  {/* Overlay */}
+                  <div style={{ position: "absolute", inset: 0, borderRadius: 18, background: "rgba(15,32,68,0.85)", backdropFilter: "blur(6px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                    <span style={{ fontSize: "1.5rem" }}>✦</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 100, background: "rgba(251,191,36,0.09)", border: "1px solid rgba(251,191,36,0.22)", color: "#fbbf24" }}>Em breve</span>
+                    <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)", margin: 0 }}>coletando depoimentos</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <GoldDivider />
+        <GoldDivider />
 
-      {/* ── FAQ ─────────────────────────────────────────────────────────────── */}
-      <section id="faq" className="py-20 px-6" style={{ background: "rgba(255,255,255,0.02)" }}>
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>FAQ</p>
-            <h2 className="font-bold text-white"
-              style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(1.8rem, 4vw, 2.8rem)", lineHeight: 1.1 }}>
-              Perguntas frequentes
+        {/* ── FAQ ─────────────────────────────────────────────────────────── */}
+        <section id="faq" style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+            <div style={{ textAlign: "center", marginBottom: 56 }}>
+              <SectionLabel>FAQ</SectionLabel>
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,2.8rem)", lineHeight: 1.1 }}>
+                Perguntas frequentes
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {FAQ_ITEMS.map((item, i) => (
+                <div key={i} style={{
+                  borderRadius: 14, overflow: "hidden", border: "1px solid",
+                  borderColor: faqAberto === i ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.08)",
+                  transition: "border-color 0.2s"
+                }}>
+                  <button
+                    onClick={() => setFaqAberto(faqAberto === i ? null : i)}
+                    style={{
+                      width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "18px 24px", textAlign: "left", background: faqAberto === i ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.03)",
+                      border: "none", cursor: "pointer", transition: "background 0.2s",
+                    }}>
+                    <span style={{ fontWeight: 600, fontSize: "0.92rem", color: faqAberto === i ? "white" : "rgba(255,255,255,0.75)", paddingRight: 16, lineHeight: 1.4 }}>{item.q}</span>
+                    <span style={{ color: GOLD, fontSize: "1.2rem", fontWeight: 300, flexShrink: 0, transform: faqAberto === i ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", lineHeight: 1 }}>+</span>
+                  </button>
+                  <div className="faq-answer" style={{ maxHeight: faqAberto === i ? 300 : 0, opacity: faqAberto === i ? 1 : 0 }}>
+                    <div style={{ padding: "4px 24px 20px", background: "rgba(201,168,76,0.03)" }}>
+                      <p style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, margin: 0 }}>{item.a}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <GoldDivider />
+
+        {/* ── GARANTIA ────────────────────────────────────────────────────── */}
+        <section style={{ padding: "64px 1.5rem", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+            <div style={{ fontSize: "3rem", marginBottom: 16 }}>🛡️</div>
+            <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.5rem", marginBottom: 12 }}>Garantia incondicional de 7 dias</h3>
+            <p style={{ color: "rgba(255,255,255,0.45)", lineHeight: 1.8, fontSize: "0.95rem" }}>
+              Se você entrar no LEAP BUILD e em 7 dias sentir que não era para você, devolvo 100% do valor sem perguntas. O risco é zero. O arrependimento de não começar custa muito mais.
+            </p>
+          </div>
+        </section>
+
+        {/* ── CTA FINAL ───────────────────────────────────────────────────── */}
+        <section style={{ padding: "128px 1.5rem", position: "relative", overflow: "hidden" }}>
+          {/* Ghost text de fundo */}
+          <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "clamp(5rem,15vw,14rem)", color: "white", opacity: 0.025, whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none", letterSpacing: "-0.05em" }}>
+            LEAP
+          </div>
+          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, ${GOLD}08 0%, transparent 65%)`, pointerEvents: "none" }} />
+
+          <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+            <SectionLabel>A decisão é agora</SectionLabel>
+            <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2.5rem,6vw,4.5rem)", lineHeight: 1.02, letterSpacing: "-0.04em", marginBottom: 16 }}>
+              O salto começa aqui.
             </h2>
-          </div>
+            <p style={{ fontSize: "1.15rem", color: "rgba(255,255,255,0.45)", fontStyle: "italic", fontFamily: "'Libre Baskerville',serif", marginBottom: 48 }}>
+              R$498 hoje. R$998 depois. O preço de turma zero nunca volta.
+            </p>
 
-          <div className="space-y-3">
-            {FAQ_ITEMS.map((item, i) => (
-              <div key={i}
-                className="rounded-xl overflow-hidden border transition-all duration-200"
-                style={{ borderColor: faqAberto === i ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.08)" }}>
-                <button
-                  className="w-full flex items-center justify-between px-6 py-4 text-left transition-colors duration-150"
-                  style={{ background: faqAberto === i ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.03)" }}
-                  onClick={() => setFaqAberto(faqAberto === i ? null : i)}
-                >
-                  <span className="font-semibold text-sm pr-4" style={{ color: faqAberto === i ? "white" : "rgba(255,255,255,0.75)" }}>
-                    {item.q}
-                  </span>
-                  <span className="flex-shrink-0 text-base transition-transform duration-200"
-                    style={{ color: GOLD, transform: faqAberto === i ? "rotate(45deg)" : "rotate(0deg)" }}>
-                    +
-                  </span>
-                </button>
-                {faqAberto === i && (
-                  <div className="px-6 pb-5" style={{ background: "rgba(201,168,76,0.03)" }}>
-                    <p className="text-sm leading-loose" style={{ color: "rgba(255,255,255,0.55)" }}>{item.a}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <GoldDivider />
-
-      {/* ── GARANTIA ────────────────────────────────────────────────────────── */}
-      <section className="py-16 px-6" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="text-5xl mb-4">🛡️</div>
-          <h3 className="font-bold text-white text-2xl mb-3" style={{ fontFamily: "'General Sans', sans-serif" }}>
-            Garantia incondicional de 7 dias
-          </h3>
-          <p className="text-base leading-loose" style={{ color: "rgba(255,255,255,0.5)" }}>
-            Se você entrar no LEAP BUILD e em 7 dias sentir que não era para você, devolvo 100% do valor sem perguntas. O risco é zero. O arrependimento de não começar custa muito mais.
-          </p>
-        </div>
-      </section>
-
-      {/* ── CTA FINAL ───────────────────────────────────────────────────────── */}
-      <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5"
-          style={{ background: `radial-gradient(ellipse at center, ${GOLD} 0%, transparent 70%)` }} />
-
-        <div className="max-w-3xl mx-auto text-center relative z-10">
-          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: GOLD, letterSpacing: "0.2em" }}>
-            A decisão é agora
-          </p>
-          <h2 className="font-bold text-white mb-4"
-            style={{ fontFamily: "'General Sans', sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", lineHeight: 1.05 }}>
-            O salto começa aqui.
-          </h2>
-          <p className="text-xl mb-10" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Libre Baskerville', serif", fontStyle: "italic" }}>
-            R$498 hoje. R$998 depois. O preço de turma zero nunca volta.
-          </p>
-
-          <Link href="/cliente"
-            className="inline-flex items-center justify-center gap-3 px-10 py-5 rounded-2xl font-bold text-xl transition-all duration-200 hover:scale-105"
-            style={{ background: GOLD, color: NAVY, boxShadow: `0 0 60px rgba(201,168,76,0.35)` }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 80px rgba(201,168,76,0.55)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 60px rgba(201,168,76,0.35)"; }}>
-            Entrar no LEAP BUILD →
-          </Link>
-
-          <p className="text-xs mt-5" style={{ color: "rgba(255,255,255,0.25)" }}>
-            Turma zero · R$498 · 22 aulas + 4 bônus · Acesso vitalício · Garantia de 7 dias
-          </p>
-
-          <div className="mt-10 flex items-center justify-center gap-2">
-            <span className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Já tem acesso?</span>
-            <Link href="/member/login" className="text-sm font-medium underline" style={{ color: "rgba(255,255,255,0.4)" }}>
-              Entrar na área de membros
+            <Link href="/cliente" className="btn-gold" style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 12,
+              padding: "20px 52px", borderRadius: 18, fontWeight: 700, fontSize: "1.15rem",
+              color: NAVY, textDecoration: "none", boxShadow: "0 0 64px rgba(201,168,76,0.4)",
+            }}>
+              Entrar no LEAP BUILD →
             </Link>
+
+            <p style={{ fontSize: 11, marginTop: 20, color: "rgba(255,255,255,0.2)", letterSpacing: "0.05em" }}>
+              Turma zero · R$498 · 22 aulas + 4 bônus · Acesso vitalício · Garantia de 7 dias
+            </p>
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 32 }}>
+              <span style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.25)" }}>Já tem acesso?</span>
+              <Link href="/member/login" style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.4)", textDecoration: "underline" }}>Entrar na área de membros</Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── TECH CAROUSEL ───────────────────────────────────────────────────── */}
-      <section className="py-16 overflow-hidden border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-        <div className="max-w-2xl mx-auto text-center mb-10 px-6">
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: GOLD, letterSpacing: "0.2em" }}>
-            Tecnologia de ponta
-          </p>
-          <h3 className="text-2xl font-bold text-white" style={{ fontFamily: "'General Sans', sans-serif" }}>
-            Construído com as melhores ferramentas do mundo
-          </h3>
-        </div>
-        <CarouselTrack />
-      </section>
+        {/* ── TECH CAROUSEL ───────────────────────────────────────────────── */}
+        <section style={{ padding: "64px 0", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ maxWidth: 600, margin: "0 auto 40px", textAlign: "center", padding: "0 1.5rem" }}>
+            <SectionLabel>Tecnologia de ponta</SectionLabel>
+            <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.5rem" }}>
+              Construído com as melhores ferramentas do mundo
+            </h3>
+          </div>
+          <CarouselTrack />
+        </section>
 
-      {/* ── FOOTER ──────────────────────────────────────────────────────────── */}
-      <footer className="py-12 px-6 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            {/* Logo + tagline */}
-            <div className="text-center md:text-left">
-              <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
-                  style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}>
-                  🤖
-                </div>
-                <span className="font-bold text-white text-sm" style={{ fontFamily: "'General Sans', sans-serif" }}>IA com Peterson</span>
+        {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+        <footer style={{ padding: "56px 1.5rem", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 32 }}>
+            {/* Logo */}
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}>🤖</div>
+                <span style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: 14 }}>IA com Peterson</span>
               </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>Método LEAP · Gestor de IA · {new Date().getFullYear()}</p>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Método LEAP · Gestor de IA · {new Date().getFullYear()}</p>
             </div>
 
             {/* Links */}
-            <div className="flex items-center gap-6 text-xs flex-wrap justify-center" style={{ color: "rgba(255,255,255,0.3)" }}>
-              <Link href="/cliente" className="hover:text-white transition-colors">Formulário</Link>
-              <a href="#metodo" className="hover:text-white transition-colors">Método LEAP</a>
-              <a href="#cursos" className="hover:text-white transition-colors">Cursos</a>
-              <a href="#consultoria" className="hover:text-white transition-colors">Consultoria</a>
-              <Link href="/member/login" className="hover:text-white transition-colors">Membros</Link>
+            <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
+              {[
+                { label: "Formulário", href: "/cliente", isLink: true },
+                { label: "Método LEAP", href: "#metodo", isLink: false },
+                { label: "Cursos", href: "#cursos", isLink: false },
+                { label: "Consultoria", href: "#consultoria", isLink: false },
+                { label: "Membros", href: "/member/login", isLink: true },
+              ].map(item => (
+                item.isLink
+                  ? <Link key={item.label} href={item.href} style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textDecoration: "none", transition: "color 0.2s" }}
+                      onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                      onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}>
+                      {item.label}
+                    </Link>
+                  : <a key={item.label} href={item.href} style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textDecoration: "none", transition: "color 0.2s" }}
+                      onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                      onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}>
+                      {item.label}
+                    </a>
+              ))}
             </div>
 
-            {/* Social */}
             <SocialLinks />
           </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+
+      </div>
+    </>
   );
 }
