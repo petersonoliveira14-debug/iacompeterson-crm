@@ -784,7 +784,7 @@ export default function LandingPage() {
                 Quem já recebeu uma solução
               </h2>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 16px", borderRadius: 8, background: "rgba(0,0,0,0.4)", border: `1px solid rgba(201,168,76,0.18)` }}>
-                <span style={{ fontFamily: MONO, color: `${GOLD}60`, fontSize: 10 }}>></span>
+                <span style={{ fontFamily: MONO, color: `${GOLD}60`, fontSize: 10 }}>{">"}</span>
                 <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}>aguardando_confirmação.depoimentos — collecting...</span>
                 <span className="cursor" style={{ fontFamily: MONO, color: GOLD, fontSize: 10 }}>█</span>
               </div>
