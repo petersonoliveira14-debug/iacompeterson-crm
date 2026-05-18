@@ -148,8 +148,15 @@ export default function LandingPage() {
           transform: scale(1.08) translateY(-4px);
           opacity: 0.08;
         }
-        .portfolio-card:hover .portfolio-overlay {
-          opacity: 1;
+        .pf-card .pf-panel {
+          transform: translateY(calc(100% - 58px));
+          transition: transform 0.42s cubic-bezier(0.4,0,0.2,1);
+        }
+        .pf-card:hover .pf-panel {
+          transform: translateY(0);
+        }
+        .pf-card {
+          transition: border-color 0.25s, box-shadow 0.25s;
         }
         .faq-answer {
           overflow: hidden;
@@ -724,54 +731,62 @@ export default function LandingPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
               {SAAS_CASES.map((s, i) => (
-                <div key={s.nome} className="portfolio-card tech-card"
+                <div key={s.nome} className="pf-card"
                   style={{
-                    borderRadius: 12, overflow: "hidden", position: "relative", cursor: "default",
-                    background: "rgba(255,255,255,0.02)", border: `1px solid ${s.accent}18`,
-                    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.2s, background 0.2s",
+                    position: "relative", borderRadius: 16, overflow: "hidden",
+                    height: 260, cursor: "default",
+                    border: `1px solid ${s.accent}22`,
                     gridColumn: i === 4 ? "2" : "auto",
                   }}
-                  onMouseMove={e => {
+                  onMouseEnter={e => {
                     const el = e.currentTarget as HTMLElement;
-                    const r = el.getBoundingClientRect();
-                    const x = e.clientX - r.left;
-                    const y = e.clientY - r.top;
-                    el.style.background = `radial-gradient(circle at ${x}px ${y}px, ${s.accent}22 0%, rgba(255,255,255,0.03) 55%)`;
                     el.style.borderColor = s.accent + '55';
-                    el.style.transform = 'translateY(-4px) scale(1.015)';
-                    el.style.boxShadow = `0 16px 48px ${s.accent}18`;
+                    el.style.boxShadow = `0 24px 64px ${s.accent}20`;
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLElement;
-                    el.style.background = 'rgba(255,255,255,0.03)';
-                    el.style.borderColor = 'rgba(255,255,255,0.08)';
-                    el.style.transform = 'translateY(0) scale(1)';
+                    el.style.borderColor = s.accent + '22';
                     el.style.boxShadow = 'none';
                   }}>
-                  {/* Scan line */}
-                  <div className="scan-line" />
-                  {/* Top accent */}
-                  <div style={{ height: 1, background: s.accent }} />
-                  {/* File header monospace */}
-                  <div style={{ padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: `${s.accent}80`, fontSize: 10 }}>▶</span>
-                    <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.22)", letterSpacing: "0.04em" }}>{s.nome.toLowerCase().replace(/ /g, "-")}.ts</span>
+
+                  {/* ── Visual area (background) */}
+                  <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at 35% 25%, ${s.accent}22 0%, transparent 55%), linear-gradient(160deg, rgba(15,32,68,0.7) 0%, #050d1a 100%)` }}>
+                    {/* Dot-grid overlay */}
+                    <div className="dot-grid" style={{ position: "absolute", inset: 0, opacity: 0.45 }} />
+                    {/* Top accent bar */}
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${s.accent}, transparent)` }} />
+                    {/* Centered emoji */}
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: 48 }}>
+                      <span style={{ fontSize: "3.2rem", lineHeight: 1, filter: `drop-shadow(0 0 24px ${s.accent}60)` }}>{s.emoji}</span>
+                    </div>
                   </div>
 
-                  <div style={{ padding: "20px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                      <div style={{ width: 44, height: 44, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", background: `${s.accent}15`, border: `1px solid ${s.accent}25`, flexShrink: 0 }}>{s.emoji}</div>
-                      <div>
-                        <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.05rem", margin: 0 }}>{s.nome}</h3>
-                        <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", margin: 0 }}>{s.categoria}</p>
-                      </div>
-                    </div>
-                    {/* Stack pills */}
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {s.stack.map(t => (
-                        <span key={t} style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 10px", borderRadius: 6, background: `${s.accent}12`, color: s.accent, border: `1px solid ${s.accent}25` }}>{t}</span>
+                  {/* ── File header (top, always visible) */}
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, zIndex: 3 }}>
+                    <span style={{ fontFamily: MONO, color: `${s.accent}80`, fontSize: 10 }}>▶</span>
+                    <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.28)", letterSpacing: "0.04em" }}>{s.nome.toLowerCase().replace(/ /g, "-")}.ts</span>
+                    <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                      {["rgba(255,255,255,0.12)","rgba(255,255,255,0.12)","rgba(255,255,255,0.12)"].map((c,j) => (
+                        <div key={j} style={{ width: 6, height: 6, borderRadius: "50%", background: c }} />
                       ))}
-                      <span style={{ fontSize: "0.72rem", fontWeight: 600, padding: "4px 10px", borderRadius: 6, background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.08)" }}>Em produção ✓</span>
+                    </div>
+                  </div>
+
+                  {/* ── Slide-up info panel */}
+                  <div className="pf-panel" style={{
+                    position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 4,
+                    padding: "16px 20px 20px",
+                    background: `linear-gradient(to top, rgba(5,13,26,0.98) 70%, rgba(5,13,26,0.88) 100%)`,
+                    backdropFilter: "blur(12px)",
+                    borderTop: `1px solid ${s.accent}30`,
+                  }}>
+                    <h3 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.0rem", margin: "0 0 4px", lineHeight: 1.2 }}>{s.nome}</h3>
+                    <p style={{ fontSize: "0.74rem", color: "rgba(255,255,255,0.42)", margin: "0 0 12px", lineHeight: 1.4 }}>{s.categoria}</p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                      {s.stack.map(t => (
+                        <span key={t} style={{ fontSize: "0.68rem", fontWeight: 600, padding: "3px 9px", borderRadius: 5, background: `${s.accent}12`, color: s.accent, border: `1px solid ${s.accent}28` }}>{t}</span>
+                      ))}
+                      <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "3px 9px", borderRadius: 5, background: "rgba(52,211,153,0.10)", color: "#34d399", border: "1px solid rgba(52,211,153,0.22)" }}>Em produção ✓</span>
                     </div>
                   </div>
                 </div>
@@ -797,30 +812,33 @@ export default function LandingPage() {
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
-              {[
+              {([
                 {
                   initials: "SE",
+                  foto: null,
                   nome: "Sabrina Espinós",
                   cargo: "CEO",
                   empresa: "IAra",
-                  placeholder: "Depoimento a caminho — solução entregue.",
+                  depoimento: null,
                 },
                 {
                   initials: "MR",
+                  foto: null,
                   nome: "Marina Oliveira Rodrigues",
                   cargo: "Head de Estratégia e Marketing",
                   empresa: "Grupo Carbo",
-                  placeholder: "Depoimento a caminho — solução entregue.",
+                  depoimento: null,
                 },
                 {
                   initials: "SJ",
+                  foto: "/photos/sarah-justus.jpg",
                   nome: "Sarah Justus",
                   cargo: "Co-founder · Gestora de Tráfego",
                   empresa: "Forget.co",
-                  placeholder: "Depoimento a caminho — solução entregue.",
+                  depoimento: "A entrega foi feita de forma extremamente rápida, seguindo os direcionamentos de layout e copy, além disso os ajustes foram feitos muito rápidos também e tivemos a entrega dentro do prazo e suporte necessário. Indico muito!",
                 },
-              ].map(d => (
-                <div key={d.nome} style={{ position: "relative", borderRadius: 12, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.02)", border: `1px solid rgba(201,168,76,0.12)` }}>
+              ] as Array<{ initials: string; foto: string | null; nome: string; cargo: string; empresa: string; depoimento: string | null }>).map(d => (
+                <div key={d.nome} style={{ position: "relative", borderRadius: 12, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.02)", border: `1px solid ${d.depoimento ? "rgba(201,168,76,0.25)" : "rgba(201,168,76,0.12)"}` }}>
                   {/* Corner brackets */}
                   <div style={{ position: "absolute", top: 10, left: 10, width: 12, height: 12, borderTop: `1px solid ${GOLD}35`, borderLeft: `1px solid ${GOLD}35` }} />
                   <div style={{ position: "absolute", top: 10, right: 10, width: 12, height: 12, borderTop: `1px solid ${GOLD}35`, borderRight: `1px solid ${GOLD}35` }} />
@@ -829,9 +847,13 @@ export default function LandingPage() {
 
                   {/* Header identidade */}
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.82rem", flexShrink: 0, background: "rgba(201,168,76,0.10)", border: "1px solid rgba(201,168,76,0.20)", color: GOLD, fontFamily: MONO }}>
-                      {d.initials}
-                    </div>
+                    {d.foto ? (
+                      <img src={d.foto} alt={d.nome} style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", objectPosition: "top center", flexShrink: 0, border: `1px solid rgba(201,168,76,0.30)` }} />
+                    ) : (
+                      <div style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.82rem", flexShrink: 0, background: "rgba(201,168,76,0.10)", border: "1px solid rgba(201,168,76,0.20)", color: GOLD, fontFamily: MONO }}>
+                        {d.initials}
+                      </div>
+                    )}
                     <div>
                       <p style={{ fontWeight: 700, color: "white", fontSize: "0.88rem", margin: 0 }}>{d.nome}</p>
                       <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.38)", margin: "2px 0 0", lineHeight: 1.4 }}>{d.cargo} · {d.empresa}</p>
@@ -841,16 +863,20 @@ export default function LandingPage() {
                   <div style={{ display: "flex", gap: 2, marginBottom: 14 }}>
                     {[1,2,3,4,5].map(i => <span key={i} style={{ color: GOLD, fontSize: "0.8rem" }}>★</span>)}
                   </div>
-                  <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.3)", lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>{d.placeholder}</p>
+                  <p style={{ fontSize: "0.82rem", color: d.depoimento ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.3)", lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>
+                    {d.depoimento ?? "Depoimento a caminho — solução entregue."}
+                  </p>
 
-                  {/* Overlay "aguardando" */}
-                  <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "rgba(5,13,26,0.82)", backdropFilter: "blur(8px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", border: `1px solid rgba(201,168,76,0.3)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontFamily: MONO, color: GOLD, fontSize: 14 }}>↻</span>
+                  {/* Overlay "aguardando" — só para cards sem depoimento */}
+                  {!d.depoimento && (
+                    <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "rgba(5,13,26,0.82)", backdropFilter: "blur(8px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: "50%", border: `1px solid rgba(201,168,76,0.3)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ fontFamily: MONO, color: GOLD, fontSize: 14 }}>↻</span>
+                      </div>
+                      <p style={{ fontFamily: MONO, fontSize: 9, color: `${GOLD}70`, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0 }}>aguardando</p>
+                      <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.22)", margin: 0 }}>depoimento solicitado</p>
                     </div>
-                    <p style={{ fontFamily: MONO, fontSize: 9, color: `${GOLD}70`, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0 }}>aguardando</p>
-                    <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.22)", margin: 0 }}>depoimento solicitado</p>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
