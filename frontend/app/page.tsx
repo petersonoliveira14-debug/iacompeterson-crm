@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CarouselTrack, SocialLinks } from "@/components/layout/TechCarousel";
 
 /* ─── Design tokens ─────────────────────────────────────────────────────────── */
@@ -82,6 +82,23 @@ function SectionLabel({ children, color = GOLD }: { children: React.ReactNode; c
 export default function LandingPage() {
   const [faqAberto, setFaqAberto] = useState<number | null>(null);
 
+  useEffect(() => {
+    const targets = document.querySelectorAll('[data-fade]');
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+    targets.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <>
       {/* Animações CSS */}
@@ -101,6 +118,15 @@ export default function LandingPage() {
         @keyframes fade-up {
           from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        [data-fade] {
+          opacity: 0;
+          transform: translateY(40px);
+          transition: opacity 0.75s cubic-bezier(0.4,0,0.2,1), transform 0.75s cubic-bezier(0.4,0,0.2,1);
+        }
+        [data-fade].visible {
+          opacity: 1;
+          transform: translateY(0);
         }
         .btn-gold {
           background: linear-gradient(110deg, #c9a84c 0%, #e8c96a 40%, #c9a84c 60%, #b8943c 100%);
@@ -256,7 +282,7 @@ export default function LandingPage() {
 
         {/* ── NÚMEROS ─────────────────────────────────────────────────────── */}
         <section style={{ padding: "64px 1.5rem", background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
+          <div data-fade="" style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
             {[
               { n: "60%",  d: "redução em tarefas operacionais" },
               { n: "10",   d: "dias para o primeiro sistema rodando" },
@@ -276,7 +302,7 @@ export default function LandingPage() {
 
         {/* ── DOR / AGITAÇÃO ──────────────────────────────────────────────── */}
         <section style={{ padding: "96px 1.5rem" }}>
-          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 720, margin: "0 auto" }}>
             <SectionLabel>Seja honesto</SectionLabel>
             <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1, textAlign: "center", marginBottom: 48 }}>
               Você reconhece{" "}
@@ -308,7 +334,7 @@ export default function LandingPage() {
 
         {/* ── MÉTODO LEAP ─────────────────────────────────────────────────── */}
         <section id="metodo" style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 64 }}>
               <SectionLabel>A solução</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
@@ -326,8 +352,23 @@ export default function LandingPage() {
               ].map(f => (
                 <div key={f.letra} className="leap-card"
                   style={{ padding: "28px 24px", borderRadius: 20, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)", position: "relative", overflow: "hidden", cursor: "default", transition: "border-color 0.2s, box-shadow 0.2s" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = f.cor + "60"; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 32px ${f.cor}15`; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.09)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
+                  onMouseMove={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    const r = el.getBoundingClientRect();
+                    const x = (e.clientX - r.left) / r.width - 0.5;
+                    const y = (e.clientY - r.top) / r.height - 0.5;
+                    el.style.transition = 'border-color 0.2s, box-shadow 0.2s';
+                    el.style.transform = `perspective(700px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(6px)`;
+                    el.style.borderColor = f.cor + '60';
+                    el.style.boxShadow = `0 20px 60px ${f.cor}25`;
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.transition = 'border-color 0.2s, box-shadow 0.2s, transform 0.5s ease';
+                    el.style.transform = 'perspective(700px) rotateY(0) rotateX(0) translateZ(0)';
+                    el.style.borderColor = 'rgba(255,255,255,0.09)';
+                    el.style.boxShadow = 'none';
+                  }}>
                   {/* Giant watermark letter */}
                   <div className="leap-letter" style={{ position: "absolute", top: -8, right: -8, fontSize: "7rem", fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: f.cor, opacity: 0.05, lineHeight: 1, userSelect: "none", transition: "all 0.3s ease", pointerEvents: "none" }}>{f.letra}</div>
                   <div style={{ fontFamily: "'General Sans',sans-serif", fontSize: "2.5rem", fontWeight: 700, color: f.cor, marginBottom: 12, position: "relative" }}>{f.letra}</div>
@@ -349,7 +390,7 @@ export default function LandingPage() {
 
         {/* ── TRILOGIA ────────────────────────────────────────────────────── */}
         <section id="cursos" style={{ padding: "96px 1.5rem" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 64 }}>
               <SectionLabel>Os produtos</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
@@ -365,8 +406,22 @@ export default function LandingPage() {
                   background: "rgba(255,255,255,0.03)",
                   border: c.active ? `1px solid rgba(201,168,76,0.4)` : "1px solid rgba(255,255,255,0.08)",
                   boxShadow: c.active ? "0 0 40px rgba(201,168,76,0.10), inset 0 1px 0 rgba(201,168,76,0.15)" : "none",
-                  position: "relative"
-                }}>
+                  position: "relative", transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.transform = 'translateY(-6px)';
+                    el.style.boxShadow = c.active
+                      ? `0 0 60px ${c.accent}25, inset 0 1px 0 rgba(201,168,76,0.15)`
+                      : `0 12px 40px rgba(255,255,255,0.06)`;
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.transform = 'translateY(0)';
+                    el.style.boxShadow = c.active
+                      ? '0 0 40px rgba(201,168,76,0.10), inset 0 1px 0 rgba(201,168,76,0.15)'
+                      : 'none';
+                  }}>
                   {/* Accent bar */}
                   <div style={{ height: 3, background: c.accent }} />
 
@@ -435,7 +490,7 @@ export default function LandingPage() {
 
         {/* ── FGI ─────────────────────────────────────────────────────────── */}
         <section style={{ padding: "96px 1.5rem", background: "rgba(59,130,246,0.03)", borderTop: "1px solid rgba(59,130,246,0.08)" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
             <div>
               <SectionLabel color="#60a5fa">Formação Completa · Junho 2025</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", lineHeight: 1.1, marginBottom: 20 }}>
@@ -478,7 +533,7 @@ export default function LandingPage() {
 
         {/* ── CONSULTORIA ─────────────────────────────────────────────────── */}
         <section id="consultoria" style={{ padding: "96px 1.5rem" }}>
-          <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 1000, margin: "0 auto" }}>
             <div style={{ borderRadius: 24, padding: "56px 64px", background: "rgba(201,168,76,0.04)", border: "1px solid rgba(201,168,76,0.18)", borderLeft: "4px solid " + GOLD, position: "relative", overflow: "hidden" }}>
               {/* Background decoration */}
               <div style={{ position: "absolute", top: -80, right: -80, width: 320, height: 320, borderRadius: "50%", background: GOLD, opacity: 0.03, pointerEvents: "none" }} />
@@ -537,32 +592,36 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <GoldDivider />
-
         {/* ── SOBRE PETERSON ──────────────────────────────────────────────── */}
-        <section id="sobre" style={{ padding: "96px 1.5rem" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "420px 1fr", gap: 64, alignItems: "center" }}>
+        <section id="sobre" style={{ overflow: "hidden" }}>
+          <div data-fade="" style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", alignItems: "stretch" }}>
 
-            {/* Foto */}
-            <div style={{ position: "relative" }}>
-              <div style={{ borderRadius: 24, overflow: "hidden", position: "relative", boxShadow: "0 0 0 1px rgba(201,168,76,0.25), 0 32px 80px rgba(0,0,0,0.5)" }}>
-                <img src="/photos/peterson-headshot.jpg" alt="Peterson Oliveira" style={{ width: "100%", display: "block", objectFit: "cover", maxHeight: 540, objectPosition: "top center" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15,32,68,0.7) 0%, transparent 50%)" }} />
-                {/* Name overlay */}
-                <div style={{ position: "absolute", bottom: 20, left: 24, right: 24 }}>
-                  <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.1rem", margin: 0 }}>Peterson Oliveira</p>
-                  <p style={{ color: GOLD, fontSize: "0.8rem", margin: "2px 0 0" }}>Criador do Método LEAP</p>
-                </div>
+            {/* Foto — full height, sem maxHeight */}
+            <div style={{ position: "relative", minHeight: 640, overflow: "hidden" }}>
+              <img src="/photos/peterson-headshot.jpg" alt="Peterson Oliveira"
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
+              {/* Blend direita → funde com o fundo navy */}
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, transparent 50%, #0f2044 100%)" }} />
+              {/* Sombra base */}
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15,32,68,0.85) 0%, transparent 40%)" }} />
+
+              {/* Name plate */}
+              <div style={{ position: "absolute", bottom: 28, left: 28 }}>
+                <p style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "1.15rem", margin: 0 }}>Peterson Oliveira</p>
+                <p style={{ color: GOLD, fontSize: "0.8rem", margin: "3px 0 0" }}>Criador do Método LEAP</p>
               </div>
 
-              {/* Thumbnail evento */}
-              <div style={{ position: "absolute", bottom: -16, right: -16, width: 100, height: 100, borderRadius: 14, overflow: "hidden", border: `2px solid ${NAVY}`, boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
-                <img src="/photos/peterson-evento.jpg" alt="Peterson em evento" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }} />
+              {/* Stage photo badge */}
+              <div style={{ position: "absolute", top: 20, left: 20, borderRadius: 12, overflow: "hidden", width: 88, height: 88, border: "2px solid rgba(201,168,76,0.35)", boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+                <img src="/photos/peterson-stage.jpg" alt="Peterson no palco"
+                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center" }} />
               </div>
+              <p style={{ position: "absolute", top: 114, left: 20, fontSize: 10, color: "rgba(255,255,255,0.38)", letterSpacing: "0.12em", textTransform: "uppercase", margin: 0 }}>no palco</p>
             </div>
 
             {/* Bio */}
-            <div>
+            <div style={{ padding: "72px 56px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <SectionLabel>Quem criou o método</SectionLabel>
               <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.8, marginBottom: 16, fontSize: "0.95rem" }}>
                 Criou o Método LEAP depois de perceber que o mercado estava cheio de ferramentas de IA sem nenhum método para usá-las estrategicamente. Em menos de 3 meses, construiu mais de 10 sistemas de IA, 10 sites e landing pages e 5 SaaS que já estão rodando com clientes reais.
               </p>
@@ -598,11 +657,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <GoldDivider />
-
         {/* ── PORTFOLIO / CASES ───────────────────────────────────────────── */}
-        <section style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <section style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 64 }}>
               <SectionLabel>Portfólio</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1 }}>
@@ -622,8 +679,23 @@ export default function LandingPage() {
                     transition: "border-color 0.2s, box-shadow 0.2s, transform 0.2s",
                     gridColumn: i === 4 ? "2" : "auto",
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = s.accent + "50"; (e.currentTarget as HTMLElement).style.boxShadow = `0 12px 40px ${s.accent}12`; (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+                  onMouseMove={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    const r = el.getBoundingClientRect();
+                    const x = e.clientX - r.left;
+                    const y = e.clientY - r.top;
+                    el.style.background = `radial-gradient(circle at ${x}px ${y}px, ${s.accent}22 0%, rgba(255,255,255,0.03) 55%)`;
+                    el.style.borderColor = s.accent + '55';
+                    el.style.transform = 'translateY(-4px) scale(1.015)';
+                    el.style.boxShadow = `0 16px 48px ${s.accent}18`;
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.background = 'rgba(255,255,255,0.03)';
+                    el.style.borderColor = 'rgba(255,255,255,0.08)';
+                    el.style.transform = 'translateY(0) scale(1)';
+                    el.style.boxShadow = 'none';
+                  }}>
                   {/* Top color strip */}
                   <div style={{ height: 3, background: s.accent }} />
 
@@ -653,7 +725,7 @@ export default function LandingPage() {
 
         {/* ── DEPOIMENTOS ─────────────────────────────────────────────────── */}
         <section style={{ padding: "96px 1.5rem" }}>
-          <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 56 }}>
               <SectionLabel>Prova social</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1, marginBottom: 16 }}>
@@ -698,7 +770,7 @@ export default function LandingPage() {
 
         {/* ── FAQ ─────────────────────────────────────────────────────────── */}
         <section id="faq" style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
-          <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div data-fade="" style={{ maxWidth: 720, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 56 }}>
               <SectionLabel>FAQ</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,2.8rem)", lineHeight: 1.1 }}>
@@ -719,7 +791,9 @@ export default function LandingPage() {
                       width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
                       padding: "18px 24px", textAlign: "left", background: faqAberto === i ? "rgba(201,168,76,0.06)" : "rgba(255,255,255,0.03)",
                       border: "none", cursor: "pointer", transition: "background 0.2s",
-                    }}>
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = faqAberto === i ? 'rgba(201,168,76,0.09)' : 'rgba(255,255,255,0.055)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = faqAberto === i ? 'rgba(201,168,76,0.06)' : 'rgba(255,255,255,0.03)'; }}>
                     <span style={{ fontWeight: 600, fontSize: "0.92rem", color: faqAberto === i ? "white" : "rgba(255,255,255,0.75)", paddingRight: 16, lineHeight: 1.4 }}>{item.q}</span>
                     <span style={{ color: GOLD, fontSize: "1.2rem", fontWeight: 300, flexShrink: 0, transform: faqAberto === i ? "rotate(45deg)" : "rotate(0deg)", transition: "transform 0.25s ease", lineHeight: 1 }}>+</span>
                   </button>
@@ -755,7 +829,7 @@ export default function LandingPage() {
           </div>
           <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, ${GOLD}08 0%, transparent 65%)`, pointerEvents: "none" }} />
 
-          <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+          <div data-fade="" style={{ maxWidth: 760, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
             <SectionLabel>A decisão é agora</SectionLabel>
             <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2.5rem,6vw,4.5rem)", lineHeight: 1.02, letterSpacing: "-0.04em", marginBottom: 16 }}>
               O salto começa aqui.
