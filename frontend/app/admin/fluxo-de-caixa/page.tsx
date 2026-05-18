@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { supabase } from "@/lib/supabase";
@@ -17,6 +17,13 @@ interface Lancamento {
   data: string;
   recorrente: boolean;
   recorrencia: "mensal" | "trimestral" | "anual" | null;
+  produto?: string | null;
+  cliente_id?: string | null;
+}
+
+interface ClienteOpcao {
+  id: string;
+  nome: string;
 }
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
@@ -26,6 +33,12 @@ const MONTH_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out"
 const CATEGORIAS_ENTRADA = ["Projeto fechado","Consultoria","Recorrência","Mentoria","Curso","Outro"];
 const CATEGORIAS_SAIDA   = ["IA / APIs","Hospedagem","Marketing","Assinaturas","Ferramentas","Impostos","Pró-labore","Outro"];
 
+const PRODUTOS = [
+  "LEAP BUILD", "LEAP RUN", "LEAP SCALE", "Trilogia LEAP",
+  "FGI Essencial", "FGI Premium", "Mentoria Individual",
+  "Consultoria Sob Medida", "Grupo Mastermind", "OCTUS",
+];
+
 const EMPTY_FORM = {
   tipo: "entrada" as "entrada" | "saida",
   categoria: "",
@@ -34,6 +47,8 @@ const EMPTY_FORM = {
   data: new Date().toISOString().split("T")[0],
   recorrente: false,
   recorrencia: "" as "" | "mensal" | "trimestral" | "anual",
+  produto: "",
+  clienteId: "",
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -79,11 +94,15 @@ function BarChart({ meses }: { meses: Array<{ label: string; entradas: number; s
 export default function FluxoCaixaPage() {
   const router = useRouter();
   const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
-  const [loading, setLoading]       = useState(true);
-  const [saving, setSaving]         = useState(false);
-  const [showForm, setShowForm]     = useState(false);
-  const [form, setForm]             = useState(EMPTY_FORM);
-  const [mesFiltro, setMesFiltro]   = useState<string>(() => {
+  const [clientes, setClientes]       = useState<ClienteOpcao[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [saving, setSaving]           = useState(false);
+  const [showForm, setShowForm]       = useState(false);
+  const [form, setForm]               = useState(EMPTY_FORM);
+  const [clienteBusca, setClienteBusca] = useState("");
+  const [showClienteDropdown, setShowClienteDropdown] = useState(false);
+  const clienteRef = useRef<HTMLDivElement>(null);
+  const [mesFiltro, setMesFiltro]     = useState<string>(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
@@ -91,17 +110,39 @@ export default function FluxoCaixaPage() {
   // ── Auth + busca ──
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
-    fetchLancamentos();
+    fetchAll();
   }, [router]);
 
-  const fetchLancamentos = useCallback(async () => {
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (clienteRef.current && !clienteRef.current.contains(e.target as Node)) {
+        setShowClienteDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const fetchAll = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("fluxo_caixa")
-      .select("*")
-      .order("data", { ascending: false });
-    if (!error && data) setLancamentos(data as Lancamento[]);
+    const [lancRes, cliRes] = await Promise.all([
+      supabase.from("fluxo_caixa").select("*").order("data", { ascending: false }),
+      supabase.from("clientes").select("id, nome_empresa, nome_contato").order("nome_empresa"),
+    ]);
+    if (!lancRes.error && lancRes.data) setLancamentos(lancRes.data as Lancamento[]);
+    if (!cliRes.error && cliRes.data) {
+      setClientes(cliRes.data.map((c: { id: string; nome_empresa: string | null; nome_contato: string | null }) => ({
+        id: c.id,
+        nome: c.nome_empresa || c.nome_contato || "—",
+      })));
+    }
     setLoading(false);
+  }, []);
+
+  const fetchLancamentos = useCallback(async () => {
+    const { data, error } = await supabase.from("fluxo_caixa").select("*").order("data", { ascending: false });
+    if (!error && data) setLancamentos(data as Lancamento[]);
   }, []);
 
   // ── Expandir recorrentes nos próximos 6 meses ──
@@ -180,6 +221,12 @@ export default function FluxoCaixaPage() {
     return Array.from(set).sort().reverse();
   }, [lancamentos]);
 
+  // ── Clientes filtrados pelo busca ──
+  const clientesFiltrados = useMemo(() => {
+    if (!clienteBusca) return [];
+    return clientes.filter(c => c.nome.toLowerCase().includes(clienteBusca.toLowerCase())).slice(0, 6);
+  }, [clientes, clienteBusca]);
+
   // ── Salvar ──
   const handleSave = async () => {
     if (!form.categoria || !form.valor || !form.data) {
@@ -195,6 +242,8 @@ export default function FluxoCaixaPage() {
       data: form.data,
       recorrente: form.recorrente,
       recorrencia: form.recorrente && form.recorrencia ? form.recorrencia : null,
+      produto: form.tipo === "entrada" ? (form.produto || null) : null,
+      cliente_id: form.tipo === "entrada" ? (form.clienteId || null) : null,
     };
     const { error } = await supabase.from("fluxo_caixa").insert(payload);
     if (error) {
@@ -203,6 +252,7 @@ export default function FluxoCaixaPage() {
       toast.success("Lançamento salvo!");
       setShowForm(false);
       setForm(EMPTY_FORM);
+      setClienteBusca("");
       await fetchLancamentos();
     }
     setSaving(false);
@@ -249,7 +299,7 @@ export default function FluxoCaixaPage() {
               <div className="md:col-span-2 flex gap-3">
                 {(["entrada","saida"] as const).map(t => (
                   <button key={t} type="button"
-                    onClick={() => setForm(f => ({ ...f, tipo: t, categoria: "" }))}
+                    onClick={() => setForm(f => ({ ...f, tipo: t, categoria: "", produto: "", clienteId: "" }))}
                     className="flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all"
                     style={{
                       background: form.tipo === t ? (t === "entrada" ? "#10b981" : "#ef4444") : "var(--admin-badge-bg)",
@@ -261,6 +311,67 @@ export default function FluxoCaixaPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Produto (só entrada) */}
+              {form.tipo === "entrada" && (
+                <div>
+                  <label className="text-xs font-medium text-slate-500 block mb-1">Produto vendido</label>
+                  <select value={form.produto} onChange={e => setForm(f => ({ ...f, produto: e.target.value }))} className="input-field w-full">
+                    <option value="">Selecione o produto...</option>
+                    {PRODUTOS.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Cliente (só entrada) */}
+              {form.tipo === "entrada" && (
+                <div ref={clienteRef} className="relative">
+                  <label className="text-xs font-medium text-slate-500 block mb-1">Cliente</label>
+                  <input
+                    type="text"
+                    placeholder="Buscar cliente pelo nome..."
+                    value={clienteBusca}
+                    onChange={e => {
+                      setClienteBusca(e.target.value);
+                      setShowClienteDropdown(true);
+                      if (!e.target.value) setForm(f => ({ ...f, clienteId: "", descricao: "" }));
+                    }}
+                    onFocus={() => setShowClienteDropdown(true)}
+                    className="input-field w-full"
+                  />
+                  {showClienteDropdown && clientesFiltrados.length > 0 && (
+                    <div
+                      className="absolute z-20 top-full left-0 right-0 mt-1 rounded-xl overflow-hidden shadow-xl"
+                      style={{ background: "var(--admin-card-bg)", border: "1px solid var(--admin-col-border)" }}
+                    >
+                      {clientesFiltrados.map(c => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          className="w-full text-left px-4 py-2.5 text-sm transition-colors"
+                          style={{ color: "var(--admin-text-1)" }}
+                          onMouseEnter={e => (e.currentTarget.style.background = "var(--admin-badge-bg)")}
+                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                          onClick={() => {
+                            setForm(f => ({ ...f, clienteId: c.id, descricao: c.nome }));
+                            setClienteBusca(c.nome);
+                            setShowClienteDropdown(false);
+                          }}
+                        >
+                          {c.nome}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {form.clienteId && (
+                    <p className="text-xs mt-1" style={{ color: "#10b981" }}>
+                      ✓ Cliente selecionado — descrição preenchida automaticamente
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Categoria */}
               <div>
@@ -290,8 +401,10 @@ export default function FluxoCaixaPage() {
 
               {/* Descrição */}
               <div>
-                <label className="text-xs font-medium text-slate-500 block mb-1">Descrição</label>
-                <input type="text" placeholder="Ex: API OpenAI março" maxLength={120}
+                <label className="text-xs font-medium text-slate-500 block mb-1">
+                  Descrição {form.tipo === "entrada" && form.clienteId && <span style={{ color: "#10b981" }}>(auto)</span>}
+                </label>
+                <input type="text" placeholder={form.tipo === "entrada" ? "Preenchido pelo cliente selecionado" : "Ex: API OpenAI março"} maxLength={120}
                   value={form.descricao} onChange={e => setForm(f => ({ ...f, descricao: e.target.value }))}
                   className="input-field w-full" />
               </div>
@@ -306,7 +419,7 @@ export default function FluxoCaixaPage() {
                 </label>
                 {form.recorrente && (
                   <select value={form.recorrencia}
-                    onChange={e => setForm(f => ({ ...f, recorrencia: e.target.value as any }))}
+                    onChange={e => setForm(f => ({ ...f, recorrencia: e.target.value as "mensal" | "trimestral" | "anual" | "" }))}
                     className="input-field w-auto text-sm">
                     <option value="">Periodicidade...</option>
                     <option value="mensal">Mensal</option>
@@ -318,7 +431,7 @@ export default function FluxoCaixaPage() {
             </div>
 
             <div className="flex gap-3 mt-5">
-              <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); }} className="btn-secondary flex-1 text-sm">
+              <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setClienteBusca(""); }} className="btn-secondary flex-1 text-sm">
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving} className="btn-primary flex-1 text-sm">
@@ -389,6 +502,12 @@ export default function FluxoCaixaPage() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-800 truncate">
                           {l.categoria}
+                          {l.produto && (
+                            <span className="ml-1.5 text-xs font-medium px-1.5 py-0.5 rounded-md"
+                              style={{ background: "rgba(201,168,76,0.12)", color: "#c9a84c" }}>
+                              {l.produto}
+                            </span>
+                          )}
                           {isProj && <span className="ml-1.5 text-xs text-slate-400 font-normal">(projeção)</span>}
                           {l.recorrente && !isProj && <span className="ml-1.5 text-xs text-slate-400 font-normal">🔁 {l.recorrencia}</span>}
                         </p>
