@@ -780,38 +780,70 @@ export default function LandingPage() {
         <section style={{ padding: "96px 1.5rem" }}>
           <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: 56 }}>
-              <SectionLabel>Prova social</SectionLabel>
-              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1, marginBottom: 16 }}>
-                O que estão dizendo
+              <h2 style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: "white", fontSize: "clamp(2rem,4vw,3rem)", lineHeight: 1.1, marginBottom: 20 }}>
+                Quem já recebeu uma solução
               </h2>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 18px", borderRadius: 100, background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.18)" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fbbf24", display: "inline-block" }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: "#fbbf24" }}>Turma Zero em formação — depoimentos chegando em breve</span>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 16px", borderRadius: 8, background: "rgba(0,0,0,0.4)", border: `1px solid rgba(201,168,76,0.18)` }}>
+                <span style={{ fontFamily: MONO, color: `${GOLD}60`, fontSize: 10 }}>></span>
+                <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}>aguardando_confirmação.depoimentos — collecting...</span>
+                <span className="cursor" style={{ fontFamily: MONO, color: GOLD, fontSize: 10 }}>█</span>
               </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
               {[
-                { i: "CM", n: "Carlos M.",    e: "E-commerce",      c: "Fundador",      t: "O sistema de atendimento automatizado que construí no LEAP está respondendo 80% dos clientes sem minha intervenção." },
-                { i: "AP", n: "Ana Paula S.", e: "Clínica de Saúde", c: "Gestora",       t: "Em 10 dias já tinha o primeiro fluxo rodando. Nunca imaginei que conseguiria sem saber programar." },
-                { i: "RT", n: "Rafael T.",    e: "Agência Digital",  c: "Sócio-diretor", t: "O Método LEAP mudou como entrego resultados para meus clientes. IA deixou de ser custo e virou diferencial." },
+                {
+                  initials: "SE",
+                  nome: "Sabrina Espinós",
+                  cargo: "CEO",
+                  empresa: "IAra",
+                  placeholder: "Depoimento a caminho — solução entregue.",
+                },
+                {
+                  initials: "MR",
+                  nome: "Marina Oliveira Rodrigues",
+                  cargo: "Head de Estratégia e Marketing",
+                  empresa: "Grupo Carbo",
+                  placeholder: "Depoimento a caminho — solução entregue.",
+                },
+                {
+                  initials: "SJ",
+                  nome: "Sarah Justus",
+                  cargo: "Co-founder · Gestora de Tráfego",
+                  empresa: "Forget.co",
+                  placeholder: "Depoimento a caminho — solução entregue.",
+                },
               ].map(d => (
-                <div key={d.n} style={{ position: "relative", borderRadius: 18, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div key={d.nome} style={{ position: "relative", borderRadius: 12, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.02)", border: `1px solid rgba(201,168,76,0.12)` }}>
+                  {/* Corner brackets */}
+                  <div style={{ position: "absolute", top: 10, left: 10, width: 12, height: 12, borderTop: `1px solid ${GOLD}35`, borderLeft: `1px solid ${GOLD}35` }} />
+                  <div style={{ position: "absolute", top: 10, right: 10, width: 12, height: 12, borderTop: `1px solid ${GOLD}35`, borderRight: `1px solid ${GOLD}35` }} />
+                  <div style={{ position: "absolute", bottom: 10, left: 10, width: 12, height: 12, borderBottom: `1px solid ${GOLD}35`, borderLeft: `1px solid ${GOLD}35` }} />
+                  <div style={{ position: "absolute", bottom: 10, right: 10, width: 12, height: 12, borderBottom: `1px solid ${GOLD}35`, borderRight: `1px solid ${GOLD}35` }} />
+
+                  {/* Header identidade */}
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.85rem", flexShrink: 0, background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.22)", color: GOLD }}>{d.i}</div>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "0.82rem", flexShrink: 0, background: "rgba(201,168,76,0.10)", border: "1px solid rgba(201,168,76,0.20)", color: GOLD, fontFamily: MONO }}>
+                      {d.initials}
+                    </div>
                     <div>
-                      <p style={{ fontWeight: 700, color: "white", fontSize: "0.85rem", margin: 0 }}>{d.n}</p>
-                      <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", margin: 0 }}>{d.c} · {d.e}</p>
+                      <p style={{ fontWeight: 700, color: "white", fontSize: "0.88rem", margin: 0 }}>{d.nome}</p>
+                      <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.38)", margin: "2px 0 0", lineHeight: 1.4 }}>{d.cargo} · {d.empresa}</p>
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 2, marginBottom: 12 }}>{[1,2,3,4,5].map(i => <span key={i} style={{ color: GOLD, fontSize: "0.85rem" }}>★</span>)}</div>
-                  <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: 0 }}>"{d.t}"</p>
 
-                  {/* Overlay */}
-                  <div style={{ position: "absolute", inset: 0, borderRadius: 18, background: "rgba(15,32,68,0.85)", backdropFilter: "blur(6px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                    <span style={{ fontSize: "1.5rem" }}>✦</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 100, background: "rgba(251,191,36,0.09)", border: "1px solid rgba(251,191,36,0.22)", color: "#fbbf24" }}>Em breve</span>
-                    <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.25)", margin: 0 }}>coletando depoimentos</p>
+                  <div style={{ display: "flex", gap: 2, marginBottom: 14 }}>
+                    {[1,2,3,4,5].map(i => <span key={i} style={{ color: GOLD, fontSize: "0.8rem" }}>★</span>)}
+                  </div>
+                  <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.3)", lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>{d.placeholder}</p>
+
+                  {/* Overlay "aguardando" */}
+                  <div style={{ position: "absolute", inset: 0, borderRadius: 12, background: "rgba(5,13,26,0.82)", backdropFilter: "blur(8px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", border: `1px solid rgba(201,168,76,0.3)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontFamily: MONO, color: GOLD, fontSize: 14 }}>↻</span>
+                    </div>
+                    <p style={{ fontFamily: MONO, fontSize: 9, color: `${GOLD}70`, letterSpacing: "0.15em", textTransform: "uppercase", margin: 0 }}>aguardando</p>
+                    <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.22)", margin: 0 }}>depoimento solicitado</p>
                   </div>
                 </div>
               ))}
