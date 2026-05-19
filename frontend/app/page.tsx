@@ -244,82 +244,164 @@ export default function LandingPage() {
           {/* Horizontal scan line */}
           <div style={{ position: "absolute", top: "60%", left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${GOLD}20 30%, ${GOLD}40 50%, ${GOLD}20 70%, transparent)`, pointerEvents: "none" }} />
 
-          <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center", position: "relative", zIndex: 1 }}>
-            {/* Badge terminal CLI */}
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 16px", borderRadius: 8, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(201,168,76,0.22)", marginBottom: 36, backdropFilter: "blur(8px)" }}>
-              <span style={{ position: "relative", display: "flex", width: 7, height: 7 }}>
-                <span style={{ position: "absolute", display: "inline-flex", width: "100%", height: "100%", borderRadius: "50%", background: "#4ade80", animation: "pulse-ring 1.5s cubic-bezier(0,0,0.2,1) infinite", opacity: 0.7 }} />
-                <span style={{ position: "relative", display: "inline-flex", borderRadius: "50%", width: 7, height: 7, background: "#4ade80" }} />
-              </span>
-              <span style={{ fontFamily: MONO, color: "rgba(255,255,255,0.35)", fontSize: 11 }}>$</span>
-              <span style={{ fontFamily: MONO, color: GOLD, fontSize: 11, letterSpacing: "0.04em" }}>leap build --turma-zero --preco R$498</span>
-              <span className="cursor" style={{ fontFamily: MONO, color: GOLD, fontSize: 11 }}>█</span>
-            </div>
+          <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 72, alignItems: "center" }}>
 
-            {/* Título principal */}
-            <h1 style={{
-              fontFamily: "'General Sans',sans-serif",
-              fontSize: "clamp(2.8rem, 7vw, 5.5rem)",
-              fontWeight: 700, lineHeight: 1.02,
-              color: "white", marginBottom: 20,
-              letterSpacing: "-0.03em",
-              textShadow: "0 4px 60px rgba(0,0,0,0.4)",
-            }}>
-              Você usa IA.<br />
-              Enquanto seu concorrente<br />
-              <span style={{ color: GOLD }}>a comanda.</span>
-            </h1>
+            {/* ── Coluna esquerda — texto */}
+            <div>
+              {/* Badge terminal CLI */}
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "8px 16px", borderRadius: 8, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(201,168,76,0.22)", marginBottom: 32, backdropFilter: "blur(8px)" }}>
+                <span style={{ position: "relative", display: "flex", width: 7, height: 7 }}>
+                  <span style={{ position: "absolute", display: "inline-flex", width: "100%", height: "100%", borderRadius: "50%", background: "#4ade80", animation: "pulse-ring 1.5s cubic-bezier(0,0,0.2,1) infinite", opacity: 0.7 }} />
+                  <span style={{ position: "relative", display: "inline-flex", borderRadius: "50%", width: 7, height: 7, background: "#4ade80" }} />
+                </span>
+                <span style={{ fontFamily: MONO, color: "rgba(255,255,255,0.35)", fontSize: 11 }}>$</span>
+                <span style={{ fontFamily: MONO, color: GOLD, fontSize: 11, letterSpacing: "0.04em" }}>leap build --turma-zero --preco R$498</span>
+                <span className="cursor" style={{ fontFamily: MONO, color: GOLD, fontSize: 11 }}>█</span>
+              </div>
 
-            {/* Subtítulo */}
-            <p style={{ fontSize: "clamp(1rem, 2vw, 1.2rem)", fontWeight: 700, color: GOLD, marginBottom: 18, letterSpacing: "-0.01em", fontFamily: "'General Sans',sans-serif" }}>
-              Torne-se um Gestor de IA com o Método LEAP e saia da plateia de uma vez por todas.
-            </p>
-            <p style={{ fontSize: "clamp(0.95rem, 1.5vw, 1.1rem)", color: "rgba(255,255,255,0.5)", marginBottom: 44, maxWidth: 620, margin: "0 auto 44px", lineHeight: 1.75, fontStyle: "italic", fontFamily: "'Libre Baskerville',serif" }}>
-              O Método LEAP transforma você no profissional que o mercado está buscando: quem não só usa IA, mas lidera, automatiza e faz o negócio escalar com ela. Sem programar uma linha de código.
-            </p>
-
-            {/* CTAs */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center", marginBottom: 52 }}>
-              <Link href="/cliente" className="btn-gold" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "16px 36px", borderRadius: 16, fontWeight: 700,
-                fontSize: "1.05rem", color: NAVY, textDecoration: "none",
-                boxShadow: "0 0 48px rgba(201,168,76,0.35)",
+              <h1 style={{
+                fontFamily: "'General Sans',sans-serif",
+                fontSize: "clamp(2.6rem, 5vw, 4.8rem)",
+                fontWeight: 700, lineHeight: 1.04,
+                color: "white", marginBottom: 20,
+                letterSpacing: "-0.03em",
+                textShadow: "0 4px 60px rgba(0,0,0,0.4)",
               }}>
-                Dê o salto agora →
-              </Link>
-              <Link href="/member/login" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "16px 32px", borderRadius: 16, fontWeight: 700,
-                fontSize: "1.05rem", color: "rgba(255,255,255,0.65)",
-                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-                textDecoration: "none", transition: "all 0.2s"
-              }}>
-                Já sou membro
-              </Link>
-            </div>
+                Você usa IA.<br />
+                Enquanto seu concorrente<br />
+                <span style={{ color: GOLD }}>a comanda.</span>
+              </h1>
 
-            {/* Floating proof badges */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-              {[
-                { icon: "🏗️", text: "10+ sistemas de IA construídos" },
-                { icon: "📦", text: "5 SaaS em produção" },
-                { icon: "⚡", text: "0 linhas de código necessárias" },
-              ].map(p => (
-                <div key={p.text} style={{
+              <p style={{ fontSize: "clamp(0.95rem, 1.5vw, 1.05rem)", color: "rgba(255,255,255,0.5)", marginBottom: 36, lineHeight: 1.75, fontStyle: "italic", fontFamily: "'Libre Baskerville',serif" }}>
+                O Método LEAP transforma você no profissional que o mercado está buscando: quem não só usa IA, mas lidera, automatiza e faz o negócio escalar com ela. Sem programar uma linha de código.
+              </p>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 40 }}>
+                <Link href="/cliente" className="btn-gold" style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
-                  padding: "7px 14px", borderRadius: 100,
-                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)",
-                  fontSize: 12, color: "rgba(255,255,255,0.5)"
+                  padding: "16px 36px", borderRadius: 16, fontWeight: 700,
+                  fontSize: "1.05rem", color: NAVY, textDecoration: "none",
+                  boxShadow: "0 0 48px rgba(201,168,76,0.35)",
                 }}>
-                  <span>{p.icon}</span>{p.text}
+                  Dê o salto agora →
+                </Link>
+                <Link href="/member/login" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "16px 32px", borderRadius: 16, fontWeight: 700,
+                  fontSize: "1.05rem", color: "rgba(255,255,255,0.65)",
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                  textDecoration: "none", transition: "all 0.2s"
+                }}>
+                  Já sou membro
+                </Link>
+              </div>
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {[
+                  { icon: "🏗️", text: "10+ sistemas de IA" },
+                  { icon: "📦", text: "5 SaaS em produção" },
+                  { icon: "⚡", text: "0 linhas de código" },
+                ].map(p => (
+                  <div key={p.text} style={{
+                    display: "inline-flex", alignItems: "center", gap: 7,
+                    padding: "6px 13px", borderRadius: 100,
+                    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)",
+                    fontSize: 12, color: "rgba(255,255,255,0.5)"
+                  }}>
+                    <span>{p.icon}</span>{p.text}
+                  </div>
+                ))}
+              </div>
+
+              <p style={{ fontSize: 11, marginTop: 24, color: "rgba(255,255,255,0.18)", letterSpacing: "0.04em" }}>
+                LEAP BUILD · 22 aulas · Acesso vitalício · Garantia de 7 dias
+              </p>
+            </div>
+
+            {/* ── Coluna direita — LEAP system panel */}
+            <div style={{ borderRadius: 20, border: "1px solid rgba(201,168,76,0.18)", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(16px)", overflow: "hidden" }}>
+              {/* Panel titlebar */}
+              <div style={{ padding: "12px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 8, background: "rgba(0,0,0,0.35)" }}>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {["#ff5f57","#febc2e","#28c840"].map(c => (
+                    <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />
+                  ))}
+                </div>
+                <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.28)", marginLeft: 8 }}>leap.system — running</span>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
+                  <span style={{ fontFamily: MONO, fontSize: 9, color: "#4ade80" }}>active</span>
+                </div>
+              </div>
+
+              {/* Panel body */}
+              <div style={{ padding: "24px" }}>
+                {[
+                  { letter: "L", label: "Liderar",      desc: "estratégia antes da ferramenta",      status: "done",   color: GOLD },
+                  { letter: "E", label: "Escalar",       desc: "ecossistema de 500+ integrações",     status: "done",   color: "#60a5fa" },
+                  { letter: "A", label: "Automatizar",   desc: "agentes de IA rodando 24/7",          status: "active", color: "#34d399" },
+                  { letter: "P", label: "Performar",     desc: "dashboards e monetização real",        status: "next",   color: "#a78bfa" },
+                ].map((step, i) => (
+                  <div key={step.letter} style={{
+                    display: "flex", alignItems: "center", gap: 14,
+                    padding: "14px 16px", borderRadius: 12, marginBottom: i < 3 ? 8 : 0,
+                    background: step.status === "active" ? `${step.color}10` : "rgba(255,255,255,0.02)",
+                    border: `1px solid ${step.status === "active" ? step.color + "35" : "rgba(255,255,255,0.05)"}`,
+                    transition: "background 0.2s",
+                  }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: `${step.color}15`, border: `1px solid ${step.color}30`, flexShrink: 0 }}>
+                      <span style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, color: step.color, fontSize: "0.95rem" }}>{step.letter}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontWeight: 700, color: "white", fontSize: "0.84rem", margin: 0 }}>{step.label}</p>
+                      <p style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.32)", margin: 0, marginTop: 2 }}>{step.desc}</p>
+                    </div>
+                    <div style={{ flexShrink: 0 }}>
+                      {step.status === "done"   && <span style={{ fontFamily: MONO, fontSize: 10, color: "#4ade80" }}>✓ done</span>}
+                      {step.status === "active" && <span style={{ fontFamily: MONO, fontSize: 10, color: step.color }}>{">"} running</span>}
+                      {step.status === "next"   && <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.22)" }}>queued</span>}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Status bar */}
+                <div style={{ marginTop: 16, padding: "12px 16px", borderRadius: 10, background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.15)", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#4ade80", flexShrink: 0, boxShadow: "0 0 6px #4ade80" }} />
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.42)" }}>sistema ativo · 0 linhas de código · acesso vitalício</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── TOOLS BAND ──────────────────────────────────────────────────── */}
+        <section style={{ padding: "22px 1.5rem", borderTop: "1px solid rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(0,0,0,0.25)" }}>
+          <div style={{ maxWidth: 900, margin: "0 auto" }}>
+            <p style={{ fontFamily: MONO, fontSize: 9, color: "rgba(255,255,255,0.18)", letterSpacing: "0.2em", textTransform: "uppercase", textAlign: "center", marginBottom: 14 }}>ferramentas que você vai dominar</p>
+            <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+              {[
+                { icon: "🤖", name: "Claude" },
+                { icon: "🔄", name: "n8n" },
+                { icon: "⚙️", name: "Make" },
+                { icon: "🗄️", name: "Supabase" },
+                { icon: "▲", name: "Vercel" },
+                { icon: "🧠", name: "OpenAI" },
+                { icon: "⚡", name: "Zapier" },
+                { icon: "📋", name: "Notion" },
+              ].map((t, i, arr) => (
+                <div key={t.name} style={{ display: "flex", alignItems: "center" }}>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 7, padding: "7px 18px", color: "rgba(255,255,255,0.28)", transition: "color 0.2s", cursor: "default" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = GOLD; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.28)"; }}>
+                    <span style={{ fontSize: 13 }}>{t.icon}</span>
+                    <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 600, letterSpacing: "0.05em" }}>{t.name}</span>
+                  </div>
+                  {i < arr.length - 1 && <span style={{ color: "rgba(255,255,255,0.10)", fontSize: 12, userSelect: "none" }}>·</span>}
                 </div>
               ))}
             </div>
-
-            <p style={{ fontSize: 11, marginTop: 28, color: "rgba(255,255,255,0.2)", letterSpacing: "0.04em" }}>
-              LEAP BUILD · 22 aulas · Acesso vitalício · Garantia de 7 dias
-            </p>
           </div>
         </section>
 
@@ -327,18 +409,16 @@ export default function LandingPage() {
         <section style={{ padding: "64px 1.5rem", background: "rgba(0,0,0,0.35)", borderTop: `1px solid rgba(201,168,76,0.08)`, borderBottom: `1px solid rgba(201,168,76,0.08)` }}>
           <div data-fade="" style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
             {[
-              { n: "60%",  d: "redução em tarefas operacionais",  key: "EFFICIENCY" },
-              { n: "10",   d: "dias para o primeiro sistema",     key: "TIME_TO_LIVE" },
-              { n: "24/7", d: "operação no piloto automático",    key: "UPTIME" },
-              { n: "0",    d: "linhas de código necessárias",     key: "CODE_REQUIRED" },
+              { n: "60%",  d: "menos tarefas manuais. Clientes reais rodando automações com o Método LEAP." },
+              { n: "10",   d: "dias para o primeiro sistema. Da ideia ao deploy, sem uma linha de código." },
+              { n: "24/7", d: "operação no automático. Os sistemas do LEAP rodam enquanto você dorme." },
+              { n: "0",    d: "linhas de código. Tudo que Peterson ensina, qualquer gestor consegue replicar." },
             ].map(r => (
-              <div key={r.n} className="tech-card" style={{ textAlign: "center", padding: "24px 14px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.12)", position: "relative", overflow: "hidden" }}>
+              <div key={r.n} className="tech-card" style={{ padding: "24px 20px", borderRadius: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(201,168,76,0.12)", position: "relative", overflow: "hidden" }}>
                 <div className="scan-line" />
-                {/* Top scanline accent */}
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: `linear-gradient(90deg, transparent, ${GOLD}50, transparent)` }} />
-                <p style={{ fontFamily: MONO, fontSize: 9, color: `${GOLD}50`, letterSpacing: "0.12em", marginBottom: 10 }}>{r.key}</p>
-                <div style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "clamp(2rem,4vw,3rem)", color: GOLD, lineHeight: 1, marginBottom: 10 }}>{r.n}</div>
-                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.38)", lineHeight: 1.5 }}>{r.d}</p>
+                <div style={{ fontFamily: "'General Sans',sans-serif", fontWeight: 700, fontSize: "clamp(2rem,4vw,2.8rem)", color: GOLD, lineHeight: 1, marginBottom: 12 }}>{r.n}</div>
+                <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.50)", lineHeight: 1.6, margin: 0 }}>{r.d}</p>
               </div>
             ))}
           </div>
@@ -355,16 +435,22 @@ export default function LandingPage() {
               <span style={{ color: GOLD }}>algum destes cenários?</span>
             </h2>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
-              {DORES.map((dor, i) => (
-                <div key={i}
-                  style={{ display: "flex", gap: 16, padding: "18px 22px", borderRadius: 10, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", transition: "all 0.2s", cursor: "default", position: "relative", overflow: "hidden" }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(201,168,76,0.22)"; (e.currentTarget as HTMLElement).style.background = "rgba(201,168,76,0.04)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.02)"; }}>
-                  <span style={{ fontFamily: MONO, color: `${GOLD}60`, fontSize: 10, flexShrink: 0, marginTop: 4 }}>0{i + 1}</span>
-                  <p style={{ fontSize: "0.95rem", lineHeight: 1.7, color: "rgba(255,255,255,0.65)", margin: 0 }}>{dor}</p>
-                </div>
-              ))}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 40 }}>
+              {DORES.map((dor, i) => {
+                const cores = [GOLD, "#60a5fa", "#34d399", "#f97316"];
+                const bgAlpha = [
+                  "rgba(201,168,76,0.06)", "rgba(96,165,250,0.06)",
+                  "rgba(52,211,153,0.06)", "rgba(249,115,22,0.06)",
+                ];
+                return (
+                  <div key={i}
+                    style={{ padding: "20px 24px", borderRadius: "0 12px 12px 0", background: "rgba(255,255,255,0.025)", borderLeft: `3px solid ${cores[i]}`, transition: "background 0.2s", cursor: "default" }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = bgAlpha[i]; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.025)"; }}>
+                    <p style={{ fontSize: "1rem", lineHeight: 1.7, color: "rgba(255,255,255,0.70)", margin: 0 }}>{dor}</p>
+                  </div>
+                );
+              })}
             </div>
 
             <div style={{ padding: "24px 28px", borderRadius: 16, background: "rgba(201,168,76,0.06)", borderLeft: "4px solid " + GOLD }}>
@@ -379,8 +465,12 @@ export default function LandingPage() {
         <GoldDivider />
 
         {/* ── MÉTODO LEAP ─────────────────────────────────────────────────── */}
-        <section id="metodo" style={{ padding: "96px 1.5rem", background: "rgba(255,255,255,0.015)" }}>
-          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <section id="metodo" style={{ padding: "96px 1.5rem", position: "relative", overflow: "hidden", background: "linear-gradient(160deg, rgba(201,168,76,0.07) 0%, rgba(15,32,68,0.5) 35%, rgba(5,13,26,1) 70%)" }}>
+          {/* Grid lines overlay */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)", backgroundSize: "60px 60px", pointerEvents: "none" }} />
+          {/* Radial glow */}
+          <div style={{ position: "absolute", top: -120, left: "50%", transform: "translateX(-50%)", width: 900, height: 500, background: `radial-gradient(ellipse, ${GOLD}0d 0%, transparent 60%)`, pointerEvents: "none" }} />
+          <div data-fade="" style={{ maxWidth: 1100, margin: "0 auto", position: "relative", zIndex: 1 }}>
             <div style={{ textAlign: "center", marginBottom: 64 }}>
               <SectionLabel>A solução</SectionLabel>
               <h2 style={{ fontFamily: "'General Sans',sans-serif", fontSize: "clamp(2rem,4vw,3rem)", fontWeight: 700, color: "white", lineHeight: 1.1 }}>
