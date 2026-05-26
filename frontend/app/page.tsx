@@ -896,7 +896,7 @@ export default function LandingPage() {
               </h2>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "7px 16px", borderRadius: 8, background: "rgba(0,0,0,0.4)", border: `1px solid rgba(201,168,76,0.18)` }}>
                 <span style={{ fontFamily: MONO, color: `${GOLD}60`, fontSize: 10 }}>{">"}</span>
-                <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}>aguardando_confirmação.depoimentos — collecting...</span>
+                <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: "0.06em" }}>2/3 depoimentos — 1 a caminho</span>
                 <span className="cursor" style={{ fontFamily: MONO, color: GOLD, fontSize: 10 }}>█</span>
               </div>
             </div>
@@ -905,11 +905,11 @@ export default function LandingPage() {
               {([
                 {
                   initials: "SE",
-                  foto: null,
+                  foto: "/photos/sabrina-espinos.jpg",
                   nome: "Sabrina Espinós",
                   cargo: "CEO",
                   empresa: "IAra",
-                  depoimento: null,
+                  depoimento: "O trabalho do Peterson na IAra foi essencial para transformar uma ideia em algo real, funcional e estratégico. Ele foi responsável pela criação da plataforma, desenvolvimento do Hub de materiais, estruturação do bot de atendimento e integração das funcionalidades que tornam a experiência muito mais fluida e inteligente. O que mais impressiona é a capacidade dele de unir visão estratégica, agilidade e execução. Tudo isso sendo desenvolvido em um tempo extremamente rápido, sem perder qualidade, organização e atenção aos detalhes.",
                 },
                 {
                   initials: "MR",
