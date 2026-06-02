@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -47,6 +47,7 @@ const PRAZO_LABELS: Record<string, string> = {
 interface Pacote {
   id: string; nome: string; descricao?: string;
   itens: string[]; valor: number; prazo_dias: number; destaque: boolean;
+  suporte_mensal_ativo?: boolean; suporte_mensal_valor?: number; suporte_mensal_meses?: number;
 }
 
 interface ApresentacaoData {
@@ -78,7 +79,7 @@ function GoldBadge({ children }: { children: React.ReactNode }) {
 
 function SlideWrapper({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
   return (
-    <div className="w-full h-full flex flex-col justify-center px-8 md:px-16 lg:px-24 py-12 overflow-auto"
+    <div className="w-full h-full flex flex-col justify-center px-4 md:px-12 lg:px-24 py-10 overflow-auto"
       style={{ background: dark ? NAVY : "#f8fafc" }}>
       {children}
     </div>
@@ -99,7 +100,7 @@ function Slide1Capa({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: GOLD }}>
           Proposta Comercial
         </p>
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: "'General Sans', sans-serif" }}>
+        <h1 className="text-3xl md:text-5xl font-bold text-white mb-4" style={{ fontFamily: "'General Sans', sans-serif" }}>
           {data.cliente.nome_empresa || data.cliente.nome_contato}
         </h1>
         <p className="text-lg mb-8" style={{ color: "#d0def4" }}>
@@ -125,7 +126,7 @@ function Slide2Negocio({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: GOLD }}>
           O que entendemos
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+        <h2 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
           Sobre o seu negócio
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -163,7 +164,7 @@ function Slide3Dores({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: GOLD }}>
           Suas dores
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-8" style={{ fontFamily: "'General Sans', sans-serif" }}>
+        <h2 className="text-2xl md:text-4xl font-bold text-white mb-6 md:mb-8" style={{ fontFamily: "'General Sans', sans-serif" }}>
           O que está te impedindo de crescer
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -196,7 +197,7 @@ function Slide4Solucoes({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: GOLD }}>
           A solução
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+        <h2 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
           O que vamos construir para você
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -233,9 +234,13 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
     menos_5k: 3500, "5k_15k": 8000, "15k_50k": 25000, mais_50k: 60000,
   };
   const custoMensal = budget ? BUDGET_VALOR[budget] : null;
-  const investimento = pacoteDestaque?.valor ?? 0;
+  const implVal = pacoteDestaque?.valor ?? 0;
+  const recorrenteVal = pacoteDestaque?.suporte_mensal_ativo
+    ? (pacoteDestaque.suporte_mensal_valor ?? 398) * (pacoteDestaque.suporte_mensal_meses ?? 12)
+    : 0;
+  const investimento = implVal + recorrenteVal;
 
-  // Payback: investimento / (40% do custo mensal liberado pela IA)
+  // Payback: investimento total / (40% do custo mensal liberado pela IA)
   const paybackMeses = custoMensal && investimento
     ? Math.ceil(investimento / (custoMensal * 0.4))
     : null;
@@ -257,39 +262,46 @@ function Slide5ROI({ data }: { data: ApresentacaoData }) {
           Automatizar custa menos do que continuar pagando pelo problema
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {/* Cards: mobile = stack com seta inline, md = 3 colunas */}
+        <div className="flex flex-col md:grid md:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
           {/* Custo atual */}
-          <div className="rounded-2xl p-6" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+          <div className="rounded-2xl p-5 md:p-6" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <p className="text-xs font-medium mb-2" style={{ color: "#8ba3c7" }}>Custo atual da operação</p>
             {budgetLabel ? (
               <>
-                <p className="text-2xl font-bold text-white">{budgetLabel}</p>
+                <p className="text-xl md:text-2xl font-bold text-white">{budgetLabel}</p>
                 <p className="text-xs mt-1" style={{ color: "#8ba3c7" }}>por mês</p>
               </>
             ) : (
               <>
-                <p className="text-2xl font-bold text-white">~R$2.430/mês</p>
+                <p className="text-xl md:text-2xl font-bold text-white">~R$2.430/mês</p>
                 <p className="text-xs mt-1 leading-snug" style={{ color: "#8ba3c7" }}>
-                  equivale a 1 atendente CLT<br />com salário mínimo + encargos
+                  equivale a 1 atendente CLT com salário mínimo + encargos
                 </p>
               </>
             )}
           </div>
 
-          {/* Seta */}
-          <div className="rounded-2xl p-6 flex flex-col items-center justify-center">
-            <span className="text-4xl" style={{ color: "rgba(255,255,255,0.3)" }}>→</span>
-            <p className="text-xs mt-2" style={{ color: GOLD }}>com IA</p>
+          {/* Seta — row no mobile, coluna no md */}
+          <div className="flex flex-row md:flex-col items-center justify-center py-2 md:rounded-2xl md:p-6">
+            <span className="text-2xl md:text-4xl" style={{ color: "rgba(255,255,255,0.3)" }}>→</span>
+            <p className="text-xs ml-2 md:ml-0 md:mt-2" style={{ color: GOLD }}>com IA</p>
           </div>
 
           {/* Investimento */}
           {pacoteDestaque && (
-            <div className="rounded-2xl p-6" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)" }}>
-              <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento no projeto</p>
-              <p className="text-2xl font-bold text-white">
-                R$ {pacoteDestaque.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+            <div className="rounded-2xl p-5 md:p-6" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)" }}>
+              <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento total</p>
+              <p className="text-xl md:text-2xl font-bold text-white">
+                R$ {investimento.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
               </p>
-              <p className="text-xs mt-1" style={{ color: "#8ba3c7" }}>pagamento único</p>
+              {pacoteDestaque.suporte_mensal_ativo ? (
+                <p className="text-xs mt-1 leading-snug" style={{ color: "#8ba3c7" }}>
+                  R$ {implVal.toLocaleString("pt-BR")} impl. + R$ {(pacoteDestaque.suporte_mensal_valor ?? 398).toLocaleString("pt-BR")}/mês × {pacoteDestaque.suporte_mensal_meses ?? 12}m suporte
+                </p>
+              ) : (
+                <p className="text-xs mt-1" style={{ color: "#8ba3c7" }}>pagamento único</p>
+              )}
             </div>
           )}
         </div>
@@ -337,7 +349,7 @@ function Slide6Pacotes({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: GOLD }}>
           Investimento
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+        <h2 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
           Escolha o seu pacote
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -356,9 +368,24 @@ function Slide6Pacotes({ data }: { data: ApresentacaoData }) {
               )}
               <p className="text-base font-bold text-slate-800 mb-1">{p.nome}</p>
               {p.descricao && <p className="text-sm text-slate-500 mb-3">{p.descricao}</p>}
-              <p className="text-2xl font-bold mb-0.5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
-                R$ {p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
-              </p>
+              {p.suporte_mensal_ativo ? (
+                <div className="mb-3">
+                  <p className="text-xs text-slate-400">Implementação</p>
+                  <p className="text-lg font-bold" style={{ color: NAVY }}>
+                    R$ {p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    + R$ {(p.suporte_mensal_valor ?? 398).toLocaleString("pt-BR")}/mês × {p.suporte_mensal_meses ?? 12}m
+                  </p>
+                  <p className="text-base font-bold mt-0.5" style={{ color: GOLD }}>
+                    Total: R$ {(p.valor + (p.suporte_mensal_valor ?? 398) * (p.suporte_mensal_meses ?? 12)).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-2xl font-bold mb-0.5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+                  R$ {p.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                </p>
+              )}
               <p className="text-sm text-slate-400 mb-4">{p.prazo_dias} dias úteis</p>
               <ul className="space-y-2 flex-1">
                 {p.itens.slice(0, 5).map((item, i) => (
@@ -394,7 +421,7 @@ function Slide7ProximosPassos({ data }: { data: ApresentacaoData }) {
         <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: GOLD }}>
           Como funciona
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+        <h2 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
           Próximos passos
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -484,7 +511,7 @@ export default function ApresentacaoPage() {
           dores_b2b, budget_mensal, resultado_esperado, porte_empresa,
           diferencial, faixa_investimento, prazo_desejado
         ),
-        proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque)
+        proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque, suporte_mensal_ativo, suporte_mensal_valor, suporte_mensal_meses)
       `)
       .eq("token", token)
       .single()
@@ -517,6 +544,7 @@ export default function ApresentacaoPage() {
   const prev = useCallback(() => setSlide(s => Math.max(0, s - 1)), []);
   const next = useCallback(() => setSlide(s => Math.min(TOTAL_SLIDES - 1, s + 1)), []);
 
+  // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight" || e.key === "ArrowDown") next();
@@ -525,6 +553,19 @@ export default function ApresentacaoPage() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
+
+  // Touch swipe
+  const touchStartRef = useRef<number | null>(null);
+  const swipeHandlers = {
+    onTouchStart: (e: React.TouchEvent) => { touchStartRef.current = e.touches[0].clientX; },
+    onTouchEnd:   (e: React.TouchEvent) => {
+      if (touchStartRef.current === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartRef.current;
+      touchStartRef.current = null;
+      if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    },
+  };
+
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: NAVY }}>
@@ -554,56 +595,69 @@ export default function ApresentacaoPage() {
   ];
 
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ background: NAVY }}>
+    <div
+      className="fixed inset-0 overflow-hidden"
+      style={{ background: NAVY }}
+      {...swipeHandlers}
+    >
       {/* Slide area */}
       <div className="w-full h-full">
         {slides[slide]}
       </div>
 
       {/* Navigation */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
+      <div className="fixed bottom-6 md:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         <button
           onClick={prev}
           disabled={slide === 0}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30 text-sm"
           style={{ background: navBtnBg, color: navBtnColor, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
         >
           ←
         </button>
 
-        {/* Dots */}
-        <div className="flex items-center gap-2">
+        {/* Dots — visíveis apenas em md+; no mobile mostra contador */}
+        <div className="hidden md:flex items-center gap-2">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setSlide(i)}
               className="rounded-full transition-all"
               style={{
-                width: i === slide ? 24 : 8,
-                height: 8,
+                width: i === slide ? 20 : 7,
+                height: 7,
                 background: i === slide ? GOLD : navDotInactive,
               }}
             />
           ))}
         </div>
 
+        {/* Contador mobile */}
+        <span
+          className="md:hidden text-xs font-semibold px-3 py-1 rounded-full tabular-nums"
+          style={{ background: navCounterBg, color: navCounterColor }}
+        >
+          {slide + 1} / {TOTAL_SLIDES}
+        </span>
+
         <button
           onClick={next}
           disabled={slide === TOTAL_SLIDES - 1}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
+          className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-30 text-sm"
           style={{ background: navBtnBg, color: navBtnColor, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
         >
           →
         </button>
       </div>
 
-      {/* Slide counter */}
-      <div className="fixed top-4 right-4 text-xs z-50 px-3 py-1.5 rounded-full"
+      {/* Slide counter — desktop only (mobile já tem no nav) */}
+      <div className="hidden md:block fixed top-4 right-4 text-xs z-50 px-3 py-1.5 rounded-full"
         style={{ background: navCounterBg, color: navCounterColor }}>
         {slide + 1} / {TOTAL_SLIDES}
       </div>
 
-      {/* Close / voltar */}
+      {/* Voltar */}
       <Link
         href={`/proposta/${token}`}
         className="fixed top-4 left-4 z-50 text-xs px-3 py-1.5 rounded-full transition-all"

@@ -140,7 +140,7 @@ export default function PropostaPage() {
           <p className="text-sm font-bold tracking-widest uppercase mb-4" style={{ color: GOLD }}>
             Proposta exclusiva
           </p>
-          <h1 className="text-5xl font-bold mb-5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
+          <h1 className="text-3xl md:text-5xl font-bold mb-5" style={{ color: NAVY, fontFamily: "'General Sans', sans-serif" }}>
             Olá, {firstName}!
           </h1>
           <p className="text-xl text-slate-500 mb-10 leading-relaxed">
@@ -273,7 +273,11 @@ export default function PropostaPage() {
                   menos_5k: 3500, "5k_15k": 8000, "15k_50k": 25000, mais_50k: 60000,
                 };
                 const custoMensal = budget ? BUDGET_MENSAL_VALOR[budget] : null;
-                const investimento = pacoteDestaque?.valor ?? 0;
+                const implVal = pacoteDestaque?.valor ?? 0;
+                const recorrenteVal = pacoteDestaque?.suporte_mensal_ativo
+                  ? (pacoteDestaque.suporte_mensal_valor ?? 398) * (pacoteDestaque.suporte_mensal_meses ?? 12)
+                  : 0;
+                const investimento = implVal + recorrenteVal;
                 const paybackMeses = custoMensal && investimento
                   ? Math.ceil(investimento / (custoMensal * 0.4)) // estimativa: IA libera 40% do custo
                   : null;
@@ -290,7 +294,7 @@ export default function PropostaPage() {
                       Automatizar custa menos do que continuar pagando pelo problema
                     </p>
 
-                    <div className="grid grid-cols-3 gap-4 mb-6 items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6 items-center">
                       {/* Custo atual */}
                       <div className="rounded-xl p-5 text-center" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
                         <p className="text-xs font-medium mb-2" style={{ color: "rgba(255,255,255,0.45)" }}>
@@ -311,11 +315,15 @@ export default function PropostaPage() {
                       {/* Investimento */}
                       {pacoteDestaque && (
                         <div className="rounded-xl p-5 text-center" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)" }}>
-                          <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento no projeto</p>
+                          <p className="text-xs font-medium mb-2" style={{ color: GOLD }}>Investimento total</p>
                           <p className="text-xl font-bold text-white leading-tight">
-                            R$ {pacoteDestaque.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                            R$ {investimento.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
                           </p>
-                          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>pagamento único</p>
+                          <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+                            {pacoteDestaque.suporte_mensal_ativo
+                              ? `impl. + ${pacoteDestaque.suporte_mensal_meses ?? 12}m suporte`
+                              : "pagamento único"}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -370,7 +378,7 @@ export default function PropostaPage() {
             Escolha o plano ideal para você
           </h2>
 
-          <div className="grid md:grid-cols-3 gap-6 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 items-start">
             {proposta.pacotes.map((pacote) => (
               <PacoteCard
                 key={pacote.id}
@@ -518,14 +526,49 @@ function PacoteCard({ pacote, selected, onSelect }: {
         )}
 
         {/* Preço */}
-        <p className="text-3xl font-bold mb-1"
-          style={{ color: selected ? GOLD : NAVY, fontFamily: "'General Sans', sans-serif" }}>
-          R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-        </p>
-        <p className="text-sm mb-6"
-          style={{ color: selected ? "rgba(255,255,255,0.45)" : "#94a3b8" }}>
-          Prazo: {pacote.prazo_dias} dias úteis
-        </p>
+        {pacote.suporte_mensal_ativo ? (
+          <div className="mb-6">
+            <div className="rounded-xl p-4 mb-0" style={{ background: selected ? "rgba(255,255,255,0.06)" : "rgba(15,32,68,0.04)", border: `1px solid ${selected ? "rgba(255,255,255,0.10)" : "rgba(15,32,68,0.08)"}` }}>
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-xs" style={{ color: selected ? "rgba(255,255,255,0.5)" : "#94a3b8" }}>Implementação</span>
+                <span className="text-base font-bold" style={{ color: selected ? "white" : NAVY }}>
+                  R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                </span>
+              </div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs" style={{ color: selected ? "rgba(255,255,255,0.5)" : "#94a3b8" }}>
+                  Suporte {pacote.suporte_mensal_valor}/mês × {pacote.suporte_mensal_meses}m
+                </span>
+                <span className="text-base font-bold" style={{ color: selected ? "white" : NAVY }}>
+                  R$ {((pacote.suporte_mensal_valor ?? 398) * (pacote.suporte_mensal_meses ?? 12)).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                </span>
+              </div>
+              <div className="h-px mb-2" style={{ background: selected ? "rgba(255,255,255,0.12)" : "#e2e8f0" }} />
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-semibold" style={{ color: selected ? GOLD : NAVY }}>
+                  Total {pacote.suporte_mensal_meses ?? 12} meses
+                </span>
+                <span className="text-2xl font-bold" style={{ color: selected ? GOLD : NAVY, fontFamily: "'General Sans', sans-serif" }}>
+                  R$ {(pacote.valor + (pacote.suporte_mensal_valor ?? 398) * (pacote.suporte_mensal_meses ?? 12)).toLocaleString("pt-BR", { minimumFractionDigits: 0 })}
+                </span>
+              </div>
+            </div>
+            <p className="text-xs mt-2" style={{ color: selected ? "rgba(255,255,255,0.40)" : "#94a3b8" }}>
+              Prazo de entrega: {pacote.prazo_dias} dias úteis
+            </p>
+          </div>
+        ) : (
+          <>
+            <p className="text-3xl font-bold mb-1"
+              style={{ color: selected ? GOLD : NAVY, fontFamily: "'General Sans', sans-serif" }}>
+              R$ {pacote.valor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-sm mb-6"
+              style={{ color: selected ? "rgba(255,255,255,0.45)" : "#94a3b8" }}>
+              Prazo: {pacote.prazo_dias} dias úteis
+            </p>
+          </>
+        )}
 
         {/* Divisor */}
         <div className="h-px mb-6"
@@ -593,7 +636,8 @@ function ComparisonTable({ pacotes, selected, onSelect }: {
         </h2>
 
         <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid #e2e8f0", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}>
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px]">
             <thead>
               <tr style={{ background: NAVY }}>
                 <th className="text-left px-6 py-5 text-sm font-semibold w-2/5" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -660,6 +704,7 @@ function ComparisonTable({ pacotes, selected, onSelect }: {
               </tr>
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </section>
