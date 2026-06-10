@@ -14,6 +14,9 @@ interface Pacote {
   valor: string;
   prazo_dias: string;
   destaque: boolean;
+  suporte_mensal_ativo: boolean;
+  suporte_mensal_valor: string;
+  suporte_mensal_meses: string;
 }
 
 // ─── Mapas e lógica de geração ────────────────────────────────────────────────
@@ -76,6 +79,7 @@ function gerarPacotes(c: any): Pacote[] {
       valor: String(precos[0]),
       prazo_dias: String(prazos[0]),
       destaque: false,
+      suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12",
     },
     {
       nome: "Profissional",
@@ -89,6 +93,7 @@ function gerarPacotes(c: any): Pacote[] {
       valor: String(precos[1]),
       prazo_dias: String(prazos[1]),
       destaque: true,
+      suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12",
     },
     {
       nome: "Premium",
@@ -104,14 +109,15 @@ function gerarPacotes(c: any): Pacote[] {
       valor: String(precos[2]),
       prazo_dias: String(prazos[2]),
       destaque: false,
+      suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12",
     },
   ];
 }
 
 const defaultPacotes = (): Pacote[] => [
-  { nome: "Essencial", descricao: "", itens: "", valor: "", prazo_dias: "", destaque: false },
-  { nome: "Profissional", descricao: "", itens: "", valor: "", prazo_dias: "", destaque: true },
-  { nome: "Premium", descricao: "", itens: "", valor: "", prazo_dias: "", destaque: false },
+  { nome: "Essencial",    descricao: "", itens: "", valor: "", prazo_dias: "", destaque: false, suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12" },
+  { nome: "Profissional", descricao: "", itens: "", valor: "", prazo_dias: "", destaque: true,  suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12" },
+  { nome: "Premium",      descricao: "", itens: "", valor: "", prazo_dias: "", destaque: false, suporte_mensal_ativo: false, suporte_mensal_valor: "398", suporte_mensal_meses: "12" },
 ];
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -132,6 +138,11 @@ export default function PropostaBuilderPage() {
   // Exibição pós-save
   const [savedToken, setSavedToken] = useState<string | null>(null);
 
+  // Estrutura aprovada (para sincronização)
+  const [estruturaAprovada, setEstruturaAprovada] = useState(false);
+  const [estruturaItens, setEstruturaItens] = useState<string[]>([]);
+  const [escopoSincronizado, setEscopoSincronizado] = useState(false);
+
   useEffect(() => {
     if (!localStorage.getItem("admin_session")) { router.push("/admin/login"); return; }
 
@@ -151,6 +162,16 @@ export default function PropostaBuilderPage() {
 
       if (!clienteData) return;
       setCliente(clienteData);
+
+      // Carregar estrutura aprovada para sincronização
+      if (clienteData.estrutura_aprovada && Array.isArray(clienteData.estrutura_sistema)) {
+        setEstruturaAprovada(true);
+        setEstruturaItens(
+          clienteData.estrutura_sistema
+            .filter((i: any) => i.incluir)
+            .map((i: any) => i.label as string)
+        );
+      }
 
       // 2) Query 1: verificar se já existe proposta para este cliente (sem join)
       const { data: propostaExistente } = await supabase
@@ -185,6 +206,9 @@ export default function PropostaBuilderPage() {
               valor: String(p.valor ?? ""),
               prazo_dias: String(p.prazo_dias ?? ""),
               destaque: !!p.destaque,
+              suporte_mensal_ativo: !!p.suporte_mensal_ativo,
+              suporte_mensal_valor: String(p.suporte_mensal_valor ?? "398"),
+              suporte_mensal_meses: String(p.suporte_mensal_meses ?? "12"),
             }))
           );
         }
@@ -199,6 +223,29 @@ export default function PropostaBuilderPage() {
 
   const updatePacote = (i: number, field: keyof Pacote, value: string | boolean) => {
     setPacotes(prev => prev.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
+  };
+
+  const sincronizarComEstrutura = () => {
+    if (estruturaItens.length === 0) return;
+    const corte = Math.ceil(estruturaItens.length * 0.45);
+    const essencialItens = estruturaItens.slice(0, corte);
+    const profissionalItens = estruturaItens;
+    const premiumItens = [
+      ...estruturaItens,
+      "Customizações extras",
+      "Suporte por 60 dias",
+      "Reuniões mensais de acompanhamento",
+    ];
+    setPacotes(prev => prev.map((p, i) => ({
+      ...p,
+      itens: i === 0
+        ? essencialItens.join("\n")
+        : i === 1
+          ? profissionalItens.join("\n")
+          : premiumItens.join("\n"),
+    })));
+    setEscopoSincronizado(true);
+    toast.success(`${estruturaItens.length} itens importados da estrutura. Ajuste os valores e salve.`);
   };
 
   const handleSave = async () => {
@@ -217,6 +264,9 @@ export default function PropostaBuilderPage() {
         valor: parseFloat(p.valor.replace(",", ".")),
         prazo_dias: parseInt(p.prazo_dias),
         destaque: p.destaque,
+        suporte_mensal_ativo: p.suporte_mensal_ativo,
+        suporte_mensal_valor: parseFloat(p.suporte_mensal_valor.replace(",", ".") || "398"),
+        suporte_mensal_meses: parseInt(p.suporte_mensal_meses || "12"),
       }));
 
       if (isEditing && existingPropostaId) {
@@ -345,6 +395,44 @@ export default function PropostaBuilderPage() {
           </div>
         )}
 
+        {/* Banner de sincronização com estrutura aprovada */}
+        {estruturaAprovada && (
+          <div
+            className="rounded-xl p-4 mb-5 flex items-start gap-3"
+            style={{
+              background: escopoSincronizado ? "rgba(52,211,153,0.08)" : "rgba(245,158,11,0.10)",
+              border: escopoSincronizado ? "1px solid rgba(52,211,153,0.28)" : "1px solid rgba(245,158,11,0.32)",
+            }}
+          >
+            <span className="text-lg mt-0.5 flex-shrink-0">{escopoSincronizado ? "✓" : "⚡"}</span>
+            <div className="flex-1 min-w-0">
+              {escopoSincronizado ? (
+                <p className="text-sm font-semibold" style={{ color: "#10b981" }}>
+                  Escopo sincronizado — {estruturaItens.length} itens importados da estrutura aprovada.
+                </p>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold" style={{ color: "#d97706" }}>
+                    Estrutura aprovada com {estruturaItens.length} itens definidos
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "#92400e" }}>
+                    Os pacotes ainda usam itens genéricos. Importe o escopo real com um clique.
+                  </p>
+                </>
+              )}
+            </div>
+            {!escopoSincronizado && (
+              <button
+                onClick={sincronizarComEstrutura}
+                className="btn-primary text-xs py-2 px-4 flex-shrink-0"
+                style={{ background: "#d97706", borderColor: "#d97706" }}
+              >
+                Atualizar escopo →
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="card p-5 mb-5">
           <label className="block text-sm font-medium text-slate-700 mb-1.5">
             Validade da proposta
@@ -391,9 +479,93 @@ export default function PropostaBuilderPage() {
                   <label className="block text-xs font-medium text-slate-600 mb-1">
                     O que está incluso (1 item por linha)
                   </label>
+                  {/* Checkboxes do PRD aprovado */}
+                  {estruturaAprovada && estruturaItens.length > 0 && (
+                    <div className="mb-2 rounded-lg border border-gold-200 bg-gold-50/40 p-3">
+                      <p className="text-xs font-semibold text-gold-700 mb-2">
+                        Selecionar itens da estrutura aprovada:
+                      </p>
+                      <div className="grid grid-cols-1 gap-1 max-h-36 overflow-y-auto pr-1">
+                        {estruturaItens.map((item) => {
+                          const jaIncluso = p.itens.split("\n").map(s => s.trim()).includes(item);
+                          return (
+                            <label key={item} className="flex items-center gap-2 cursor-pointer text-xs text-slate-700 hover:text-slate-900 py-0.5">
+                              <input
+                                type="checkbox"
+                                checked={jaIncluso}
+                                onChange={() => {
+                                  const linhas = p.itens.split("\n").map(s => s.trim()).filter(Boolean);
+                                  const novas = jaIncluso
+                                    ? linhas.filter(l => l !== item)
+                                    : [...linhas, item];
+                                  updatePacote(i, "itens", novas.join("\n"));
+                                }}
+                                className="w-3.5 h-3.5 flex-shrink-0"
+                                style={{ accentColor: "#c9a84c" }}
+                              />
+                              <span style={{ textDecoration: jaIncluso ? "none" : "none", opacity: jaIncluso ? 1 : 0.65 }}>
+                                {item}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                   <textarea className="input-field h-28 resize-none pt-2 text-xs"
                     value={p.itens}
                     onChange={e => updatePacote(i, "itens", e.target.value)} />
+                </div>
+
+                {/* Suporte mensal */}
+                <div className="col-span-2">
+                  <label className="flex items-center gap-2.5 cursor-pointer mb-2">
+                    <input
+                      type="checkbox"
+                      checked={p.suporte_mensal_ativo}
+                      onChange={e => updatePacote(i, "suporte_mensal_ativo", e.target.checked)}
+                      className="w-4 h-4"
+                      style={{ accentColor: "#c9a84c" }}
+                    />
+                    <span className="text-sm font-medium text-slate-700">Incluir Suporte Mensal contínuo</span>
+                  </label>
+                  {p.suporte_mensal_ativo && (
+                    <div className="rounded-xl p-3 border border-gold-200 bg-gold-50/50 space-y-2">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1">Valor/mês (R$)</label>
+                          <input
+                            className="input-field text-sm"
+                            value={p.suporte_mensal_valor}
+                            onChange={e => updatePacote(i, "suporte_mensal_valor", e.target.value)}
+                            placeholder="398"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1">Duração (meses)</label>
+                          <input
+                            className="input-field text-sm"
+                            value={p.suporte_mensal_meses}
+                            onChange={e => updatePacote(i, "suporte_mensal_meses", e.target.value)}
+                            placeholder="12"
+                          />
+                        </div>
+                      </div>
+                      {(() => {
+                        const impl = parseFloat(p.valor.replace(",", ".") || "0");
+                        const mensal = parseFloat(p.suporte_mensal_valor.replace(",", ".") || "0");
+                        const meses = parseInt(p.suporte_mensal_meses || "0");
+                        const recorrencia = mensal * meses;
+                        const total = impl + recorrencia;
+                        return (
+                          <div className="flex justify-between text-xs pt-1 border-t border-gold-200">
+                            <span className="text-slate-500">Recorrência total: <strong className="text-slate-700">R$ {recorrencia.toLocaleString("pt-BR")}</strong></span>
+                            <span className="text-gold-700 font-semibold">Total {meses}m: R$ {total.toLocaleString("pt-BR")}</span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

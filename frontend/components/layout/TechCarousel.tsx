@@ -27,7 +27,7 @@ export const TECH_STACK: TechItem[] = [
 export const SOCIAL_LINKS = [
   { label: "Instagram", href: "https://instagram.com/iacompeterson",      logoUrl: "https://cdn.simpleicons.org/instagram/ffffff" },
   { label: "LinkedIn",  href: "https://linkedin.com/in/petersonoliveirawind", logoUrl: "/logos/linkedin.svg" },
-  { label: "WhatsApp",  href: "https://wa.me/5584998955575",               logoUrl: "https://cdn.simpleicons.org/whatsapp/ffffff" },
+  { label: "WhatsApp",  href: "https://wa.me/5584999867636",               logoUrl: "https://cdn.simpleicons.org/whatsapp/ffffff" },
   { label: "YouTube",   href: "https://youtube.com/@iacompeterson",        logoUrl: "https://cdn.simpleicons.org/youtube/ffffff" },
 ];
 

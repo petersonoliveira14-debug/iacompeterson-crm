@@ -54,6 +54,9 @@ export interface PacoteProposta {
   valor: number;
   prazo_dias: number;
   destaque: boolean;
+  suporte_mensal_ativo?: boolean;
+  suporte_mensal_valor?: number;
+  suporte_mensal_meses?: number;
 }
 
 export async function submitForm(data: FormData): Promise<{ id: string }> {
@@ -72,7 +75,7 @@ export async function getProposta(token: string): Promise<Proposta> {
     .select(`
       id, token, status, validade_ate,
       clientes (nome_contato, nome_empresa, dores_b2b, tipos_solucao, tipo_solucao, budget_mensal),
-      proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque)
+      proposta_pacotes (id, nome, descricao, itens, valor, prazo_dias, destaque, suporte_mensal_ativo, suporte_mensal_valor, suporte_mensal_meses)
     `)
     .eq("token", token)
     .single();

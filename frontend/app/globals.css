@@ -105,6 +105,24 @@ h3 { letter-spacing: -0.015em; }
   animation-play-state: paused;
 }
 
+/* ─── Portfolio carousel ────────────────────────────────────────────────────── */
+@keyframes scroll-pf {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-scroll-pf {
+  animation: scroll-pf 40s linear infinite;
+}
+.animate-scroll-pf.paused {
+  animation-play-state: paused;
+}
+
+/* pf-panel always visible (no hover slide) */
+.pf-card .pf-panel {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
 /* ─── CSS Variables para o tema admin (light por padrão) ───────────────────── */
 
 :root {

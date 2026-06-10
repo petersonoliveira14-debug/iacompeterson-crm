@@ -61,6 +61,80 @@ const TIPO_LABELS: Record<string, string> = {
   plataforma: "Plataforma de usuários (portal, área de membros...)",
 };
 
+// ─── Banco de sugestões por tipo de solução ──────────────────────────────────
+
+const SUGESTOES_POR_TIPO: Record<string, string[]> = {
+  sistema: [
+    "Importação e exportação de dados em CSV/Excel",
+    "Histórico de alterações com auditoria",
+    "Notificações automáticas por e-mail",
+    "API de integração com sistemas externos",
+    "Gestão de múltiplos perfis e permissões",
+    "Dashboard com gráficos em tempo real",
+    "Backup automático de dados",
+    "Sistema de tags e categorização",
+    "Filtros avançados e busca por campo",
+    "Paginação e ordenação de registros",
+    "Modo offline com sincronização posterior",
+    "Log de atividades por usuário",
+  ],
+  plataforma: [
+    "Onboarding guiado para novos usuários",
+    "Controle de assinatura e pagamentos recorrentes",
+    "Notificações push e e-mail marketing integrado",
+    "Painel de analytics por usuário",
+    "API pública para integradores",
+    "Suporte a múltiplos idiomas",
+    "Sistema de gamificação e recompensas",
+    "Módulo de afiliados e indicações",
+  ],
+  atendimento: [
+    "Triagem automática por intenção da mensagem",
+    "Pesquisa de satisfação pós-atendimento (NPS)",
+    "Relatório de volume e tempo médio de resposta",
+    "Respostas rápidas com templates personalizados",
+    "Integração com Instagram Direct",
+    "Horário de atendimento configurável",
+    "Encaminhamento por departamento ou especialidade",
+    "Histórico completo de conversas por contato",
+    "Detecção de urgência e escalonamento automático",
+    "Campanha de reativação para leads frios",
+  ],
+  assistente: [
+    "Atualização dinâmica da base de conhecimento",
+    "Múltiplos assistentes por contexto ou área",
+    "Feedback loop para melhoria contínua das respostas",
+    "Integração com documentos internos (PDF, Notion, Drive)",
+    "Respostas com citação de fonte",
+    "Modo de moderação para revisar respostas antes de enviar",
+    "Histórico de conversas por usuário",
+    "Fallback para atendente humano quando necessário",
+  ],
+  site_lp: [
+    "Integração com Meta Ads e Google Analytics",
+    "Página de obrigado com upsell",
+    "A/B testing de headlines",
+    "Chat ao vivo ou widget de WhatsApp",
+    "Blog ou seção de conteúdo para SEO",
+    "Certificado SSL e performance otimizada (Core Web Vitals)",
+    "Pixels de rastreamento de conversão",
+    "Integração com RD Station ou ActiveCampaign",
+  ],
+  universal: [
+    "Documentação técnica do sistema",
+    "Manual do usuário em PDF",
+    "Vídeos tutoriais para a equipe",
+    "Checklist de go-live e homologação",
+    "Monitoramento de uptime e alertas",
+    "Política de privacidade e termos de uso",
+    "Integração com Google Workspace",
+    "Integração com ferramentas de gestão de projetos",
+    "Ambiente de homologação (staging) separado do produção",
+    "Responsividade mobile completa",
+    "Testes automatizados de regressão",
+  ],
+};
+
 // ─── Interface e gerador de estrutura ────────────────────────────────────────
 
 interface EstruturaItem {
@@ -386,6 +460,10 @@ export default function PRDPage() {
   const [novoItem, setNovoItem] = useState("");
   const [salvandoEstrutura, setSalvandoEstrutura] = useState(false);
 
+  // Sugestões de funcionalidades
+  const [sugestoes, setSugestoes] = useState<string[]>([]);
+  const [showSugestoes, setShowSugestoes] = useState(false);
+
   // Etapa 3 — PRD
   const [conteudo, setConteudo] = useState("");
   const [versao, setVersao] = useState(1);
@@ -454,11 +532,35 @@ export default function PRDPage() {
     setEstrutura((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-  const adicionarItem = () => {
-    const label = novoItem.trim();
+  const adicionarItem = (labelParam?: string) => {
+    const label = (labelParam ?? novoItem).trim();
     if (!label) return;
     setEstrutura((prev) => [...prev, { id: uid(), label, incluir: true }]);
-    setNovoItem("");
+    if (!labelParam) setNovoItem("");
+  };
+
+  const gerarSugestoes = () => {
+    const tipos: string[] = cliente?.tipos_solucao ||
+      (cliente?.tipo_solucao ? cliente.tipo_solucao.split(", ") : []);
+    const labelsExistentes = new Set(estrutura.map((i) => i.label.toLowerCase()));
+
+    const pool: string[] = [
+      ...SUGESTOES_POR_TIPO.universal,
+      ...tipos.flatMap((t) => SUGESTOES_POR_TIPO[t] || []),
+    ];
+
+    // Embaralha levemente: divide em fatias e rotaciona para mostrar variedade
+    const novas = pool
+      .filter((s) => !labelsExistentes.has(s.toLowerCase()))
+      .slice(0, 6);
+
+    setSugestoes(novas);
+    setShowSugestoes(true);
+  };
+
+  const adicionarSugestao = (label: string) => {
+    adicionarItem(label);
+    setSugestoes((prev) => prev.filter((s) => s !== label));
   };
 
   const salvarEstrutura = async () => {
@@ -686,14 +788,66 @@ export default function PRDPage() {
                   className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1 placeholder:text-slate-400"
                 />
                 <button
-                  onClick={adicionarItem}
+                  onClick={() => adicionarItem()}
                   disabled={!novoItem.trim()}
                   className="btn-primary text-sm py-2 px-4 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Adicionar item"
                 >
                   +
                 </button>
+                <button
+                  onClick={gerarSugestoes}
+                  className="text-sm py-2 px-3 rounded-lg border border-slate-200 text-slate-600 hover:border-gold-400 hover:text-gold-600 hover:bg-gold-50 transition-colors"
+                  title="Sugerir funcionalidades com base no perfil do cliente"
+                >
+                  ✦ Sugerir
+                </button>
               </div>
+
+              {/* Painel de sugestões */}
+              {showSugestoes && sugestoes.length > 0 && (
+                <div
+                  className="mt-3 rounded-xl p-4"
+                  style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.20)" }}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                      Sugestões para este projeto
+                    </p>
+                    <button
+                      onClick={gerarSugestoes}
+                      className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                      title="Mostrar mais sugestões"
+                    >
+                      Atualizar ↻
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {sugestoes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => adicionarSugestao(s)}
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all hover:scale-[1.02]"
+                        style={{
+                          background: "rgba(201,168,76,0.10)",
+                          borderColor: "rgba(201,168,76,0.30)",
+                          color: "#92700a",
+                        }}
+                        title={`Adicionar: ${s}`}
+                      >
+                        <span style={{ color: "#c9a84c", fontWeight: 700 }}>+</span>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {showSugestoes && sugestoes.length === 0 && (
+                <p className="text-xs text-slate-400 mt-3 text-center">
+                  Todas as sugestões disponíveis já foram adicionadas. ✓
+                </p>
+              )}
             </div>
 
             {/* Botão avançar */}
