@@ -1113,7 +1113,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
               {([
                 {
                   initials: "SE",
@@ -1138,14 +1138,6 @@ export default function LandingPage() {
                   cargo: "Estrategista de Expansão de Negócios · Founder",
                   empresa: "MOR & Co",
                   depoimento: "Estar em projetos com o Peterson é ter por perto alguém que faz a régua subir. Ele entende o problema, organiza rapidamente caminhos possíveis e usa tecnologia, especialmente IA, estrategicamente. Ele orquestra muito bem a visão de negócio, leitura de pessoas, pensamento estruturado e capacidade real de transformar ideia em produtos e melhoria concreta. É o tipo de pessoa que amplia a qualidade das decisões.",
-                },
-                {
-                  initials: "MR",
-                  foto: null,
-                  nome: "Marina Oliveira Rodrigues",
-                  cargo: "Head de Estratégia e Marketing",
-                  empresa: "Grupo Carbo",
-                  depoimento: null,
                 },
               ] as Array<{ initials: string; foto: string | null; nome: string; cargo: string; empresa: string; depoimento: string | null }>).map(d => (
                 <div key={d.nome} style={{ position: "relative", borderRadius: 12, padding: "24px", overflow: "hidden", background: "rgba(255,255,255,0.02)", border: `1px solid ${d.depoimento ? "rgba(201,168,76,0.25)" : "rgba(201,168,76,0.12)"}` }}>
