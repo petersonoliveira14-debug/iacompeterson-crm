@@ -23,14 +23,21 @@ const DORES_ANTES: Record<string, string> = {
   escala_sem_contratar: "Impossível crescer sem contratar mais gente",
   sem_metricas: "Decisões tomadas no achômetro, sem dados",
   vendas_desorganizadas: "Processo de vendas bagunçado e imprevisível",
+  dependencia_indicacoes: "Crescimento 100% dependente de indicações, sem previsibilidade",
+  sem_canal_digital: "Sem canal digital ativo gerando novos clientes",
 };
 
 const SOLUCOES_DEPOIS: Record<string, string> = {
   sistema: "Sistema personalizado gerenciando tudo automaticamente",
   atendimento: "Bot de IA atendendo e qualificando 24/7 no WhatsApp",
+  atendimento_automatizado: "Atendimento e qualificação automatizados convertendo leads 24/7",
   assistente: "Assistente de IA treinado no seu negócio",
+  assistente_ia: "Assistente com IA treinado no contexto do seu negócio",
   site_lp: "Presença digital que converte visitante em cliente",
   plataforma: "Plataforma completa com área de membros e gestão",
+  funil_captacao: "Funil de captação no Instagram gerando leads qualificados automaticamente",
+  calculadora: "Calculadora inteligente convertendo seguidores em leads qualificados",
+  crm_leads: "CRM personalizado controlando leads, vagas e fechamentos",
 };
 
 const BUDGET_LABELS: Record<string, string> = {
