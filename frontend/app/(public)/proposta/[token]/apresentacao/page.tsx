@@ -9,11 +9,16 @@ import { CarouselTrack, SocialLinks } from "@/components/layout/TechCarousel";
 // ─── Mapas de rótulos ─────────────────────────────────────────────────────────
 
 const TIPO_LABELS: Record<string, { label: string; emoji: string; desc: string }> = {
-  sistema:     { emoji: "⚙️", label: "Sistema interno",            desc: "CRM, ERP, estoque, dashboard, pipeline comercial" },
-  atendimento: { emoji: "🤖", label: "Atendimento automatizado",   desc: "Bot no WhatsApp, Instagram DM, chat no site 24/7" },
-  assistente:  { emoji: "🧠", label: "Assistente com IA",          desc: "IA personalizada para uso interno ou com clientes" },
-  site_lp:     { emoji: "🌐", label: "Site / Landing Page",        desc: "Site institucional, LP de campanha, página de vendas" },
-  plataforma:  { emoji: "👥", label: "Plataforma de usuários",     desc: "Portal, área de membros, app web personalizado" },
+  sistema:              { emoji: "⚙️", label: "Sistema interno",                  desc: "CRM, ERP, estoque, dashboard, pipeline comercial" },
+  atendimento:          { emoji: "🤖", label: "Atendimento automatizado",         desc: "Bot no WhatsApp, Instagram DM, chat no site 24/7" },
+  atendimento_automatizado: { emoji: "🤖", label: "Atendimento automatizado",     desc: "Qualificação e conversão de leads automatizadas 24/7" },
+  assistente:           { emoji: "🧠", label: "Assistente com IA",                desc: "IA personalizada para uso interno ou com clientes" },
+  assistente_ia:        { emoji: "🧠", label: "Assistente com IA",                desc: "IA treinada no contexto do seu negócio" },
+  site_lp:              { emoji: "🌐", label: "Site / Landing Page",              desc: "Site institucional, LP de campanha, página de vendas" },
+  plataforma:           { emoji: "👥", label: "Plataforma de usuários",           desc: "Portal, área de membros, app web personalizado" },
+  funil_captacao:       { emoji: "🎯", label: "Funil de Captação no Instagram",   desc: "Calculadora gratuita + página de venda low-ticket gerando leads qualificados 24/7" },
+  crm_leads:            { emoji: "📊", label: "CRM + Controle de Vagas",          desc: "Gestão de leads qualificados com controle automático de agenda e dashboard de métricas" },
+  calculadora:          { emoji: "🧮", label: "Calculadora de Diagnóstico",       desc: "Ferramenta interativa que converte seguidores em leads qualificados" },
 };
 
 const DORES_LABELS: Record<string, string> = {
